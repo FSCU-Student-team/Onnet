@@ -17,4 +17,6 @@ public interface Page {
     boolean isVisible();
 
     void setVisible(boolean b);
+
+    void redraw();
 }
