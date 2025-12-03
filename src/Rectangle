@@ -1,0 +1,144 @@
+package Shapes;
+import Pages.Page;
+import com.jogamp.opengl.GL2;
+import java.awt.event.ActionEvent;
+
+public class Rectangle implements Page {
+
+    private final double width;
+    private final double height;
+    private final Color color;
+    private final boolean fill;
+    private final double rotation; // degrees
+    private final Point origin;    // bottom-left
+
+    private boolean visible;
+
+    // Private constructor
+    private Rectangle(Builder b) {
+        this.width = b.width;
+        this.height = b.height;
+        this.color = b.color;
+        this.fill = b.fill;
+        this.rotation = b.rotation;
+        this.origin = b.origin;
+        this.visible = true;
+    }
+
+    // ----------------- Page methods -----------------
+    @Override
+    public void init() {
+
+    }
+
+    @Override
+    public void setupFrame() {
+
+    }
+
+    @Override
+    public void setupAnimator() {
+
+    }
+
+    @Override
+    public void addComponents() {
+
+    }
+
+    @Override
+    public void addListeners() {
+
+    }
+
+    @Override
+    public void handleEvents(ActionEvent e) {
+
+    }
+
+    @Override
+    public void dispose() {
+
+    }
+
+    @Override
+    public boolean isVisible() {
+        return visible;
+    }
+
+    @Override
+    public void setVisible(boolean b) {
+        visible = b;
+    }
+
+    // ----------------- Rectangle specific -----------------
+    public void draw(GL2 gl) {
+        if (!visible) return;
+
+        color.useColorGl(gl);
+
+        gl.glPushMatrix();
+
+        // Translate to origin
+        gl.glTranslated(origin.x(), origin.y(), 0);
+
+        gl.glRotated(rotation, 0, 0, 1); // rotate around Z axis
+
+        if (fill) {
+            gl.glBegin(GL2.GL_QUADS);
+        } else {
+            gl.glBegin(GL2.GL_LINE_LOOP);
+        }
+
+        gl.glVertex2d(0, 0);
+        gl.glVertex2d(width, 0);
+        gl.glVertex2d(width, height);
+        gl.glVertex2d(0, height);
+
+        gl.glEnd();
+        gl.glPopMatrix();
+    }
+
+    public static class Builder {
+        private double width = 1;
+        private double height = 1;
+        private Color color = Color.BLACK;
+        private boolean fill = false;
+        private double rotation = 0;
+        private Point origin = new Point(0, 0);
+
+        public Builder width(double width) {
+            this.width = width;
+            return this;
+        }
+
+        public Builder height(double height) {
+            this.height = height;
+            return this;
+        }
+
+        public Builder color(Color color) {
+            this.color = color;
+            return this;
+        }
+
+        public Builder fill(boolean fill) {
+            this.fill = fill;
+            return this;
+        }
+
+        public Builder rotation(double rotation) {
+            this.rotation = rotation;
+            return this;
+        }
+
+        public Builder origin(Point origin) {
+            this.origin = origin;
+            return this;
+        }
+
+        public Rectangle build() {
+            return new Rectangle(this);
+        }
+    }
+}
