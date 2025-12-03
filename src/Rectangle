@@ -1,18 +1,15 @@
 package Shapes;
-import Pages.Page;
+
 import com.jogamp.opengl.GL2;
-import java.awt.event.ActionEvent;
 
-public class Rectangle implements Page {
+public class Rectangle implements Shape {
 
-    private final double width;
-    private final double height;
-    private final Color color;
-    private final boolean fill;
-    private final double rotation; // degrees
-    private final Point origin;    // bottom-left
-
-    private boolean visible;
+    private double width;
+    private double height;
+    private Color color;
+    private boolean fill;
+    private double rotation; // degrees
+    private Point origin;    // bottom-left
 
     // Private constructor
     private Rectangle(Builder b) {
@@ -22,67 +19,52 @@ public class Rectangle implements Page {
         this.fill = b.fill;
         this.rotation = b.rotation;
         this.origin = b.origin;
-        this.visible = true;
     }
 
-    // ----------------- Page methods -----------------
+    // ----------------- Shape methods -----------------
     @Override
-    public void init() {
-
-    }
-
-    @Override
-    public void setupFrame() {
-
+    public void setOrigin(Point origin) {
+        this.origin = origin;
     }
 
     @Override
-    public void setupAnimator() {
-
+    public Point getCenter() {
+        return new Point(origin.x() + width / 2, origin.y() + height / 2);
     }
 
     @Override
-    public void addComponents() {
-
+    public double getWidth() {
+        return width;
     }
 
     @Override
-    public void addListeners() {
-
+    public double getHeight() {
+        return height;
     }
 
     @Override
-    public void handleEvents(ActionEvent e) {
-
+    public void Scale(double factor) {
+        this.width *= factor;
+        this.height *= factor;
     }
 
     @Override
-    public void dispose() {
-
+    public void Rotate(double angle) {
+        this.rotation += angle;
     }
 
     @Override
-    public boolean isVisible() {
-        return visible;
+    public void Move(double x, double y) {
+        this.origin = new Point(origin.x() + x, origin.y() + y);
     }
 
     @Override
-    public void setVisible(boolean b) {
-        visible = b;
-    }
-
-    // ----------------- Rectangle specific -----------------
-    public void draw(GL2 gl) {
-        if (!visible) return;
-
+    public void Draw(GL2 gl) {
         color.useColorGl(gl);
 
         gl.glPushMatrix();
-
-        // Translate to origin
         gl.glTranslated(origin.x(), origin.y(), 0);
-
-        gl.glRotated(rotation, 0, 0, 1); // rotate around Z axis
+        gl.glRotated(rotation, 0, 0, 1);
 
         if (fill) {
             gl.glBegin(GL2.GL_QUADS);
@@ -99,6 +81,32 @@ public class Rectangle implements Page {
         gl.glPopMatrix();
     }
 
+    @Override
+    public Shape Copy() {
+        return new Builder()
+                .width(width)
+                .height(height)
+                .color(color)
+                .fill(fill)
+                .rotation(rotation)
+                .origin(origin)
+                .build();
+    }
+
+    @Override
+    public Shape Copy(Shape ref) {
+        if (ref instanceof Rectangle r) {
+            this.width = r.width;
+            this.height = r.height;
+            this.color = r.color;
+            this.fill = r.fill;
+            this.rotation = r.rotation;
+            this.origin = r.origin;
+        }
+        return this;
+    }
+
+    // ----------------- Builder -----------------
     public static class Builder {
         private double width = 1;
         private double height = 1;
@@ -107,35 +115,12 @@ public class Rectangle implements Page {
         private double rotation = 0;
         private Point origin = new Point(0, 0);
 
-        public Builder width(double width) {
-            this.width = width;
-            return this;
-        }
-
-        public Builder height(double height) {
-            this.height = height;
-            return this;
-        }
-
-        public Builder color(Color color) {
-            this.color = color;
-            return this;
-        }
-
-        public Builder fill(boolean fill) {
-            this.fill = fill;
-            return this;
-        }
-
-        public Builder rotation(double rotation) {
-            this.rotation = rotation;
-            return this;
-        }
-
-        public Builder origin(Point origin) {
-            this.origin = origin;
-            return this;
-        }
+        public Builder width(double width) { this.width = width; return this; }
+        public Builder height(double height) { this.height = height; return this; }
+        public Builder color(Color color) { this.color = color; return this; }
+        public Builder fill(boolean fill) { this.fill = fill; return this; }
+        public Builder rotation(double rotation) { this.rotation = rotation; return this; }
+        public Builder origin(Point origin) { this.origin = origin; return this; }
 
         public Rectangle build() {
             return new Rectangle(this);
