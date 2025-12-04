@@ -21,7 +21,7 @@ public class Triangle implements Shape {
         this.angle = b.angle;
         this.width = b.width;
         this.height = b.height;
-        this.filled=b.filled;
+        this.filled = b.filled;
     }
 
     @Override
@@ -101,17 +101,14 @@ public class Triangle implements Shape {
         gl.glColor4d(color.r(), color.g(), color.b(), color.a());
         if (filled) {
             gl.glBegin(GL2.GL_TRIANGLES);
-            gl.glVertex2d(P1.x(), P1.y());
-            gl.glVertex2d(P2.x(), P2.y());
-            gl.glVertex2d(P3.x(), P3.y());
-            gl.glEnd();
+
         } else {
             gl.glBegin(GL2.GL_LINE_LOOP);
-            gl.glVertex2d(P1.x(), P1.y());
-            gl.glVertex2d(P2.x(), P2.y());
-            gl.glVertex2d(P3.x(), P3.y());
-            gl.glEnd();
         }
+        gl.glVertex2d(P1.x(), P1.y());
+        gl.glVertex2d(P2.x(), P2.y());
+        gl.glVertex2d(P3.x(), P3.y());
+        gl.glEnd();
 
     }
 
@@ -168,7 +165,6 @@ public class Triangle implements Shape {
             this.filled = filled;
             return this;
         }
-
 
 
         public Builder Pone(Point Pone) {
