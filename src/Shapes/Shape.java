@@ -5,6 +5,9 @@ import com.jogamp.opengl.GL2;
 public interface Shape {
 
 
+     // ----------------- Shape methods -----------------
+     void setCenter(Point origin);
+
      Point getCenter();
 
      double getWidth();
