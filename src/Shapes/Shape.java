@@ -4,9 +4,7 @@ import com.jogamp.opengl.GL2;
 
 public interface Shape {
 
-
-     // ----------------- Shape methods -----------------
-     void setCenter(Point origin);
+     void setOrigin(Point origin);
 
      Point getCenter();
 
@@ -22,7 +20,5 @@ public interface Shape {
 
      void Draw(GL2 gl);
 
-     Shape Copy();
-
-     Shape Copy(Shape ref);
+     <T> T Copy();
 }

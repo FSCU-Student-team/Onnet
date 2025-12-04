@@ -6,12 +6,11 @@ public class Rectangle implements Shape {
 
     private double width;
     private double height;
-    private Color color;
-    private boolean fill;
+    private final Color color;
+    private final boolean fill;
     private double rotation; // degrees
-    private Point origin;    // bottom-left
+    private Point origin;    // starting from bottom left
 
-    // Private constructor
     private Rectangle(Builder b) {
         this.width = b.width;
         this.height = b.height;
@@ -21,9 +20,8 @@ public class Rectangle implements Shape {
         this.origin = b.origin;
     }
 
-    // ----------------- Shape methods -----------------
     @Override
-    public void setCenter(Point origin) {
+    public void setOrigin(Point origin) {
         this.origin = origin;
     }
 
@@ -81,32 +79,19 @@ public class Rectangle implements Shape {
         gl.glPopMatrix();
     }
 
+    //provides a deep copy of the rectangle
     @Override
-    public Shape Copy() {
+    public Rectangle Copy() {
         return new Builder()
                 .width(width)
                 .height(height)
                 .color(color)
                 .fill(fill)
                 .rotation(rotation)
-                .origin(origin)
+                .origin(new Point(origin.x(), origin.y()))
                 .build();
     }
 
-    @Override
-    public Shape Copy(Shape ref) {
-        if (ref instanceof Rectangle r) {
-            this.width = r.width;
-            this.height = r.height;
-            this.color = r.color;
-            this.fill = r.fill;
-            this.rotation = r.rotation;
-            this.origin = r.origin;
-        }
-        return this;
-    }
-
-    // ----------------- Builder -----------------
     public static class Builder {
         private double width = 1;
         private double height = 1;
@@ -115,12 +100,35 @@ public class Rectangle implements Shape {
         private double rotation = 0;
         private Point origin = new Point(0, 0);
 
-        public Builder width(double width) { this.width = width; return this; }
-        public Builder height(double height) { this.height = height; return this; }
-        public Builder color(Color color) { this.color = color; return this; }
-        public Builder fill(boolean fill) { this.fill = fill; return this; }
-        public Builder rotation(double rotation) { this.rotation = rotation; return this; }
-        public Builder origin(Point origin) { this.origin = origin; return this; }
+        public Builder width(double width) {
+            this.width = width;
+            return this;
+        }
+
+        public Builder height(double height) {
+            this.height = height;
+            return this;
+        }
+
+        public Builder color(Color color) {
+            this.color = color;
+            return this;
+        }
+
+        public Builder fill(boolean fill) {
+            this.fill = fill;
+            return this;
+        }
+
+        public Builder rotation(double rotation) {
+            this.rotation = rotation;
+            return this;
+        }
+
+        public Builder origin(Point origin) {
+            this.origin = origin;
+            return this;
+        }
 
         public Rectangle build() {
             return new Rectangle(this);

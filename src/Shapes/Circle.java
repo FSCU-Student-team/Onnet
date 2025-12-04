@@ -1,19 +1,16 @@
 package Shapes;
 
-//import Others_Files.Color;
-//import Others_Files.Point;
-
 import com.jogamp.opengl.GL2;
 
-public class CircleShape implements Shape {
+public class Circle implements Shape {
     private double radius;
     private Point Center;
-    private double Angle;
+    private double Angle; //in degrees
     private boolean filled;
-    private Color color;
+    private final Color color;
 
 
-    public CircleShape(Builder builder) {
+    public Circle(Builder builder) {
         radius = builder.radius;
         Center = builder.Center;
         Angle = builder.Angle;
@@ -23,7 +20,7 @@ public class CircleShape implements Shape {
 
     // set the center as point not as Coordinate
     @Override
-    public void setCenter(Point center) {
+    public void setOrigin(Point center) {
         Center = center;
     }
 
@@ -83,27 +80,32 @@ public class CircleShape implements Shape {
         Center = new Point(x + Center.x(), y + Center.y());
     }
 
-    // Drawing circle as filled or not angle is radian
     @Override
     public void Draw(GL2 gl) {
-        int Numseg = (int) Math.min(20, radius * 10);
-        double angleStep = 2 * Math.PI / Numseg;
-        double rotate_rad = Math.toRadians(angleStep);
-        if (isFilled()) {
-            gl.glBegin(GL2.GL_TRIANGLE_FAN);
-            gl.glVertex2d(Center.x(), Center.y());
-        } else {
-            gl.glBegin(GL2.GL_LINE_LOOP);
+        int iterations = Math.max(20, (int)(radius * 2));
+        double angleStepDeg = 360.0 / iterations;
+
+        double rotationRad = Math.toRadians(Angle);
+
+        color.useColorGl(gl);
+
+        gl.glBegin(filled ? GL2.GL_POLYGON : GL2.GL_LINE_LOOP);
+
+        for (int i = 0; i < iterations; i++) {
+            double theta = Math.toRadians(i * angleStepDeg) + rotationRad;
+
+            double x = Center.x() + radius * Math.cos(theta);
+            double y = Center.y() + radius * Math.sin(theta);
+
+            gl.glVertex2d(x, y);
         }
-        for (int i = 0; i < Numseg; i++) {
-            double theta = Math.toRadians(i * angleStep + rotate_rad);//as rotation
-            gl.glVertex2d(Center.x() + radius * Math.cos(theta), Center.y() + radius * Math.sin(theta));
-        }
+
         gl.glEnd();
     }
 
+
     @Override
-    public Shape Copy() {
+    public Circle Copy() {
         return new Builder()
                 .Radius(radius)
                 .Filled(isFilled())
@@ -113,19 +115,7 @@ public class CircleShape implements Shape {
                 .Build();
     }
 
-    @Override
-    public Shape Copy(Shape ref) {
-        if (ref instanceof CircleShape copy) {
-            this.Center=copy.Center;
-            this.Angle=copy.Angle;
-            this.color=copy.color;
-            this.filled=copy.filled;
-            this.radius=copy.radius;
-        }
-        return this;
-    }
-
-    private static class Builder {
+    public static class Builder {
         private double radius;
         private Point Center;
         private double Angle;
@@ -157,8 +147,8 @@ public class CircleShape implements Shape {
             return this;
         }
 
-        public CircleShape Build() {
-            return new CircleShape(this);
+        public Circle Build() {
+            return new Circle(this);
         }
     }
 }
