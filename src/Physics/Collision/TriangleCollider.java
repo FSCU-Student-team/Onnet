@@ -21,17 +21,17 @@ public class TriangleCollider implements Collider {
 
     @Override
     public boolean intersectsRectangle(RectangleCollider r) {
-        return false;
+        return false; //will do later
     }
 
     @Override
     public boolean intersectsEllipse(EllipseCollider e) {
-        return false;
+        return false; //will do later
     }
 
     @Override
     public boolean intersectsTriangle(TriangleCollider t) {
-        return false;
+        return false; //will do later
     }
 
     @Override
