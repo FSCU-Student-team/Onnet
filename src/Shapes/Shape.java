@@ -4,14 +4,11 @@ import com.jogamp.opengl.GL2;
 
 public interface Shape {
 
-     void setCenter(Point center);
 
      Point getCenter();
 
-     void setWidth(double width);
      double getWidth();
 
-     void setHeight(double height);
      double getHeight();
 
      void Scale(double Factor);
