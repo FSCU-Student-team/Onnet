@@ -105,12 +105,13 @@ public class Triangle implements Shape {
             gl.glVertex2d(P2.x(), P2.y());
             gl.glVertex2d(P3.x(), P3.y());
             gl.glEnd();
-        } else gl.glBegin(GL2.GL_LINE_LOOP);
-        gl.glVertex2d(P1.x(), P1.y());
-        gl.glVertex2d(P2.x(), P2.y());
-        gl.glVertex2d(P3.x(), P3.y());
-        gl.glEnd();
-
+        } else {
+            gl.glBegin(GL2.GL_LINE_LOOP);
+            gl.glVertex2d(P1.x(), P1.y());
+            gl.glVertex2d(P2.x(), P2.y());
+            gl.glVertex2d(P3.x(), P3.y());
+            gl.glEnd();
+        }
 
     }
 
