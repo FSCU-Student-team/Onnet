@@ -23,7 +23,7 @@ public class Rectangle implements Shape {
 
     // ----------------- Shape methods -----------------
     @Override
-    public void setOrigin(Point origin) {
+    public void setCenter(Point origin) {
         this.origin = origin;
     }
 
