@@ -11,8 +11,6 @@ public class Triangle implements Shape {
     private final boolean fill;
 
     public Triangle(Builder b) {
-        if (b.points.size() != 3)
-            throw new IllegalStateException("Triangle must have exactly 3 points.");
 
         // deep copy to avoid external modification
         this.points = new ArrayList<>(b.points);
@@ -65,7 +63,6 @@ public class Triangle implements Shape {
         return max - min;
     }
 
-    // Scale
     @Override
     public void Scale(double factor) {
         Point c = getCenter();
@@ -76,9 +73,6 @@ public class Triangle implements Shape {
         }
     }
 
-    // -------------------------------
-    // Rotate
-    // -------------------------------
     @Override
     public void Rotate(double deltaAngle) {
         double rad = Math.toRadians(deltaAngle);
@@ -89,25 +83,12 @@ public class Triangle implements Shape {
     }
 
     private Point rotatePoint(Point p, Point center, double rad) {
-        double cos = Math.cos(rad);
-        double sin = Math.sin(rad);
-
-        double dx = p.x() - center.x();
-        double dy = p.y() - center.y();
-
-        return new Point(
-                center.x() + cos * dx - sin * dy,
-                center.y() + sin * dx + cos * dy
-        );
+        return Polygon.rotatePoint(p, center, rad);
     }
 
-    // -------------------------------
-    // Move
-    // -------------------------------
+    // Move by amount
     @Override
-    public void Move(double x, double y) {
-        Vector2 delta = new Vector2(x, y);
-
+    public void Move(Vector2 delta) {
         for (int i = 0; i < 3; i++)
             points.set(i, points.get(i).add(delta));
     }
@@ -156,8 +137,6 @@ public class Triangle implements Shape {
         }
 
         public Builder addPoint(Point point) {
-            if (points.size() == 3)
-                throw new IllegalArgumentException("Can't add more than 3 points to a triangle... you woke up Pythagoras his grave by the way.");
 
             points.add(point);
             return this;
@@ -169,6 +148,8 @@ public class Triangle implements Shape {
         }
 
         public Triangle build() {
+            if (points.size() != 3)
+                throw new IllegalArgumentException("A triangle must have only 3 points... you woke up Pythagoras his grave by the way.");
             return new Triangle(this);
         }
     }
