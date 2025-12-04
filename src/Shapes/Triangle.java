@@ -21,9 +21,17 @@ public class Triangle implements Shape {
     }
 
     // Quality of life: to avoid repition
-    private Point p1() { return points.getFirst(); }
-    private Point p2() { return points.get(1); }
-    private Point p3() { return points.get(2); }
+    private Point p1() {
+        return points.getFirst();
+    }
+
+    private Point p2() {
+        return points.get(1);
+    }
+
+    private Point p3() {
+        return points.get(2);
+    }
 
     @Override
     public Point getCenter() {
@@ -149,7 +157,7 @@ public class Triangle implements Shape {
 
         public Builder addPoint(Point point) {
             if (points.size() == 3)
-                throw new IllegalArgumentException("Triangle can only have 3 points. learn geometry, idiot");
+                throw new IllegalArgumentException("Can't add more than 3 points to a triangle... you woke up Pythagoras his grave by the way.");
 
             points.add(point);
             return this;
