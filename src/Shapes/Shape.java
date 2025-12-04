@@ -1,11 +1,12 @@
 package Shapes;
 
-import Physics.Collision.Collider;
 import com.jogamp.opengl.GL2;
 
 public interface Shape {
 
-     void setOrigin(Point origin);
+
+     // ----------------- Shape methods -----------------
+     void setCenter(Point origin);
 
      Point getCenter();
 

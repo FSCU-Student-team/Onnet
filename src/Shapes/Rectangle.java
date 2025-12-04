@@ -1,6 +1,5 @@
 package Shapes;
 
-import Physics.Collision.Collider;
 import com.jogamp.opengl.GL2;
 
 public class Rectangle implements Shape {
@@ -24,7 +23,7 @@ public class Rectangle implements Shape {
 
     // ----------------- Shape methods -----------------
     @Override
-    public void setOrigin(Point origin) {
+    public void setCenter(Point origin) {
         this.origin = origin;
     }
 
