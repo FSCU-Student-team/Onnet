@@ -1,5 +1,6 @@
 package Shapes;
 
+import Physics.Collision.Collider;
 import com.jogamp.opengl.GL2;
 
 public interface Shape {
