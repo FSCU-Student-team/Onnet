@@ -2,78 +2,84 @@ package Shapes;
 
 import com.jogamp.opengl.GL2;
 
+import java.util.ArrayList;
 
 public class Triangle implements Shape {
-    private Point P1;
-    private Point P2;
-    private Point P3;
-    private Color color;
-    private double angle;
-    private double width;
-    private double height;
-    private boolean filled;
+
+    private final ArrayList<Point> points; // always size 3, will throw if you attempt to add more than 3
+    private final Color color;
+    private final boolean fill;
 
     public Triangle(Builder b) {
-        this.P1 = b.Pone;
-        this.P2 = b.Ptwo;
-        this.P3 = b.Pthree;
+        if (b.points.size() != 3)
+            throw new IllegalStateException("Triangle must have exactly 3 points.");
+
+        // deep copy to avoid external modification
+        this.points = new ArrayList<>(b.points);
         this.color = b.color;
-        this.angle = b.angle;
-        this.width = b.width;
-        this.height = b.height;
-        this.filled = b.filled;
+        this.fill = b.filled;
     }
 
-    @Override
-    public void setCenter(Point origin) {
-
-    }
+    // Quality of life: to avoid repition
+    private Point p1() { return points.getFirst(); }
+    private Point p2() { return points.get(1); }
+    private Point p3() { return points.get(2); }
 
     @Override
     public Point getCenter() {
-        return new Point(getWidth() / 2.0, getHeight() / 2.0);
+        return new Point(
+                (p1().x() + p2().x() + p3().x()) / 3.0,
+                (p1().y() + p2().y() + p3().y()) / 3.0
+        );
     }
 
     @Override
+    public void setOrigin(Point newCenter) {
+        Point oldCenter = getCenter();
+        Vector2 delta = newCenter.subtract(oldCenter);
 
+        for (int i = 0; i < 3; i++)
+            points.set(i, points.get(i).add(delta));
+    }
+
+    // Bounds
+    @Override
     public double getWidth() {
-        return width;
+        double min = Math.min(p1().x(), Math.min(p2().x(), p3().x()));
+        double max = Math.max(p1().x(), Math.max(p2().x(), p3().x()));
+        return max - min;
     }
 
     @Override
     public double getHeight() {
-        return height;
+        double min = Math.min(p1().y(), Math.min(p2().y(), p3().y()));
+        double max = Math.max(p1().y(), Math.max(p2().y(), p3().y()));
+        return max - min;
     }
 
+    // Scale
     @Override
-    public void Scale(double Factor) {
-        double centerX = (P1.x() + P2.x() + P3.x()) / 3;
-        double centerY = (P1.y() + P2.y() + P3.y()) / 3;
-        Point centroid = new Point(centerX, centerY);
+    public void Scale(double factor) {
+        Point c = getCenter();
 
-        Vector2 v1 = P1.subtract(centroid).scale(Factor);
-        Vector2 v2 = P2.subtract(centroid).scale(Factor);
-        Vector2 v3 = P3.subtract(centroid).scale(Factor);
-
-        P1 = centroid.add(v1);
-        P2 = centroid.add(v2);
-        P3 = centroid.add(v3);
+        for (int i = 0; i < 3; i++) {
+            Vector2 v = points.get(i).subtract(c).scale(factor);
+            points.set(i, c.add(v));
+        }
     }
 
+    // -------------------------------
+    // Rotate
+    // -------------------------------
     @Override
-    public void Rotate(double Angle) {
-        double rad = Math.toRadians(Angle);
+    public void Rotate(double deltaAngle) {
+        double rad = Math.toRadians(deltaAngle);
+        Point c = getCenter();
 
-        double centerX = (P1.x() + P2.x() + P3.x()) / 3;
-        double centerY = (P1.y() + P2.y() + P3.y()) / 3;
-        Point centroid = new Point(centerX, centerY);
-
-        P1 = rotatePoint(P1, centroid, rad);
-        P2 = rotatePoint(P2, centroid, rad);
-        P3 = rotatePoint(P3, centroid, rad);
+        for (int i = 0; i < 3; i++)
+            points.set(i, rotatePoint(points.get(i), c, rad));
     }
 
-    // Helper method to rotate a point around a center
     private Point rotatePoint(Point p, Point center, double rad) {
         double cos = Math.cos(rad);
         double sin = Math.sin(rad);
@@ -81,81 +87,56 @@ public class Triangle implements Shape {
         double dx = p.x() - center.x();
         double dy = p.y() - center.y();
 
-        double xNew = cos * dx - sin * dy + center.x();
-        double yNew = sin * dx + cos * dy + center.y();
-
-        return new Point(xNew, yNew);
+        return new Point(
+                center.x() + cos * dx - sin * dy,
+                center.y() + sin * dx + cos * dy
+        );
     }
 
+    // -------------------------------
+    // Move
+    // -------------------------------
     @Override
     public void Move(double x, double y) {
-        Vector2 v = new Vector2(x, y);
-        P1 = P1.add(v);
-        P2 = P2.add(v);
-        P3 = P3.add(v);
+        Vector2 delta = new Vector2(x, y);
 
+        for (int i = 0; i < 3; i++)
+            points.set(i, points.get(i).add(delta));
     }
 
+    // -------------------------------
+    // Draw
+    // -------------------------------
     @Override
     public void Draw(GL2 gl) {
-        gl.glColor4d(color.r(), color.g(), color.b(), color.a());
-        if (filled) {
-            gl.glBegin(GL2.GL_TRIANGLES);
+        color.useColorGl(gl);
 
-        } else {
-            gl.glBegin(GL2.GL_LINE_LOOP);
-        }
-        gl.glVertex2d(P1.x(), P1.y());
-        gl.glVertex2d(P2.x(), P2.y());
-        gl.glVertex2d(P3.x(), P3.y());
+        gl.glBegin(fill ? GL2.GL_TRIANGLES : GL2.GL_LINE_LOOP);
+
+        gl.glVertex2d(p1().x(), p1().y());
+        gl.glVertex2d(p2().x(), p2().y());
+        gl.glVertex2d(p3().x(), p3().y());
+
         gl.glEnd();
-
     }
 
+    //provides a deep copy
     @Override
-    public Shape Copy() {
+    public Triangle Copy() {
         return new Builder()
-                .Pone(P1)
-                .Ptwo(P2)
-                .Pthree(P3)
-                .angle(angle)
-                .width(width)
-                .height(height)
+                .addPoint(p1())
+                .addPoint(p2())
+                .addPoint(p3())
                 .color(color)
-
-                .isFilled(filled)
+                .isFilled(fill)
                 .build();
-    }
-
-
-    @Override
-    public Shape Copy(Shape ref) {
-        if (ref instanceof Triangle t) {
-            return new Builder()
-                    .Pone(t.P1)
-                    .Ptwo(t.P2)
-                    .Pthree(t.P3)
-                    .color(t.color)
-                    .angle(t.angle)
-                    .width(t.width)
-                    .height(t.height)
-                    .isFilled(t.filled)
-                    .build();
-        }
-        return null;
     }
 
     public static class Builder {
 
-        private Point Pone = new Point(0, 0);
-        private Point Ptwo = new Point(0, 0);
-        private Point Pthree = new Point(0, 0);
+        private final ArrayList<Point> points = new ArrayList<>();
         private Color color = Color.BLACK;
-        private double angle = 0;
-        private double width = 0;
-        private double height = 0;
         private boolean filled = false;
-
 
         public static Builder builder() {
             return new Builder();
@@ -166,39 +147,16 @@ public class Triangle implements Shape {
             return this;
         }
 
+        public Builder addPoint(Point point) {
+            if (points.size() == 3)
+                throw new IllegalArgumentException("Triangle can only have 3 points.");
 
-        public Builder Pone(Point Pone) {
-            this.Pone = Pone;
-            return this;
-        }
-
-        public Builder Ptwo(Point Ptwo) {
-            this.Ptwo = Ptwo;
-            return this;
-        }
-
-        public Builder Pthree(Point Pthree) {
-            this.Pthree = Pthree;
+            points.add(point);
             return this;
         }
 
         public Builder color(Color color) {
             this.color = color;
-            return this;
-        }
-
-        public Builder width(double width) {
-            this.width = width;
-            return this;
-        }
-
-        public Builder height(double height) {
-            this.height = height;
-            return this;
-        }
-
-        public Builder angle(double angle) {
-            this.angle = angle;
             return this;
         }
 
