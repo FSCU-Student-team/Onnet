@@ -2,6 +2,7 @@ package Shapes;
 
 //import Others_Files.Color;
 //import Others_Files.Point;
+
 import com.jogamp.opengl.GL2;
 
 public class CircleShape implements Shape {
@@ -9,7 +10,7 @@ public class CircleShape implements Shape {
     private Point Center;
     private double Angle;
     private boolean filled;
-    private final Color color;
+    private Color color;
 
 
     public CircleShape(Builder builder) {
@@ -31,15 +32,18 @@ public class CircleShape implements Shape {
     public Point getCenter() {
         return Center;
     }
+
     // sets radius
     public void setRadius(double radius) {
         this.radius = radius;
     }
+
     //  returns the width as double of the radius
     @Override
     public double getWidth() {
         return radius * 2;
     }
+
     // sets if the circle filled or no
     public void setFilled(boolean filled) {
         this.filled = filled;
@@ -100,30 +104,57 @@ public class CircleShape implements Shape {
 
     @Override
     public Shape Copy() {
-        return new Builder(radius, Center, Angle, filled, color).Build();
+        return new Builder()
+                .Radius(radius)
+                .Filled(isFilled())
+                .color(color)
+                .Center(Center)
+                .Angle(Angle)
+                .Build();
     }
 
     @Override
     public Shape Copy(Shape ref) {
         if (ref instanceof CircleShape copy) {
-            return new Builder(copy.radius, copy.Center, copy.Angle, copy.filled, copy.color).Build();
+            this.Center=copy.Center;
+            this.Angle=copy.Angle;
+            this.color=copy.color;
+            this.filled=copy.filled;
+            this.radius=copy.radius;
         }
         return this;
     }
 
     private static class Builder {
-        private final double radius;
-        private final Point Center;
-        private final double Angle;
-        private final boolean filled;
-        private final Color color;
+        private double radius;
+        private Point Center;
+        private double Angle;
+        private boolean filled;
+        private Color color;
 
-        public Builder(double radius, Point Center, double Angle, boolean filled, Color color) {
+        public Builder Radius(double radius) {
             this.radius = radius;
-            this.Center = Center;
-            this.Angle = Angle;
-            this.filled = filled;
+            return this;
+        }
+
+        public Builder Center(Point center) {
+            this.Center = center;
+            return this;
+        }
+
+        public Builder color(Color color) {
             this.color = color;
+            return this;
+        }
+
+        public Builder Filled(boolean fill) {
+            this.filled = fill;
+            return this;
+        }
+
+        public Builder Angle(double rotation) {
+            this.Angle = rotation;
+            return this;
         }
 
         public CircleShape Build() {
