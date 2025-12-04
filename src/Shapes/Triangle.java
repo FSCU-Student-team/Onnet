@@ -25,7 +25,7 @@ public class Triangle implements Shape {
     }
 
     @Override
-    public void setOrigin(Point origin) {
+    public void setCenter(Point origin) {
 
     }
 
