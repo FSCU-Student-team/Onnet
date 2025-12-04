@@ -4,7 +4,6 @@ import com.jogamp.opengl.GL2;
 
 
 public class Triangle implements Shape {
-    private Point origin;
     private Point P1;
     private Point P2;
     private Point P3;
@@ -22,13 +21,12 @@ public class Triangle implements Shape {
         this.angle = b.angle;
         this.width = b.width;
         this.height = b.height;
-        this.origin = b.origin;
-        // this.filled=b.filled;
+        this.filled=b.filled;
     }
 
     @Override
     public void setOrigin(Point origin) {
-        this.origin = origin;
+
     }
 
     @Override
@@ -126,7 +124,7 @@ public class Triangle implements Shape {
                 .width(width)
                 .height(height)
                 .color(color)
-                .origin(origin)
+
                 .isFilled(filled)
                 .build();
     }
@@ -143,7 +141,6 @@ public class Triangle implements Shape {
                     .angle(t.angle)
                     .width(t.width)
                     .height(t.height)
-                    .origin(t.origin)
                     .isFilled(t.filled)
                     .build();
         }
@@ -151,7 +148,7 @@ public class Triangle implements Shape {
     }
 
     public static class Builder {
-        private Point origin = new Point(0, 0);
+
         private Point Pone = new Point(0, 0);
         private Point Ptwo = new Point(0, 0);
         private Point Pthree = new Point(0, 0);
@@ -171,10 +168,7 @@ public class Triangle implements Shape {
             return this;
         }
 
-        public Builder origin(Point origin) {
-            this.origin = origin;
-            return this;
-        }
+
 
         public Builder Pone(Point Pone) {
             this.Pone = Pone;
