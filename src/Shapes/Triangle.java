@@ -149,7 +149,7 @@ public class Triangle implements Shape {
 
         public Builder addPoint(Point point) {
             if (points.size() == 3)
-                throw new IllegalArgumentException("Triangle can only have 3 points.");
+                throw new IllegalArgumentException("Triangle can only have 3 points. learn geometry, idiot");
 
             points.add(point);
             return this;
