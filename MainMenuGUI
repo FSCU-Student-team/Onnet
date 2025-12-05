@@ -1,0 +1,198 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class MainMenuGUI extends JFrame implements ActionListener {
+
+    private JButton newGameButton;
+    private JButton levelsButton;
+    private JButton continueButton;
+    private JButton muteButton;
+
+    private boolean isMuted = false;
+
+    public MainMenuGUI() {
+        setTitle("Game Menu");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(800, 600);
+        setLocationRelativeTo(null); // منتصف الشاشة
+        setLayout(new BorderLayout());
+
+        // ---------------- Top Panel (Mute) ----------------
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        muteButton = new JButton("Mute");
+        muteButton.setPreferredSize(new Dimension(100, 50));
+        muteButton.addActionListener(this);
+        topPanel.add(muteButton);
+        add(topPanel, BorderLayout.NORTH);
+
+        // ---------------- Center Panel (Main Buttons) ----------------
+        JPanel centerPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(15, 15, 15, 15); // مسافات بين الأزرار
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        newGameButton = createMainButton("New Game");
+        levelsButton = createMainButton("Levels");
+        continueButton = createMainButton("Continue");
+
+        gbc.gridy = 0;
+        centerPanel.add(newGameButton, gbc);
+        gbc.gridy = 1;
+        centerPanel.add(levelsButton, gbc);
+        gbc.gridy = 2;
+        centerPanel.add(continueButton, gbc);
+
+        add(centerPanel, BorderLayout.CENTER);
+
+        // اجعل الأزرار تتناسب مع تغيير حجم الشاشة
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                resizeButtons();
+            }
+        });
+
+        setVisible(true);
+    }
+
+    private JButton createMainButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setFont(new Font("Arial", Font.BOLD, 18));
+        btn.setPreferredSize(new Dimension(180, 60)); // حجم متوسط وحلو
+        btn.addActionListener(this);
+        return btn;
+    }
+
+    private void resizeButtons() {
+        int w = getWidth();
+        int h = getHeight();
+
+        int btnWidth = Math.max(150, w / 5);
+        int btnHeight = Math.max(50, h / 10);
+
+        newGameButton.setPreferredSize(new Dimension(btnWidth, btnHeight));
+        levelsButton.setPreferredSize(new Dimension(btnWidth, btnHeight));
+        continueButton.setPreferredSize(new Dimension(btnWidth, btnHeight));
+        muteButton.setPreferredSize(new Dimension(Math.max(80, w / 8), Math.max(40, h / 12)));
+
+        revalidate();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object src = e.getSource();
+
+        if (src == newGameButton) {
+            startNewGame();
+        } else if (src == levelsButton) {
+            openLevelsMenu();
+        } else if (src == continueButton) {
+            continueGame();
+        } else if (src == muteButton) {
+            isMuted = !isMuted;
+            System.out.println("Mute toggled! " + isMuted);
+        }
+    }
+
+    private void startNewGame() {
+        System.out.println("Start New Game clicked!");
+        // ضع هنا كود تشغيل اللعبة
+    }
+
+    private void openLevelsMenu() {
+        LevelsMenu levelsMenu = new LevelsMenu(this, getSize());
+        levelsMenu.setVisible(true);
+        this.setVisible(false);
+    }
+
+    private void continueGame() {
+        System.out.println("Continue clicked!");
+        // ضع هنا كود استكمال اللعبة
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(MainMenuGUI::new);
+    }
+}
+
+// -------------------- Levels Menu --------------------
+class LevelsMenu extends JFrame implements ActionListener {
+
+    private MainMenuGUI mainMenu;
+    private JButton homeButton;
+    private JButton[] levelButtons = new JButton[10];
+
+    public LevelsMenu(MainMenuGUI mainMenu, Dimension parentSize) {
+        this.mainMenu = mainMenu;
+        setTitle("Select Level");
+        setSize(parentSize);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+
+        // Top panel for Home button
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        homeButton = new JButton("Home");
+        homeButton.setPreferredSize(new Dimension(100, 50));
+        homeButton.addActionListener(this);
+        topPanel.add(homeButton);
+        add(topPanel, BorderLayout.NORTH);
+
+        // Center panel for level buttons
+        JPanel centerPanel = new JPanel(new GridLayout(2, 5, 20, 20));
+        for (int i = 0; i < 10; i++) {
+            levelButtons[i] = new JButton("Level " + (i + 1));
+            levelButtons[i].setFont(new Font("Arial", Font.BOLD, 16));
+            levelButtons[i].addActionListener(this);
+            centerPanel.add(levelButtons[i]);
+        }
+        add(centerPanel, BorderLayout.CENTER);
+
+        // اجعل الأزرار تتناسب مع تغيير حجم الشاشة
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                resizeLevelButtons();
+            }
+        });
+    }
+
+    private void resizeLevelButtons() {
+        int w = getWidth();
+        int h = getHeight();
+
+        int btnWidth = Math.max(100, w / 10);
+        int btnHeight = Math.max(50, h / 10);
+
+        for (JButton btn : levelButtons) {
+            btn.setPreferredSize(new Dimension(btnWidth, btnHeight));
+        }
+        homeButton.setPreferredSize(new Dimension(Math.max(80, w / 8), Math.max(40, h / 12)));
+
+        revalidate();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object src = e.getSource();
+
+        if (src == homeButton) {
+            this.setVisible(false);
+            mainMenu.setVisible(true);
+        }
+        else {
+            // أي زر من أزرار الليفل
+            for (int i = 0; i < 10; i++) {
+                if (src == levelButtons[i]) {
+                    startLevel(i + 1);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void startLevel(int level) {
+        System.out.println("Starting Level " + level);
+
+    }
+}
