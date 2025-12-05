@@ -3,10 +3,10 @@ package Pages;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
-import Game.GameLoop.*;
+import Game.GameLoop;
 import Game.InputManager;
 
-public class DevGlListener implements GLEventListener {
+public class DevGlListener implements GLEventListener,GameLoop {
     private DevFrame frame = new DevFrame();
     private InputManager input = frame.getInputManager();
 
@@ -37,5 +37,13 @@ public class DevGlListener implements GLEventListener {
             input.setOrthoBounds(0, width, 0, height);
         }
         //here you can reload the matrix mode and the ortho and the other staff
+    }
+    public void physicsUpdate() {
+//   uses as updating the game parts on physics
+    }
+
+    @Override
+    public void renderUpdate(GL2 gl) {
+//   uses to render the components of the draw to update it
     }
 }

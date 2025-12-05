@@ -10,23 +10,13 @@ import com.jogamp.opengl.util.FPSAnimator;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
-public class DevFrame implements Page, GameLoop {
+public class DevFrame implements Page {
     private JFrame frame;
     private GLCanvas canvas;
     private FPSAnimator animator;
     private LoopState loopState;
     private InputManager inputManager;
     private DevGlListener glListener;
-
-    @Override
-    public void physicsUpdate() {
-//   uses as updating the game parts on physics
-    }
-
-    @Override
-    public void renderUpdate(GL2 gl) {
-//   uses to render the components of the draw to update it
-    }
 
     public InputManager getInputManager() {
         return inputManager;
