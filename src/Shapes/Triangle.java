@@ -97,8 +97,8 @@ public class Triangle implements Shape {
     // Move
     // -------------------------------
     @Override
-    public void Move(double x, double y) {
-        Vector2 delta = new Vector2(x, y);
+    public void Move(Vector2 delta) {
+
 
         for (int i = 0; i < 3; i++)
             points.set(i, points.get(i).add(delta));
