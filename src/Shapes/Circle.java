@@ -8,7 +8,6 @@ public class Circle implements Shape {
     private double Angle; //in degrees
     private boolean filled;
     private final Color color;
-    private double Cx, Cy;
 
 
     public Circle(Builder builder) {
@@ -23,8 +22,6 @@ public class Circle implements Shape {
     @Override
     public void setOrigin(Point center) {
         Center = center;
-        Cx = center.x();
-        Cy = center.y();
     }
 
     //  return the Center as point
@@ -78,14 +75,14 @@ public class Circle implements Shape {
     }
 
     // moving is by have new point of moved x and moved y by new value as speed
-    @Override
+@Override
     public void Move(Vector2 delta) {
-        Center = new Point(delta.x() + Center.x(), delta.y() + Center.y());
+        Center = new Point(delta.x()  + Center.x(), delta.y() + Center.y());
     }
 
     @Override
     public void Draw(GL2 gl) {
-        int iterations = Math.max(20, (int) (radius * 2));
+        int iterations = Math.max(20, (int)(radius * 2));
         double angleStepDeg = 360.0 / iterations;
 
         double rotationRad = Math.toRadians(Angle);
@@ -111,7 +108,7 @@ public class Circle implements Shape {
     public Circle Copy() {
         return new Builder()
                 .Radius(radius)
-                .Filled(filled)
+                .Filled(isFilled())
                 .color(color)
                 .Center(Center)
                 .Angle(Angle)
@@ -124,7 +121,6 @@ public class Circle implements Shape {
         private double Angle;
         private boolean filled;
         private Color color;
-        private double Cx, Cy;
 
         public Builder Radius(double radius) {
             this.radius = radius;
@@ -133,8 +129,6 @@ public class Circle implements Shape {
 
         public Builder Center(Point center) {
             this.Center = center;
-            this.Cx = center.x();
-            this.Cy = center.y();
             return this;
         }
 
