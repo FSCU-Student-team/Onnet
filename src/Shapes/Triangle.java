@@ -161,6 +161,8 @@ public class Triangle implements Shape {
         }
 
         public Triangle build() {
+            if (points.size() != 3)
+                throw new IllegalArgumentException("A triangle must have only 3 points... you woke up Pythagoras his grave by the way.");
             return new Triangle(this);
         }
     }

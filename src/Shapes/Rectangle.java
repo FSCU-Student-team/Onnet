@@ -52,8 +52,8 @@ public class Rectangle implements Shape {
     }
 
     @Override
-    public void Move(double x, double y) {
-        this.origin = new Point(origin.x() + x, origin.y() + y);
+    public void Move(Vector2 delta) {
+        this.origin = new Point(origin.x() + delta.x(), origin.y() + delta.y());
     }
 
     @Override

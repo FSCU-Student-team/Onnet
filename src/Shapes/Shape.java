@@ -16,7 +16,7 @@ public interface Shape {
 
      void Rotate(double Angle);
 
-     void Move(double x, double y);
+     void Move(Vector2 delta);
 
      void Draw(GL2 gl);
 
