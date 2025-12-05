@@ -75,9 +75,9 @@ public class Circle implements Shape {
     }
 
     // moving is by have new point of moved x and moved y by new value as speed
-
-    public void Move(Vector2 Delta) {
-        Center = new Point(Delta.x()  + Center.x(), Delta.y() + Center.y());
+@Override
+    public void Move(Vector2 delta) {
+        Center = new Point(delta.x()  + Center.x(), delta.y() + Center.y());
     }
 
     @Override
