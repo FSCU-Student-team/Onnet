@@ -11,6 +11,8 @@ public class Triangle implements Shape {
     private final boolean fill;
 
     public Triangle(Builder b) {
+        if (b.points.size() != 3)
+            throw new IllegalStateException("Triangle must have exactly 3 points.");
 
         // deep copy to avoid external modification
         this.points = new ArrayList<>(b.points);
@@ -19,17 +21,9 @@ public class Triangle implements Shape {
     }
 
     // Quality of life: to avoid repition
-    private Point p1() {
-        return points.getFirst();
-    }
-
-    private Point p2() {
-        return points.get(1);
-    }
-
-    private Point p3() {
-        return points.get(2);
-    }
+    private Point p1() { return points.getFirst(); }
+    private Point p2() { return points.get(1); }
+    private Point p3() { return points.get(2); }
 
     @Override
     public Point getCenter() {
@@ -63,6 +57,7 @@ public class Triangle implements Shape {
         return max - min;
     }
 
+    // Scale
     @Override
     public void Scale(double factor) {
         Point c = getCenter();
@@ -73,6 +68,9 @@ public class Triangle implements Shape {
         }
     }
 
+    // -------------------------------
+    // Rotate
+    // -------------------------------
     @Override
     public void Rotate(double deltaAngle) {
         double rad = Math.toRadians(deltaAngle);
@@ -83,12 +81,25 @@ public class Triangle implements Shape {
     }
 
     private Point rotatePoint(Point p, Point center, double rad) {
-        return Polygon.rotatePoint(p, center, rad);
+        double cos = Math.cos(rad);
+        double sin = Math.sin(rad);
+
+        double dx = p.x() - center.x();
+        double dy = p.y() - center.y();
+
+        return new Point(
+                center.x() + cos * dx - sin * dy,
+                center.y() + sin * dx + cos * dy
+        );
     }
 
-    // Move by amount
+    // -------------------------------
+    // Move
+    // -------------------------------
     @Override
-    public void Move(Vector2 delta) {
+    public void Move(double x, double y) {
+        Vector2 delta = new Vector2(x, y);
+
         for (int i = 0; i < 3; i++)
             points.set(i, points.get(i).add(delta));
     }
@@ -137,6 +148,8 @@ public class Triangle implements Shape {
         }
 
         public Builder addPoint(Point point) {
+            if (points.size() == 3)
+                throw new IllegalArgumentException("Triangle can only have 3 points. learn geometry, idiot");
 
             points.add(point);
             return this;
