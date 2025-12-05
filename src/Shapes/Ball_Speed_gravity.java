@@ -37,7 +37,7 @@ public class Ball_Speed_gravity {
         screenWidth=manager.orthoRight-manager.orthoLeft;
         screenHeight=manager.orthoTop-manager.orthoBottom;
     }
-
+//  to update as each interaction with ball the dt as physics update rate if 0.0167 means 60 FPS as no effect of FPSAnimator on it
     public void update(double dt, int inputState) {
         if (!isLaunched) {
             if (Input.isSet(inputState, Input.LEFT)) {
