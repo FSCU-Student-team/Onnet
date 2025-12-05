@@ -9,4 +9,4 @@ Members of the team:-
 - wizard1625 (عبدالرحمن اسامة) - code: 2327133
 - helmy9999 (محمد حلمى) - code: 2328158
 - yousefAtef00 (يوسف عاطف) - code: 2327471
-- areda04 (احمد رضا) - code: 2327??? (To be edited)
+- areda04 (احمد رضا احمد) - code: 2327492
