@@ -221,7 +221,7 @@ public class CircleCollider implements Collider {
             return new Vector2(mtvX, mtvY);
         }
 
-        // TODO: Add circle-circle, circle-triangle, etc.
+        // TODO: Add circle-circle, circle-triangle, and so on.
         return Vector2.ZERO;
     }
 }

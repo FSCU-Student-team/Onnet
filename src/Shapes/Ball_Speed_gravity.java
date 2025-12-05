@@ -94,7 +94,7 @@ public class Ball_Speed_gravity {
     }
 //  draw Circle and line together
     public void Draw(GL2 gl) {
-        circle.Draw(gl);
+        circle.draw(gl);
         if (!isLaunched) {
             DrawAimLine(gl,Color.RED);
         }
