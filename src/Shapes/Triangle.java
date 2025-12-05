@@ -93,18 +93,12 @@ public class Triangle implements Shape {
         );
     }
 
-    // -------------------------------
-    // Move
-    // -------------------------------
     @Override
     public void Move(Vector2 delta) {
         for (int i = 0; i < 3; i++)
             points.set(i, points.get(i).add(delta));
     }
 
-    // -------------------------------
-    // Draw
-    // -------------------------------
     @Override
     public void Draw(GL2 gl) {
         color.useColorGl(gl);
