@@ -82,7 +82,7 @@ public class Ball {
 
 
     public void draw(GL2 gl) {
-        circle.Draw(gl);
+        circle.draw(gl);
     }
 
     public void applyForce(Vector2 force, double dt) {

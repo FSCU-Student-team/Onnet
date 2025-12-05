@@ -1,5 +1,6 @@
 package Shapes;
 
+import Physics.Collision.Collider;
 import com.jogamp.opengl.GL2;
 
 import java.util.ArrayList;
@@ -80,6 +81,11 @@ public class Triangle implements Shape {
             points.set(i, rotatePoint(points.get(i), c, rad));
     }
 
+    @Override
+    public Collider getCollider() {
+        return null;
+    }
+
     private Point rotatePoint(Point p, Point center, double rad) {
         double cos = Math.cos(rad);
         double sin = Math.sin(rad);
@@ -100,7 +106,7 @@ public class Triangle implements Shape {
     }
 
     @Override
-    public void Draw(GL2 gl) {
+    public void draw(GL2 gl) {
         color.useColorGl(gl);
 
         gl.glBegin(fill ? GL2.GL_TRIANGLES : GL2.GL_LINE_LOOP);
