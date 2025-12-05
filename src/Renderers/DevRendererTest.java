@@ -49,7 +49,7 @@ public class DevRendererTest implements GLEventListener, GameLoop {
 
 
         circle = new Circle.Builder().color(Color.WHITE).Angle(0).Filled(true).Center(new Point(400, 300)).Radius(20).Build();
-        rectangle = new Rectangle.Builder().color(Color.BLUE).rotation(0).fill(true).origin(new Point(0, 50)).width(1000).height(10).build();
+        rectangle = new Rectangle.Builder().color(Color.BLUE).rotation(10).fill(true).origin(new Point(0, 50)).width(1000).height(10).build();
         rectangleTop = new Rectangle.Builder().color(Color.BLUE).rotation(0).fill(true).origin(new Point(0, 500)).width(1000).height(10).build();
         rectangleLeft = new Rectangle.Builder().color(Color.BLUE).rotation(0).fill(true).origin(new Point(700, 0)).width(10).height(1000).build();
         rectangleRight = new Rectangle.Builder().color(Color.BLUE).rotation(0).fill(true).origin(new Point(50, 0)).width(10).height(1000).build();
@@ -83,10 +83,12 @@ public class DevRendererTest implements GLEventListener, GameLoop {
 
         // Check collision with bottom rectangle
         if (circle.getCollider().intersects(rectangle.getCollider())) {
-            // Normal pointing up
-            Vector2 normal = new Vector2(0, 1);
-            circle.Move(circle.getCollider().getMTV(rectangle.getCollider()));
-            velocity = velocity.reflect(normal).scale(0.8); // energy loss factor
+            Vector2 mtv = circle.getCollider().getMTV(rectangle.getCollider());
+            if (!mtv.isZero()) {
+                circle.Move(mtv); // push out of collision
+                Vector2 normal = mtv.normalize(); // normal points from rectangle to circle
+                velocity = velocity.reflect(normal).scale(0.5);
+            }
         }
 
         // Check collision with top rectangle
@@ -94,19 +96,19 @@ public class DevRendererTest implements GLEventListener, GameLoop {
             // Normal pointing down
             Vector2 normal = new Vector2(0, -1);
             circle.Move(circle.getCollider().getMTV(rectangleTop.getCollider()));
-            velocity = velocity.reflect(normal).scale(0.8);
+            velocity = velocity.reflect(normal).scale(0.5);
         }
 
         if (circle.getCollider().intersects(rectangleLeft.getCollider())) {
             Vector2 normal = new Vector2(-1, 0);
             circle.Move(circle.getCollider().getMTV(rectangleLeft.getCollider()));
-            velocity = velocity.reflect(normal).scale(0.8);
+            velocity = velocity.reflect(normal).scale(0.5);
         }
 
         if (circle.getCollider().intersects(rectangleRight.getCollider())) {
             Vector2 normal = new Vector2(1, 0);
             circle.Move(circle.getCollider().getMTV(rectangleRight.getCollider()));
-            velocity = velocity.reflect(normal).scale(0.8);
+            velocity = velocity.reflect(normal).scale(0.5);
         }
 
         circle.Move(velocity);
