@@ -1,5 +1,7 @@
 package Shapes;
 
+import Physics.Collision.Collider;
+import Physics.Collision.RectangleCollider;
 import com.jogamp.opengl.GL2;
 
 public class Rectangle implements Shape {
@@ -10,6 +12,8 @@ public class Rectangle implements Shape {
     private final boolean fill;
     private double rotation; // degrees
     private Point origin;    // starting from bottom left
+    private RectangleCollider collider;
+
 
     private Rectangle(Builder b) {
         this.width = b.width;
@@ -18,11 +22,13 @@ public class Rectangle implements Shape {
         this.fill = b.fill;
         this.rotation = b.rotation;
         this.origin = b.origin;
+        collider = new RectangleCollider(origin, width, height, rotation);
     }
 
     @Override
     public void setOrigin(Point origin) {
         this.origin = origin;
+        collider.setOrigin(origin);
     }
 
     @Override
@@ -44,20 +50,30 @@ public class Rectangle implements Shape {
     public void Scale(double factor) {
         this.width *= factor;
         this.height *= factor;
+        collider.setWidth(width);
+        collider.setHeight(height);
     }
 
     @Override
     public void Rotate(double angle) {
         this.rotation += angle;
+        collider.setRotation(rotation);
+    }
+
+    @Override
+    public Collider getCollider() {
+        return collider;
     }
 
     @Override
     public void Move(Vector2 delta) {
         this.origin = new Point(origin.x() + delta.x(), origin.y() + delta.y());
+        collider.setOrigin(origin);
+        collider.setOrigin(origin);
     }
 
     @Override
-    public void Draw(GL2 gl) {
+    public void draw(GL2 gl) {
         color.useColorGl(gl);
 
         gl.glPushMatrix();
