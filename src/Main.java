@@ -1,4 +1,5 @@
 import Game.PageManager;
+import Game.SoundHandler;
 import Pages.DevTestScene;
 import Pages.Page;
 
@@ -12,5 +13,6 @@ public class Main {
 
         Page test = new DevTestScene();
         PageManager.showPage(test);
+        SoundHandler.play("Sounds/memphis-trap-wav-349366.wav");
     }
 }
