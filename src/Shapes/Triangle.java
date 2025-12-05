@@ -1,5 +1,6 @@
 package Shapes;
 
+import Physics.Collision.Collider;
 import com.jogamp.opengl.GL2;
 
 import java.util.ArrayList;
@@ -68,9 +69,8 @@ public class Triangle implements Shape {
         }
     }
 
-    // -------------------------------
-    // Rotate
-    // -------------------------------
+   
+    
     @Override
     public void Rotate(double deltaAngle) {
         double rad = Math.toRadians(deltaAngle);
@@ -78,6 +78,11 @@ public class Triangle implements Shape {
 
         for (int i = 0; i < 3; i++)
             points.set(i, rotatePoint(points.get(i), c, rad));
+    }
+
+    @Override
+    public Collider getCollider() {
+        return null;
     }
 
     private Point rotatePoint(Point p, Point center, double rad) {
@@ -93,22 +98,18 @@ public class Triangle implements Shape {
         );
     }
 
-    // -------------------------------
-    // Move
-    // -------------------------------
+   
     @Override
-    public void Move(double x, double y) {
-        Vector2 delta = new Vector2(x, y);
+    public void Move(Vector2 delta) {
+
 
         for (int i = 0; i < 3; i++)
             points.set(i, points.get(i).add(delta));
     }
 
-    // -------------------------------
-    // Draw
-    // -------------------------------
+
     @Override
-    public void Draw(GL2 gl) {
+    public void draw(GL2 gl) {
         color.useColorGl(gl);
 
         gl.glBegin(fill ? GL2.GL_TRIANGLES : GL2.GL_LINE_LOOP);

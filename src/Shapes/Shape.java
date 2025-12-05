@@ -1,5 +1,6 @@
 package Shapes;
 
+import Physics.Collision.Collider;
 import com.jogamp.opengl.GL2;
 
 public interface Shape {
@@ -16,9 +17,11 @@ public interface Shape {
 
      void Rotate(double Angle);
 
-     void Move(Vector2 delta);
+    Collider getCollider();
 
-     void Draw(GL2 gl);
+    void Move(Vector2 delta);
+
+     void draw(GL2 gl);
 
      <T> T Copy();
 }

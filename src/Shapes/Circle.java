@@ -1,5 +1,7 @@
 package Shapes;
 
+import Physics.Collision.CircleCollider;
+import Physics.Collision.Collider;
 import com.jogamp.opengl.GL2;
 
 public class Circle implements Shape {
@@ -10,6 +12,8 @@ public class Circle implements Shape {
     private final Color color;
     private double Cx, Cy;
 
+    CircleCollider collider;
+
 
     public Circle(Builder builder) {
         radius = builder.radius;
@@ -17,6 +21,7 @@ public class Circle implements Shape {
         Angle = builder.Angle;
         filled = builder.filled;
         color = builder.color;
+        collider  = new CircleCollider(Center, radius);
     }
 
     // set the center as point not as Coordinate
@@ -25,6 +30,7 @@ public class Circle implements Shape {
         Center = center;
         Cx = center.x();
         Cy = center.y();
+        collider.setCenter(center);
     }
 
     //  return the Center as point
@@ -36,6 +42,7 @@ public class Circle implements Shape {
     // sets radius
     public void setRadius(double radius) {
         this.radius = radius;
+        collider.setRadius(radius);
     }
 
     //  returns the width as double of the radius
@@ -64,12 +71,18 @@ public class Circle implements Shape {
     @Override
     public void Scale(double Factor) {
         radius *= Factor;
+        collider.setRadius(radius);
     }
 
     // rotate is by the angle as it's polar coordinates as radian
     @Override
     public void Rotate(double Angle) {
         this.Angle = Angle;
+    }
+
+    @Override
+    public Collider getCollider() {
+        return collider;
     }
 
     // returns angle in radian
@@ -81,10 +94,11 @@ public class Circle implements Shape {
     @Override
     public void Move(Vector2 delta) {
         Center = new Point(delta.x() + Center.x(), delta.y() + Center.y());
+        collider.setCenter(Center);
     }
 
     @Override
-    public void Draw(GL2 gl) {
+    public void draw(GL2 gl) {
         int iterations = Math.max(20, (int) (radius * 2));
         double angleStepDeg = 360.0 / iterations;
 
