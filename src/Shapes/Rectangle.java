@@ -1,5 +1,7 @@
 package Shapes;
 
+import Physics.Collision.Collider;
+import Physics.Collision.RectangleCollider;
 import com.jogamp.opengl.GL2;
 
 public class Rectangle implements Shape {
@@ -10,6 +12,8 @@ public class Rectangle implements Shape {
     private final boolean fill;
     private double rotation; // degrees
     private Point origin;    // starting from bottom left
+    private RectangleCollider collider;
+
 
     private Rectangle(Builder b) {
         this.width = b.width;
@@ -18,11 +22,13 @@ public class Rectangle implements Shape {
         this.fill = b.fill;
         this.rotation = b.rotation;
         this.origin = b.origin;
+        collider = new RectangleCollider(origin, width, height, rotation);
     }
 
     @Override
     public void setOrigin(Point origin) {
         this.origin = origin;
+        collider.setOrigin(origin);
     }
 
     @Override
@@ -44,26 +50,50 @@ public class Rectangle implements Shape {
     public void Scale(double factor) {
         this.width *= factor;
         this.height *= factor;
+        collider.setWidth(width);
+        collider.setHeight(height);
     }
 
     @Override
     public void Rotate(double angle) {
         this.rotation += angle;
+        collider.setRotation(rotation);
+    }
+
+    @Override
+    public Collider getCollider() {
+        return collider;
+    }
+
+    public double getRotation() {
+        return rotation;
     }
 
     @Override
     public void Move(Vector2 delta) {
         this.origin = new Point(origin.x() + delta.x(), origin.y() + delta.y());
+        collider.setOrigin(origin);
+        collider.setOrigin(origin);
     }
 
     @Override
-    public void Draw(GL2 gl) {
+    public void draw(GL2 gl) {
         color.useColorGl(gl);
 
         gl.glPushMatrix();
-        gl.glTranslated(origin.x(), origin.y(), 0);
+
+        // Move to rectangle center
+        double centerX = origin.x() + width / 2;
+        double centerY = origin.y() + height / 2;
+        gl.glTranslated(centerX, centerY, 0);
+
+        // Rotate around center
         gl.glRotated(rotation, 0, 0, 1);
 
+        // Move back by half width/height to draw from bottom-left
+        gl.glTranslated(-width / 2, -height / 2, 0);
+
+        // Draw rectangle
         if (fill) {
             gl.glBegin(GL2.GL_QUADS);
         } else {
@@ -78,6 +108,7 @@ public class Rectangle implements Shape {
         gl.glEnd();
         gl.glPopMatrix();
     }
+
 
     //provides a deep copy of the rectangle
     @Override

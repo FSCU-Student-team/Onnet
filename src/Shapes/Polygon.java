@@ -1,5 +1,6 @@
 package Shapes;
 
+import Physics.Collision.Collider;
 import com.jogamp.opengl.GL2;
 
 import java.util.ArrayList;
@@ -72,6 +73,11 @@ public class Polygon implements Shape {
         rotation += deltaAngle;
     }
 
+    @Override
+    public Collider getCollider() {
+        return null;
+    }
+
     protected static Point rotatePoint(Point p, Point center, double rad) {
         double cos = Math.cos(rad);
         double sin = Math.sin(rad);
@@ -92,7 +98,7 @@ public class Polygon implements Shape {
     }
 
     @Override
-    public void Draw(GL2 gl) {
+    public void draw(GL2 gl) {
         color.useColorGl(gl);
 
         gl.glPushMatrix();

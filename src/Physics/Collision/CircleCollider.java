@@ -166,7 +166,62 @@ public class CircleCollider implements Collider {
 
     @Override
     public Vector2 getMTV(Collider other) {
-        // will do later
-        return null;
+        if (other instanceof RectangleCollider r) {
+            // Rectangle dimensions
+            double hw = r.getWidth() / 2;
+            double hh = r.getHeight() / 2;
+
+            // Rectangle center
+            Point centerR = new Point(r.getOrigin().x() + hw, r.getOrigin().y() + hh);
+
+            // Circle center in rectangle local space
+            double cx = center.x() - centerR.x();
+            double cy = center.y() - centerR.y();
+
+            // Rotate circle by -rectangle rotation
+            double angle = Math.toRadians(r.getRotation());
+            double cos = Math.cos(angle);
+            double sin = Math.sin(angle);
+            double localX = cos * cx + sin * cy;
+            double localY = -sin * cx + cos * cy;
+
+            // Closest point on rectangle
+            double closestX = Math.max(-hw, Math.min(localX, hw));
+            double closestY = Math.max(-hh, Math.min(localY, hh));
+
+            double dx = localX - closestX;
+            double dy = localY - closestY;
+            double distSq = dx*dx + dy*dy;
+
+            if (distSq == 0) {
+                // Circle center is inside rectangle: push out along smallest axis
+                double overlapX = radius + hw - Math.abs(localX);
+                double overlapY = radius + hh - Math.abs(localY);
+                if (overlapX < overlapY) {
+                    dx = (localX < 0 ? -1 : 1) * overlapX;
+                    dy = 0;
+                } else {
+                    dx = 0;
+                    dy = (localY < 0 ? -1 : 1) * overlapY;
+                }
+            } else if (distSq < radius*radius) {
+                double dist = Math.sqrt(distSq);
+                double overlap = radius - dist;
+                dx = dx / dist * overlap;
+                dy = dy / dist * overlap;
+            } else {
+                // no collision
+                return Vector2.ZERO;
+            }
+
+            // Rotate back to world space
+            double mtvX = cos * dx - sin * dy;
+            double mtvY = sin * dx + cos * dy;
+
+            return new Vector2(mtvX, mtvY);
+        }
+
+        // TODO: Add circle-circle, circle-triangle, and so on.
+        return Vector2.ZERO;
     }
 }

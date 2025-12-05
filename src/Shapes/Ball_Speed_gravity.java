@@ -37,7 +37,7 @@ public class Ball_Speed_gravity {
         screenWidth=manager.orthoRight-manager.orthoLeft;
         screenHeight=manager.orthoTop-manager.orthoBottom;
     }
-//  to update as each interaction with ball the (dt) as physics update rate if 0.0167 means 60 FPS as no effect of FPSAnimator on it
+//  to update as each interaction with ball the (dt) as physics update rate if 0.0167 means 60 FPS as no effect of FPSAnimator on it  but we can use physics Step 1/500
     public void update(double dt, int inputState) {
         if (!isLaunched) {
             if (Input.isSet(inputState, Input.LEFT)) {
@@ -94,7 +94,7 @@ public class Ball_Speed_gravity {
     }
 //  draw Circle and line together
     public void Draw(GL2 gl) {
-        circle.Draw(gl);
+        circle.draw(gl);
         if (!isLaunched) {
             DrawAimLine(gl,Color.RED);
         }

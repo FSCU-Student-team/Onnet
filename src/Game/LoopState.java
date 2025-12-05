@@ -1,6 +1,6 @@
 package Game;
 
 public class LoopState {
-    long lastTime; //time at last frame
-    double accumulator; //differnce between current and last frame
+    public long lastTime; //time at last frame
+    public double accumulator; //differnce between current and last frame
 }
