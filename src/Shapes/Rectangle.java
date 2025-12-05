@@ -65,6 +65,10 @@ public class Rectangle implements Shape {
         return collider;
     }
 
+    public double getRotation() {
+        return rotation;
+    }
+
     @Override
     public void Move(Vector2 delta) {
         this.origin = new Point(origin.x() + delta.x(), origin.y() + delta.y());
@@ -77,9 +81,19 @@ public class Rectangle implements Shape {
         color.useColorGl(gl);
 
         gl.glPushMatrix();
-        gl.glTranslated(origin.x(), origin.y(), 0);
+
+        // Move to rectangle center
+        double centerX = origin.x() + width / 2;
+        double centerY = origin.y() + height / 2;
+        gl.glTranslated(centerX, centerY, 0);
+
+        // Rotate around center
         gl.glRotated(rotation, 0, 0, 1);
 
+        // Move back by half width/height to draw from bottom-left
+        gl.glTranslated(-width / 2, -height / 2, 0);
+
+        // Draw rectangle
         if (fill) {
             gl.glBegin(GL2.GL_QUADS);
         } else {
@@ -94,6 +108,7 @@ public class Rectangle implements Shape {
         gl.glEnd();
         gl.glPopMatrix();
     }
+
 
     //provides a deep copy of the rectangle
     @Override
