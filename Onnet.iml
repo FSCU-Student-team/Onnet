@@ -10,7 +10,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/src/Libs/gluegen-rt.jar!/" />
+          <root url="jar://$MODULE_DIR$/Libs/gluegen-rt.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -19,7 +19,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/src/Libs/jogl-all.jar!/" />
+          <root url="jar://$MODULE_DIR$/Libs/jogl-all.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
