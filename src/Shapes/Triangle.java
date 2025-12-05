@@ -68,9 +68,8 @@ public class Triangle implements Shape {
         }
     }
 
-    // -------------------------------
-    // Rotate
-    // -------------------------------
+   
+    
     @Override
     public void Rotate(double deltaAngle) {
         double rad = Math.toRadians(deltaAngle);
@@ -93,9 +92,7 @@ public class Triangle implements Shape {
         );
     }
 
-    // -------------------------------
-    // Move
-    // -------------------------------
+   
     @Override
     public void Move(Vector2 delta) {
 
@@ -104,9 +101,7 @@ public class Triangle implements Shape {
             points.set(i, points.get(i).add(delta));
     }
 
-    // -------------------------------
-    // Draw
-    // -------------------------------
+
     @Override
     public void Draw(GL2 gl) {
         color.useColorGl(gl);
