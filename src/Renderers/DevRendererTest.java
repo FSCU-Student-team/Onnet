@@ -5,8 +5,6 @@ import Game.Input;
 import Game.InputManager;
 import Game.LoopState;
 import Physics.ActionManager;
-import Physics.Collision.RectangleCollider;
-import Physics.Entities.Ball;
 import Shapes.*;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
@@ -48,11 +46,11 @@ public class DevRendererTest implements GLEventListener, GameLoop {
         actionManager.bind(Input.S, () -> velocity = velocity.add(new Vector2(0, -0.05)));
 
 
-        circle = new Circle.Builder().color(Color.WHITE).Angle(0).Filled(true).Center(new Point(400, 300)).Radius(20).Build();
-        rectangle = new Rectangle.Builder().color(Color.BLUE).rotation(10).fill(true).origin(new Point(0, 50)).width(1000).height(10).build();
-        rectangleTop = new Rectangle.Builder().color(Color.BLUE).rotation(0).fill(true).origin(new Point(0, 500)).width(1000).height(10).build();
-        rectangleLeft = new Rectangle.Builder().color(Color.BLUE).rotation(0).fill(true).origin(new Point(700, 0)).width(10).height(1000).build();
-        rectangleRight = new Rectangle.Builder().color(Color.BLUE).rotation(0).fill(true).origin(new Point(50, 0)).width(10).height(1000).build();
+        circle = new Circle.Builder().color(Color.WHITE).angle(0).filled(true).center(new Point(400, 300)).radius(20).build();
+        rectangle = new Rectangle.Builder().color(Color.BLUE).rotation(10).fill(true).origin(new Point(0, 50)).restitution(0.5).width(1000).height(10).build();
+        rectangleTop = new Rectangle.Builder().color(Color.BLUE).rotation(0).fill(true).origin(new Point(0, 500)).restitution(0.5).width(1000).height(10).build();
+        rectangleLeft = new Rectangle.Builder().color(Color.BLUE).rotation(0).fill(true).origin(new Point(700, 0)).restitution(0.5).width(10).height(1000).build();
+        rectangleRight = new Rectangle.Builder().color(Color.BLUE).rotation(0).fill(true).origin(new Point(50, 0)).restitution(0.5).width(10).height(1000).build();
 
     }
 
@@ -85,9 +83,9 @@ public class DevRendererTest implements GLEventListener, GameLoop {
         if (circle.getCollider().intersects(rectangle.getCollider())) {
             Vector2 mtv = circle.getCollider().getMTV(rectangle.getCollider());
             if (!mtv.isZero()) {
-                circle.Move(mtv); // push out of collision
+                circle.move(mtv); // push out of collision
                 Vector2 normal = mtv.normalize(); // normal points from rectangle to circle
-                velocity = velocity.reflect(normal).scale(0.5);
+                velocity = velocity.reflect(normal).scale(rectangle.getRestitution());
             }
         }
 
@@ -95,23 +93,23 @@ public class DevRendererTest implements GLEventListener, GameLoop {
         if (circle.getCollider().intersects(rectangleTop.getCollider())) {
             // Normal pointing down
             Vector2 normal = new Vector2(0, -1);
-            circle.Move(circle.getCollider().getMTV(rectangleTop.getCollider()));
-            velocity = velocity.reflect(normal).scale(0.5);
+            circle.move(circle.getCollider().getMTV(rectangleTop.getCollider()));
+            velocity = velocity.reflect(normal).scale(rectangleTop.getRestitution());
         }
 
         if (circle.getCollider().intersects(rectangleLeft.getCollider())) {
             Vector2 normal = new Vector2(-1, 0);
-            circle.Move(circle.getCollider().getMTV(rectangleLeft.getCollider()));
-            velocity = velocity.reflect(normal).scale(0.5);
+            circle.move(circle.getCollider().getMTV(rectangleLeft.getCollider()));
+            velocity = velocity.reflect(normal).scale(rectangleLeft.getRestitution());
         }
 
         if (circle.getCollider().intersects(rectangleRight.getCollider())) {
             Vector2 normal = new Vector2(1, 0);
-            circle.Move(circle.getCollider().getMTV(rectangleRight.getCollider()));
-            velocity = velocity.reflect(normal).scale(0.5);
+            circle.move(circle.getCollider().getMTV(rectangleRight.getCollider()));
+            velocity = velocity.reflect(normal).scale(rectangleRight.getRestitution());
         }
 
-        circle.Move(velocity);
+        circle.move(velocity);
 
         velocity = velocity.add(gravity);
     }

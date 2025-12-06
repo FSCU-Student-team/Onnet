@@ -3,11 +3,19 @@ package Physics.Collision;
 import Shapes.Point;
 import Shapes.Vector2;
 
+import java.util.ArrayList;
+
 public class TriangleCollider implements Collider {
 
     private Point A;
     private Point B;
     private Point C;
+
+    public TriangleCollider(Point A, Point B, Point C) {
+        this.A = A;
+        this.B = B;
+        this.C = C;
+    }
 
     @Override
     public AABB getAABB() {
@@ -39,27 +47,22 @@ public class TriangleCollider implements Collider {
         return null;
     }
 
+    public void setPoints(ArrayList<Point> points) {
+        A = points.getFirst();
+        B = points.get(1);
+        C = points.get(2);
+    }
+
     public Point getA() {
-        return A;
+        return new Point(A.x(), A.y());
     }
 
-    public void setA(Point a) {
-        A = a;
+    public Point getB(){
+        return new Point(B.x(), B.y());
     }
 
-    public Point getB() {
-        return B;
+    public Point getC(){
+        return new Point(C.x(), C.y());
     }
 
-    public void setB(Point b) {
-        B = b;
-    }
-
-    public Point getC() {
-        return C;
-    }
-
-    public void setC(Point c) {
-        C = c;
-    }
 }

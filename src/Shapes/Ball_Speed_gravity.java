@@ -6,8 +6,6 @@ import Game.InputManager;
 import Physics.Collision.CircleCollider;
 import com.jogamp.opengl.GL2;
 
-import java.awt.*;
-
 public class Ball_Speed_gravity {
     private Circle circle;
     private Point CPoint;
@@ -29,7 +27,7 @@ public class Ball_Speed_gravity {
     private static final double bounce_factor = -0.8;
 
     public Ball_Speed_gravity(Point Start, double radius, double Angle, Color color, boolean Filled) {
-        circle = new Circle.Builder().Center(Start).Radius(radius).Filled(Filled).color(color).Angle(Angle).Build();
+        circle = new Circle.Builder().center(Start).radius(radius).filled(Filled).color(color).angle(Angle).build();
         collider = new CircleCollider(Start, radius);
         velocity = new Vector2(0, 0);
         CPoint = new Point(circle.getCenter().x(), circle.getCenter().y());
@@ -62,7 +60,7 @@ public class Ball_Speed_gravity {
         } else {
             double Newy = velocity.y() + (GRAVITY * dt);
             velocity = new Vector2(velocity.x(), Newy);
-            circle.Move(velocity);
+            circle.move(velocity);
             collider.setCenter(circle.getCenter());
             CheckWallCollision(screenWidth, screenHeight);
         }

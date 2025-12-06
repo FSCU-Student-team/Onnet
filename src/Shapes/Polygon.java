@@ -62,12 +62,12 @@ public class Polygon implements Shape {
     }
 
     @Override
-    public void Scale(double factor) {
+    public void scale(double factor) {
         points.replaceAll(point -> origin.add(point.subtract(origin).scale(factor)));
     }
 
     @Override
-    public void Rotate(double deltaAngle) {
+    public void rotate(double deltaAngle) {
         double rad = Math.toRadians(deltaAngle);
         points.replaceAll(p -> rotatePoint(p, origin, rad));
         rotation += deltaAngle;
@@ -75,7 +75,12 @@ public class Polygon implements Shape {
 
     @Override
     public Collider getCollider() {
-        return null;
+        return null; //TODO: implement
+    }
+
+    @Override
+    public double getRestitution() {
+        return 0; //TODO: implement
     }
 
     protected static Point rotatePoint(Point p, Point center, double rad) {
@@ -92,7 +97,7 @@ public class Polygon implements Shape {
     }
 
     @Override
-    public void Move(Vector2 delta) {
+    public void move(Vector2 delta) {
         points.replaceAll(point -> point.add(delta));
         origin = origin.add(delta);
     }
@@ -114,7 +119,7 @@ public class Polygon implements Shape {
     }
 
     @Override
-    public Polygon Copy() {
+    public Polygon copy() {
         Builder b = new Builder();
         for (Point p : points)
             b.addPoint(new Point(p.x(), p.y()));
