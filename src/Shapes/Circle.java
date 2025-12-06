@@ -6,37 +6,36 @@ import com.jogamp.opengl.GL2;
 
 public class Circle implements Shape {
     private double radius;
-    private Point Center;
-    private double Angle; //in degrees
+    private Point center;
+    private double angle; //in degrees
     private boolean filled;
     private final Color color;
-    private double Cx, Cy;
+    private final double restitution; // restitution = (1 - energyLossRatioPerImpact)
 
     CircleCollider collider;
 
 
     public Circle(Builder builder) {
         radius = builder.radius;
-        Center = builder.Center;
-        Angle = builder.Angle;
+        center = builder.center;
+        angle = builder.angle;
         filled = builder.filled;
         color = builder.color;
-        collider  = new CircleCollider(Center, radius);
+        restitution = builder.restitution;
+        collider  = new CircleCollider(center, radius);
     }
 
     // set the center as point not as Coordinate
     @Override
     public void setOrigin(Point center) {
-        Center = center;
-        Cx = center.x();
-        Cy = center.y();
+        this.center = center;
         collider.setCenter(center);
     }
 
     //  return the Center as point
     @Override
     public Point getCenter() {
-        return Center;
+        return center;
     }
 
     // sets radius
@@ -69,15 +68,15 @@ public class Circle implements Shape {
 
     // scaling with increase or decrease the radius with Factor
     @Override
-    public void Scale(double Factor) {
+    public void scale(double Factor) {
         radius *= Factor;
         collider.setRadius(radius);
     }
 
     // rotate is by the angle as it's polar coordinates as radian
     @Override
-    public void Rotate(double Angle) {
-        this.Angle = Angle;
+    public void rotate(double Angle) {
+        this.angle = Angle;
     }
 
     @Override
@@ -85,16 +84,21 @@ public class Circle implements Shape {
         return collider;
     }
 
+    @Override
+    public double getRestitution() {
+        return restitution;
+    }
+
     // returns angle in radian
     public double getAngle() {
-        return Angle;
+        return angle;
     }
 
     // moving is by have new point of moved x and moved y by new value as speed
     @Override
-    public void Move(Vector2 delta) {
-        Center = new Point(delta.x() + Center.x(), delta.y() + Center.y());
-        collider.setCenter(Center);
+    public void move(Vector2 delta) {
+        center = new Point(delta.x() + center.x(), delta.y() + center.y());
+        collider.setCenter(center);
     }
 
     @Override
@@ -102,7 +106,7 @@ public class Circle implements Shape {
         int iterations = Math.max(20, (int) (radius * 2));
         double angleStepDeg = 360.0 / iterations;
 
-        double rotationRad = Math.toRadians(Angle);
+        double rotationRad = Math.toRadians(angle);
 
         color.useColorGl(gl);
 
@@ -111,8 +115,8 @@ public class Circle implements Shape {
         for (int i = 0; i < iterations; i++) {
             double theta = Math.toRadians(i * angleStepDeg) + rotationRad;
 
-            double x = Center.x() + radius * Math.cos(theta);
-            double y = Center.y() + radius * Math.sin(theta);
+            double x = center.x() + radius * Math.cos(theta);
+            double y = center.y() + radius * Math.sin(theta);
 
             gl.glVertex2d(x, y);
         }
@@ -122,33 +126,32 @@ public class Circle implements Shape {
 
 
     @Override
-    public Circle Copy() {
+    public Circle copy() {
         return new Builder()
-                .Radius(radius)
-                .Filled(filled)
-                .color(color)
-                .Center(Center)
-                .Angle(Angle)
-                .Build();
+                .radius(radius)
+                .filled(filled)
+                .color(color) //color is immutable
+                .center(new Point(center.x(), center.y()))
+                .angle(angle)
+                .restitution(restitution)
+                .build();
     }
 
     public static class Builder {
         private double radius;
-        private Point Center;
-        private double Angle;
+        private Point center = new Point(0, 0);
+        private double angle;
         private boolean filled;
-        private Color color;
-        private double Cx, Cy;
+        private Color color = Color.WHITE;
+        private double restitution = 0;
 
-        public Builder Radius(double radius) {
+        public Builder radius(double radius) {
             this.radius = radius;
             return this;
         }
 
-        public Builder Center(Point center) {
-            this.Center = center;
-            this.Cx = center.x();
-            this.Cy = center.y();
+        public Builder center(Point center) {
+            this.center = center;
             return this;
         }
 
@@ -157,17 +160,26 @@ public class Circle implements Shape {
             return this;
         }
 
-        public Builder Filled(boolean fill) {
+        public Builder filled(boolean fill) {
             this.filled = fill;
             return this;
         }
 
-        public Builder Angle(double rotation) {
-            this.Angle = rotation;
+        public Builder angle(double rotation) {
+            this.angle = rotation;
             return this;
         }
 
-        public Circle Build() {
+        public Builder restitution(double restitution) {
+            this.restitution = restitution;
+            return this;
+        }
+
+        public Circle build() {
+            if (restitution < 0) restitution = 0;
+            if (radius < 0) radius = 0;
+            if (angle < 0) angle = (angle % 360 + 360) % 360; //turn negative angle to positive
+            if (angle > 360) angle = angle % 360;
             return new Circle(this);
         }
     }

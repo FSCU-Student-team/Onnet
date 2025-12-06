@@ -2,12 +2,9 @@ package Game;
 
 import javax.sound.sampled.*;
 import java.io.File;
-import java.io.IOException;
 
 public class SoundHandler {
-    private SoundHandler() {
-
-    }
+    private SoundHandler() {}
 
     public static void play(String sound){
         try {

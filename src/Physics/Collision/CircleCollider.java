@@ -12,12 +12,7 @@ public class CircleCollider implements Collider {
     public CircleCollider(Point center, double radius) {
         this.center = center;
         this.radius = radius;
-        aabb = new AABB(
-                center.x() - radius,
-                center.y() - radius,
-                center.x() + radius,
-                center.y() + radius
-        );
+        updateAABB();
     }
 
     public Point getCenter() {
@@ -26,7 +21,7 @@ public class CircleCollider implements Collider {
 
     public void setCenter(Point center) {
         this.center = center;
-        aabb = new AABB(center.x() - radius, center.y() - radius, center.x() + radius, center.y() + radius);
+        updateAABB();
     }
 
     public double getRadius() {
@@ -35,7 +30,16 @@ public class CircleCollider implements Collider {
 
     public void setRadius(double radius) {
         this.radius = radius;
-        aabb = new AABB(center.x() - radius, center.y() - radius, center.x() + radius, center.y() + radius);
+        updateAABB();
+    }
+
+    private void updateAABB() {
+        aabb = new AABB(
+                center.x() - radius,
+                center.y() - radius,
+                center.x() + radius,
+                center.y() + radius
+        );
     }
 
     @Override
@@ -166,62 +170,163 @@ public class CircleCollider implements Collider {
 
     @Override
     public Vector2 getMTV(Collider other) {
-        if (other instanceof RectangleCollider r) {
-            // Rectangle dimensions
-            double hw = r.getWidth() / 2;
-            double hh = r.getHeight() / 2;
+        return switch (other) {
+            case RectangleCollider r -> getRectangleMTV(r);
+            case TriangleCollider t -> getTriangleMTV(t);
+            default -> Vector2.ZERO;
+        };
 
-            // Rectangle center
-            Point centerR = new Point(r.getOrigin().x() + hw, r.getOrigin().y() + hh);
+        // TODO: Add circle-circle and circle-ellipse and circle-polynomial.
+    }
 
-            // Circle center in rectangle local space
-            double cx = center.x() - centerR.x();
-            double cy = center.y() - centerR.y();
+    private Vector2 getTriangleMTV(TriangleCollider t) {
+        Point A = t.getA();
+        Point B = t.getB();
+        Point C = t.getC();
 
-            // Rotate circle by -rectangle rotation
-            double angle = Math.toRadians(r.getRotation());
-            double cos = Math.cos(angle);
-            double sin = Math.sin(angle);
-            double localX = cos * cx + sin * cy;
-            double localY = -sin * cx + cos * cy;
+        // 1 – If circle center is inside triangle -> push out along smallest edge-normal overlap
+        if (pointInTriangle(center, t)) {
+            MTVResult r1 = mtvCircleAgainstEdge(center, radius, A, B);
+            MTVResult r2 = mtvCircleAgainstEdge(center, radius, B, C);
+            MTVResult r3 = mtvCircleAgainstEdge(center, radius, C, A);
 
-            // Closest point on rectangle
-            double closestX = Math.max(-hw, Math.min(localX, hw));
-            double closestY = Math.max(-hh, Math.min(localY, hh));
-
-            double dx = localX - closestX;
-            double dy = localY - closestY;
-            double distSq = dx*dx + dy*dy;
-
-            if (distSq == 0) {
-                // Circle center is inside rectangle: push out along smallest axis
-                double overlapX = radius + hw - Math.abs(localX);
-                double overlapY = radius + hh - Math.abs(localY);
-                if (overlapX < overlapY) {
-                    dx = (localX < 0 ? -1 : 1) * overlapX;
-                    dy = 0;
-                } else {
-                    dx = 0;
-                    dy = (localY < 0 ? -1 : 1) * overlapY;
-                }
-            } else if (distSq < radius*radius) {
-                double dist = Math.sqrt(distSq);
-                double overlap = radius - dist;
-                dx = dx / dist * overlap;
-                dy = dy / dist * overlap;
-            } else {
-                // no collision
-                return Vector2.ZERO;
-            }
-
-            // Rotate back to world space
-            double mtvX = cos * dx - sin * dy;
-            double mtvY = sin * dx + cos * dy;
-
-            return new Vector2(mtvX, mtvY);
+            MTVResult best = smallestPositive(r1, r2, r3);
+            if (best != null) return best.vector();
         }
 
-        // TODO: Add circle-circle, circle-triangle, and so on.
+        // 2 – Vertex penetration
+        MTVResult vA = mtvCircleAgainstPoint(center, radius, A);
+        MTVResult vB = mtvCircleAgainstPoint(center, radius, B);
+        MTVResult vC = mtvCircleAgainstPoint(center, radius, C);
+
+        MTVResult bestVertex = smallestPositive(vA, vB, vC);
+        if (bestVertex != null) return bestVertex.vector();
+
+        // 3 – Edge penetration
+        MTVResult e1 = mtvCircleAgainstEdge(center, radius, A, B);
+        MTVResult e2 = mtvCircleAgainstEdge(center, radius, B, C);
+        MTVResult e3 = mtvCircleAgainstEdge(center, radius, C, A);
+
+        MTVResult bestEdge = smallestPositive(e1, e2, e3);
+        if (bestEdge != null) return bestEdge.vector();
+
         return Vector2.ZERO;
+    }
+
+    private MTVResult mtvCircleAgainstPoint(Point center, double radius, Point p) {
+        Vector2 diff = center.subtract(p);
+        double distSq = diff.magnitudeSquared();
+
+        if (distSq >= radius * radius) return null;
+
+        double dist = Math.sqrt(distSq);
+        if (dist == 0) {
+            // center exactly on vertex → choose arbitrary outward direction (x positive)
+            return new MTVResult(new Vector2(radius, 0), radius);
+        }
+
+        double overlap = radius - dist;
+        Vector2 normal = diff.normalize();
+        return new MTVResult(normal.scale(overlap), overlap);
+    }
+
+    private MTVResult mtvCircleAgainstEdge(Point center, double radius, Point p1, Point p2) {
+        Vector2 ab = p2.subtract(p1);
+        Vector2 ac = center.subtract(p1);
+
+        double denom = ab.dot(ab);
+        if (denom == 0) {
+            // degenerate edge -> treat as point
+            return mtvCircleAgainstPoint(center, radius, p1);
+        }
+
+        double proj = ac.dot(ab) / denom;
+        proj = Math.max(0, Math.min(1, proj));
+
+        Point closest = new Point(
+                p1.x() + ab.x() * proj,
+                p1.y() + ab.y() * proj
+        );
+
+        Vector2 diff = center.subtract(closest);
+        double distSq = diff.magnitudeSquared();
+        if (distSq >= radius * radius) return null;
+
+        double dist = Math.sqrt(distSq);
+        if (dist == 0) {
+            // center exactly on edge -> push perpendicular to edge
+            Vector2 perp = ab.perpendicular().normalize();
+            return new MTVResult(perp.scale(radius), radius);
+        }
+
+        double overlap = radius - dist;
+        Vector2 normal = diff.normalize();
+        return new MTVResult(normal.scale(overlap), overlap);
+    }
+
+    private MTVResult smallestPositive(MTVResult... results) {
+        MTVResult best = null;
+        for (MTVResult r : results) {
+            if (r != null && r.magnitude() > 0) {
+                if (best == null || r.magnitude() < best.magnitude()) best = r;
+            }
+        }
+        return best;
+    }
+
+
+    public Vector2 getRectangleMTV(RectangleCollider r) {
+        // Rectangle dimensions
+        double hw = r.getWidth() / 2;
+        double hh = r.getHeight() / 2;
+
+        // Rectangle center
+        Point centerR = new Point(r.getOrigin().x() + hw, r.getOrigin().y() + hh);
+
+        // Circle center in rectangle local space
+        double cx = center.x() - centerR.x();
+        double cy = center.y() - centerR.y();
+
+        // Rotate circle by -rectangle rotation
+        double angle = Math.toRadians(r.getRotation());
+        double cos = Math.cos(angle);
+        double sin = Math.sin(angle);
+        double localX = cos * cx + sin * cy;
+        double localY = -sin * cx + cos * cy;
+
+        // Closest point on rectangle
+        double closestX = Math.max(-hw, Math.min(localX, hw));
+        double closestY = Math.max(-hh, Math.min(localY, hh));
+
+        double dx = localX - closestX;
+        double dy = localY - closestY;
+        double distSq = dx * dx + dy * dy;
+
+        if (distSq == 0) {
+            // Circle center is inside rectangle: push out along smallest axis
+            double overlapX = radius + hw - Math.abs(localX);
+            double overlapY = radius + hh - Math.abs(localY);
+            if (overlapX < overlapY) {
+                dx = (localX < 0 ? -1 : 1) * overlapX;
+                dy = 0;
+            } else {
+                dx = 0;
+                dy = (localY < 0 ? -1 : 1) * overlapY;
+            }
+        } else if (distSq < radius * radius) {
+            double dist = Math.sqrt(distSq);
+            double overlap = radius - dist;
+            dx = dx / dist * overlap;
+            dy = dy / dist * overlap;
+        } else {
+            // no collision
+            return Vector2.ZERO;
+        }
+
+        // Rotate back to world space
+        double mtvX = cos * dx - sin * dy;
+        double mtvY = sin * dx + cos * dy;
+
+        return new Vector2(mtvX, mtvY);
     }
 }

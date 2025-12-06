@@ -10,8 +10,10 @@ public class Rectangle implements Shape {
     private double height;
     private final Color color;
     private final boolean fill;
-    private double rotation; // degrees
+    private double angle; // degrees
     private Point origin;    // starting from bottom left
+    private double restitution;
+
     private RectangleCollider collider;
 
 
@@ -20,9 +22,10 @@ public class Rectangle implements Shape {
         this.height = b.height;
         this.color = b.color;
         this.fill = b.fill;
-        this.rotation = b.rotation;
+        this.angle = b.angle;
         this.origin = b.origin;
-        collider = new RectangleCollider(origin, width, height, rotation);
+        this.restitution = b.restitution;
+        collider = new RectangleCollider(origin, width, height, angle);
     }
 
     @Override
@@ -47,7 +50,7 @@ public class Rectangle implements Shape {
     }
 
     @Override
-    public void Scale(double factor) {
+    public void scale(double factor) {
         this.width *= factor;
         this.height *= factor;
         collider.setWidth(width);
@@ -55,9 +58,9 @@ public class Rectangle implements Shape {
     }
 
     @Override
-    public void Rotate(double angle) {
-        this.rotation += angle;
-        collider.setRotation(rotation);
+    public void rotate(double angle) {
+        this.angle += angle;
+        collider.setRotation(this.angle);
     }
 
     @Override
@@ -65,12 +68,17 @@ public class Rectangle implements Shape {
         return collider;
     }
 
-    public double getRotation() {
-        return rotation;
+    @Override
+    public double getRestitution() {
+        return restitution;
+    }
+
+    public double getAngle() {
+        return angle;
     }
 
     @Override
-    public void Move(Vector2 delta) {
+    public void move(Vector2 delta) {
         this.origin = new Point(origin.x() + delta.x(), origin.y() + delta.y());
         collider.setOrigin(origin);
         collider.setOrigin(origin);
@@ -88,7 +96,7 @@ public class Rectangle implements Shape {
         gl.glTranslated(centerX, centerY, 0);
 
         // Rotate around center
-        gl.glRotated(rotation, 0, 0, 1);
+        gl.glRotated(angle, 0, 0, 1);
 
         // Move back by half width/height to draw from bottom-left
         gl.glTranslated(-width / 2, -height / 2, 0);
@@ -112,24 +120,26 @@ public class Rectangle implements Shape {
 
     //provides a deep copy of the rectangle
     @Override
-    public Rectangle Copy() {
+    public Rectangle copy() {
         return new Builder()
                 .width(width)
                 .height(height)
                 .color(color)
                 .fill(fill)
-                .rotation(rotation)
+                .rotation(angle)
+                .restitution(restitution)
                 .origin(new Point(origin.x(), origin.y()))
                 .build();
     }
 
     public static class Builder {
-        private double width = 1;
-        private double height = 1;
-        private Color color = Color.BLACK;
+        private double width = 0;
+        private double height = 0;
+        private Color color = Color.BLUE;
         private boolean fill = false;
-        private double rotation = 0;
+        private double angle = 0;
         private Point origin = new Point(0, 0);
+        private double restitution = 0;
 
         public Builder width(double width) {
             this.width = width;
@@ -152,7 +162,7 @@ public class Rectangle implements Shape {
         }
 
         public Builder rotation(double rotation) {
-            this.rotation = rotation;
+            this.angle = rotation;
             return this;
         }
 
@@ -161,7 +171,15 @@ public class Rectangle implements Shape {
             return this;
         }
 
+        public Builder restitution(double restitution) {
+            this.restitution = restitution;
+            return this;
+        }
+
         public Rectangle build() {
+            if (restitution < 0) restitution = 0;
+            if (angle < 0) angle = (angle % 360 + 360) % 360; //turn negative angle to positive
+            if (angle > 360) angle = angle % 360;
             return new Rectangle(this);
         }
     }

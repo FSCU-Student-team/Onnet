@@ -1,6 +1,7 @@
 package Shapes;
 
 import Physics.Collision.Collider;
+import Physics.Collision.TriangleCollider;
 import com.jogamp.opengl.GL2;
 
 import java.util.ArrayList;
@@ -10,21 +11,34 @@ public class Triangle implements Shape {
     private final ArrayList<Point> points; // always size 3, will throw if you attempt to add more than 3
     private final Color color;
     private final boolean fill;
+    private final double restitution;
+
+    private TriangleCollider collider;
 
     public Triangle(Builder b) {
         if (b.points.size() != 3)
             throw new IllegalStateException("Triangle must have exactly 3 points.");
 
-        // deep copy to avoid external modification
         this.points = new ArrayList<>(b.points);
         this.color = b.color;
         this.fill = b.filled;
+        this.restitution = b.restitution;
+
+        collider = new TriangleCollider(points);
     }
 
     // Quality of life: to avoid repition
-    private Point p1() { return points.getFirst(); }
-    private Point p2() { return points.get(1); }
-    private Point p3() { return points.get(2); }
+    private Point p1() {
+        return points.getFirst();
+    }
+
+    private Point p2() {
+        return points.get(1);
+    }
+
+    private Point p3() {
+        return points.get(2);
+    }
 
     @Override
     public Point getCenter() {
@@ -60,31 +74,38 @@ public class Triangle implements Shape {
 
     // Scale
     @Override
-    public void Scale(double factor) {
+    public void scale(double factor) {
         Point c = getCenter();
-
         for (int i = 0; i < 3; i++) {
             Vector2 v = points.get(i).subtract(c).scale(factor);
             points.set(i, c.add(v));
         }
+        collider.setPoints(points);
     }
 
-   
-    
     @Override
-    public void Rotate(double deltaAngle) {
+    public void rotate(double deltaAngle) {
         double rad = Math.toRadians(deltaAngle);
         Point c = getCenter();
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++) {
             points.set(i, rotatePoint(points.get(i), c, rad));
+        }
+
+        collider.setPoints(points);
     }
 
     @Override
     public Collider getCollider() {
-        return null;
+        return collider;
     }
 
+    @Override
+    public double getRestitution() {
+        return restitution;
+    }
+
+    //helper method, rotates each point individually
     private Point rotatePoint(Point p, Point center, double rad) {
         double cos = Math.cos(rad);
         double sin = Math.sin(rad);
@@ -98,13 +119,13 @@ public class Triangle implements Shape {
         );
     }
 
-   
+
     @Override
-    public void Move(Vector2 delta) {
-
-
-        for (int i = 0; i < 3; i++)
+    public void move(Vector2 delta) {
+        for (int i = 0; i < 3; i++) {
             points.set(i, points.get(i).add(delta));
+            collider.setPoints(points);
+        }
     }
 
 
@@ -123,35 +144,35 @@ public class Triangle implements Shape {
 
     //provides a deep copy
     @Override
-    public Triangle Copy() {
+    public Triangle copy() {
         return new Builder()
                 .addPoint(p1())
                 .addPoint(p2())
                 .addPoint(p3())
                 .color(color)
-                .isFilled(fill)
+                .restitution(restitution)
+                .fill(fill)
                 .build();
     }
 
     public static class Builder {
 
         private final ArrayList<Point> points = new ArrayList<>();
-        private Color color = Color.BLACK;
+        private Color color = Color.BLUE;
         private boolean filled = false;
+        private double restitution = 0;
+
 
         public static Builder builder() {
             return new Builder();
         }
 
-        public Builder isFilled(boolean filled) {
+        public Builder fill(boolean filled) {
             this.filled = filled;
             return this;
         }
 
         public Builder addPoint(Point point) {
-            if (points.size() == 3)
-                throw new IllegalArgumentException("Triangle can only have 3 points. learn geometry, idiot");
-
             points.add(point);
             return this;
         }
@@ -161,9 +182,16 @@ public class Triangle implements Shape {
             return this;
         }
 
+        public Builder restitution(double restitution) {
+            this.restitution = restitution;
+            return this;
+        }
+
         public Triangle build() {
-            if (points.size() != 3)
+            if (points.size() != 3) {
+                //if you get this exception, the professors will want you dead or alive
                 throw new IllegalArgumentException("A triangle must have only 3 points... you woke up Pythagoras his grave by the way.");
+            }
             return new Triangle(this);
         }
     }

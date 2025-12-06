@@ -13,15 +13,17 @@ public interface Shape {
 
      double getHeight();
 
-     void Scale(double Factor);
+     void scale(double Factor);
 
-     void Rotate(double Angle);
+     void rotate(double Angle);
 
     Collider getCollider();
 
-    void Move(Vector2 delta);
+    double getRestitution(); //basically bounce but restitution sounds fancy
+
+    void move(Vector2 delta);
 
      void draw(GL2 gl);
 
-     <T> T Copy();
+     <T> T copy();
 }
