@@ -23,6 +23,8 @@ public class Triangle implements Shape {
         this.color = b.color;
         this.fill = b.filled;
         this.restitution = b.restitution;
+
+        collider = new TriangleCollider(points);
     }
 
     // Quality of life: to avoid repition

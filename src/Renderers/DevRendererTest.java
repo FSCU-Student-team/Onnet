@@ -5,6 +5,7 @@ import Game.Input;
 import Game.InputManager;
 import Game.LoopState;
 import Physics.ActionManager;
+import Physics.Collision.Collider;
 import Shapes.*;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
@@ -20,6 +21,7 @@ public class DevRendererTest implements GLEventListener, GameLoop {
     Rectangle rectangleTop;
     Rectangle rectangleLeft;
     Rectangle rectangleRight;
+    Triangle triangle;
 
     Vector2 gravity = new Vector2(0, -0.01);
     Vector2 velocity = new Vector2(0, 0);
@@ -52,6 +54,7 @@ public class DevRendererTest implements GLEventListener, GameLoop {
         rectangleLeft = new Rectangle.Builder().color(Color.BLUE).rotation(0).fill(true).origin(new Point(700, 0)).restitution(0.5).width(10).height(1000).build();
         rectangleRight = new Rectangle.Builder().color(Color.BLUE).rotation(0).fill(true).origin(new Point(50, 0)).restitution(0.5).width(10).height(1000).build();
 
+        triangle = new Triangle.Builder().color(Color.GREEN).fill(true).addPoint(new Point(100, 100)).addPoint(new Point(200, 200)).addPoint(new Point(300, 100)).restitution(0.9).build();
     }
 
     @Override
@@ -80,14 +83,7 @@ public class DevRendererTest implements GLEventListener, GameLoop {
 
 
         // Check collision with bottom rectangle
-        if (circle.getCollider().intersects(rectangle.getCollider())) {
-            Vector2 mtv = circle.getCollider().getMTV(rectangle.getCollider());
-            if (!mtv.isZero()) {
-                circle.move(mtv); // push out of collision
-                Vector2 normal = mtv.normalize(); // normal points from rectangle to circle
-                velocity = velocity.reflect(normal).scale(rectangle.getRestitution());
-            }
-        }
+        collideAndBounce(rectangle.getCollider(), rectangle.getRestitution());
 
         // Check collision with top rectangle
         if (circle.getCollider().intersects(rectangleTop.getCollider())) {
@@ -109,9 +105,22 @@ public class DevRendererTest implements GLEventListener, GameLoop {
             velocity = velocity.reflect(normal).scale(rectangleRight.getRestitution());
         }
 
+        collideAndBounce(triangle.getCollider(), triangle.getRestitution());
+
         circle.move(velocity);
 
         velocity = velocity.add(gravity);
+    }
+
+    private void collideAndBounce(Collider collider, double restitution) {
+        if (circle.getCollider().intersects(collider)) {
+            Vector2 mtv = circle.getCollider().getMTV(collider);
+            if (!mtv.isZero()) {
+                circle.move(mtv);
+                Vector2 normal = mtv.normalize();
+                velocity = velocity.reflect(normal).scale(restitution);
+            }
+        }
     }
 
 
@@ -124,6 +133,7 @@ public class DevRendererTest implements GLEventListener, GameLoop {
         rectangleTop.draw(gl);
         rectangleLeft.draw(gl);
         rectangleRight.draw(gl);
+        triangle.draw(gl);
 
         gl.glPopMatrix();
     }

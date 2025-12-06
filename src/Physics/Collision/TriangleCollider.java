@@ -17,6 +17,10 @@ public class TriangleCollider implements Collider {
         this.C = C;
     }
 
+    public TriangleCollider(ArrayList<Point> points) {
+        setPoints(points);
+    }
+
     @Override
     public AABB getAABB() {
         return null;
