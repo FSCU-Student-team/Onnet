@@ -1,0 +1,60 @@
+import Pages.Page;
+import Game.PageManager;
+import Game.SoundHandler;
+import Pages.DevTestScene;
+import Pages.MainMenuPage;
+import Pages.LevelsPage;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class Main {
+    private static boolean isMuted = false;
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            // 1️⃣ Init PageManager
+            PageManager.init();
+
+            // 2️⃣ Main JFrame
+            JFrame frame = new JFrame("Game Demo");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(800, 600);
+            frame.setLocationRelativeTo(null);
+            frame.setLayout(new CardLayout());
+
+            // 3️⃣ Pages
+            MainMenuPage mainMenu = new MainMenuPage();
+            mainMenu.init();
+            frame.add(mainMenu.getPanel(), "MainMenu");
+
+            LevelsPage levelsPage = new LevelsPage(mainMenu);
+            levelsPage.init();
+            frame.add(levelsPage.getPanel(), "Levels");
+
+            DevTestScene devScene = new DevTestScene();
+            devScene.init();
+            frame.add(devScene.getPanel(), "DevTest");
+
+            // 4️⃣ Connect buttons
+            mainMenu.setLevelsButtonAction(() -> PageManager.switchPage(mainMenu, levelsPage));
+            mainMenu.setNewGameButtonAction(() -> {
+                PageManager.switchPage(mainMenu, devScene);
+                if (!isMuted) {
+                    SoundHandler.play("Sounds/memphis-trap-wav-349366.wav");
+                }
+            });
+            mainMenu.setMuteButtonAction(() -> {
+                isMuted = !isMuted;
+                System.out.println("Mute toggled! " + isMuted);
+            });
+
+            levelsPage.setHomeButtonAction(() -> PageManager.switchPage(levelsPage, mainMenu));
+
+            // 5️⃣ Show main menu
+            PageManager.showPage(mainMenu);
+
+            frame.setVisible(true);
+        });
+    }
+}
