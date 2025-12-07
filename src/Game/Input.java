@@ -19,7 +19,8 @@ public enum Input {
     R(1 << 13),
     W(1 << 14),
     S(1 << 15),
-    Space(1 << 16);
+    Space(1 << 16),
+    Escape(1 << 17);
 
 
     public final int bit;

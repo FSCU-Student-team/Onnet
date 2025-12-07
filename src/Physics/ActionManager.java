@@ -31,4 +31,8 @@ public class ActionManager {
             }
         }
     }
+
+    public void updateSpecificAction(Input input) {
+        if (Input.isSet(inputManager.getInputState(), input)) actionMap.get(input).execute();
+    }
 }

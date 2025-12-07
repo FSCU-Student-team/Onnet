@@ -44,6 +44,7 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
             case KeyEvent.VK_D ->  inputState = Input.set(inputState, Input.D);
             case KeyEvent.VK_R ->  inputState = Input.set(inputState, Input.R);
             case KeyEvent.VK_SPACE -> inputState = Input.set(inputState, Input.Space);
+            case KeyEvent.VK_ESCAPE -> inputState = Input.set(inputState, Input.Escape);
         }
     }
 
@@ -67,6 +68,7 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
             case KeyEvent.VK_D ->  inputState = Input.clear(inputState, Input.D);
             case KeyEvent.VK_R ->  inputState = Input.clear(inputState, Input.R);
             case KeyEvent.VK_SPACE -> inputState = Input.clear(inputState, Input.Space);
+            case KeyEvent.VK_ESCAPE -> inputState = Input.clear(inputState, Input.Escape);
         }
     }
 
