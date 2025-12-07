@@ -55,6 +55,8 @@ public class DevRendererTest implements GLEventListener, GameLoop {
 
         Triangle triangle = new Triangle.Builder().color(Color.GREEN).fill(true).addPoint(new Point(100, 100)).addPoint(new Point(200, 200)).addPoint(new Point(300, 100)).restitution(0.9).build();
 
+        Circle notPlayerCircle = new Circle.Builder().color(Color.GRAY).filled(true).restitution(0.1).center(new Point(500, 200)).radius(50).build();
+
         entityUtils.updatePlayerVelocity(velocity);
         entityUtils.updateGravity(gravity);
 
@@ -64,6 +66,7 @@ public class DevRendererTest implements GLEventListener, GameLoop {
         entityUtils.addShape(rectangleLeft);
         entityUtils.addShape(rectangleRight);
         entityUtils.addShape(triangle);
+        entityUtils.addShape(notPlayerCircle);
 
         shapes = entityUtils.getShapes();
     }
