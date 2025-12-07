@@ -97,8 +97,6 @@ public class DevRendererTest implements GLEventListener, GameLoop {
 
     @Override
     public void display(GLAutoDrawable glAutoDrawable) {
-        System.out.println(GameLoop.GAME_PAUSED[0]);
-
         handleLoop(loopState, gl);
     }
 
