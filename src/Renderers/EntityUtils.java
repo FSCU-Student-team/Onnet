@@ -80,9 +80,7 @@ public class EntityUtils {
 
     private void playBounceSound(double restitution) {
         if (restitution >= 0) {
-            SoundHandler.play(bounceSounds[0]);
+            SoundHandler.play(bounceSounds[0], 0.7);
         } //TODO: ADD DIFFERENT SOUNDS DEPENDING ON RESTITUTION VALUE
     }
-
-
 }

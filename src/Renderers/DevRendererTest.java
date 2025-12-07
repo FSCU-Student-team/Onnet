@@ -25,6 +25,11 @@ public class DevRendererTest implements GLEventListener, GameLoop {
     Vector2 gravity = new Vector2(0, -0.01);
     Vector2 velocity = new Vector2(0, 0);
 
+    //NECESSARY FOR PAUSE FUNCTIONALITY
+    private long lastPauseTime = 0; // in nanoseconds
+    private static final long PAUSE_DELAY_NS = 500_000_000L; // 500 ms in nanoseconds
+
+
     public DevRendererTest() {
         inputManager = new InputManager();
     }
@@ -41,11 +46,12 @@ public class DevRendererTest implements GLEventListener, GameLoop {
         gl.glLoadIdentity();
         gl.glOrtho(0, 800, 0, 600, -1, 1);
 
-        actionManager.bind(Input.A, () -> velocity = velocity.add(new Vector2(-0.05, 0)));
-        actionManager.bind(Input.D, () -> velocity = velocity.add(new Vector2(0.05, 0)));
-        actionManager.bind(Input.W, () -> velocity = velocity.add(new Vector2(0, 0.05)));
-        actionManager.bind(Input.S, () -> velocity = velocity.add(new Vector2(0, -0.05)));
-
+        //Bind inputs
+        actionManager.bind(Input.A, () -> movePlayer(new Vector2(-0.05, 0)));
+        actionManager.bind(Input.D, () -> movePlayer(new Vector2(0.05, 0)));
+        actionManager.bind(Input.W, () -> movePlayer(new Vector2(0, 0.05)));
+        actionManager.bind(Input.S, () -> movePlayer(new Vector2(0, -0.05)));
+        actionManager.bind(Input.Escape, this::togglePauseWithDelay); // default method, check GameLoop, toggles pause and playing of loop
 
         circle = new Circle.Builder().color(Color.WHITE).angle(0).filled(true).center(new Point(400, 300)).radius(20).build();
         Rectangle rectangle = new Rectangle.Builder().color(Color.BLUE).rotation(10).fill(true).origin(new Point(0, 50)).restitution(0.5).width(1000).height(10).build();
@@ -71,12 +77,28 @@ public class DevRendererTest implements GLEventListener, GameLoop {
         shapes = entityUtils.getShapes();
     }
 
+    private void movePlayer(Vector2 delta) {
+        if (isPaused()) return;
+        velocity = velocity.add(delta);
+    }
+
+    private void togglePauseWithDelay() {
+        long now = System.nanoTime();
+        if (now - lastPauseTime >= PAUSE_DELAY_NS) {
+            togglePause();       // call GameLoop's toggle
+            lastPauseTime = now; // update timestamp
+        }
+    }
+
+
     @Override
     public void dispose(GLAutoDrawable glAutoDrawable) {
     }
 
     @Override
     public void display(GLAutoDrawable glAutoDrawable) {
+        System.out.println(GameLoop.GAME_PAUSED[0]);
+
         handleLoop(loopState, gl);
     }
 
@@ -93,8 +115,7 @@ public class DevRendererTest implements GLEventListener, GameLoop {
 
     @Override
     public void physicsUpdate() {
-        actionManager.update();
-
+        inputUpdate();
         // Update EntityUtils with new velocity so bounce uses correct vector
         entityUtils.updatePlayerVelocity(velocity);
 
@@ -122,5 +143,10 @@ public class DevRendererTest implements GLEventListener, GameLoop {
         gl.glPopMatrix();
 
         entityUtils.allowBounceSounds();
+    }
+
+    @Override
+    public void inputUpdate() {
+        actionManager.update();
     }
 }
