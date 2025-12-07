@@ -173,11 +173,16 @@ public class CircleCollider implements Collider {
         return switch (other) {
             case RectangleCollider r -> getRectangleMTV(r);
             case TriangleCollider t -> getTriangleMTV(t);
+            case CircleCollider c -> getCircleMTV(c);
             default -> Vector2.ZERO;
         };
 
-        // TODO: Add circle-circle and circle-ellipse and circle-polynomial.
+        // TODO: and circle-ellipse and circle-polynomial.
     }
+
+
+
+    //helper MTV methods below:
 
     private Vector2 getTriangleMTV(TriangleCollider t) {
         Point A = t.getA();
@@ -329,4 +334,26 @@ public class CircleCollider implements Collider {
 
         return new Vector2(mtvX, mtvY);
     }
+
+    private Vector2 getCircleMTV(CircleCollider c) {
+        Vector2 diff = center.subtract(c.center);
+        double distSq = diff.magnitudeSquared();
+        double r = radius + c.radius;
+
+        // No collision
+        if (distSq >= r * r) return Vector2.ZERO;
+
+        // Overlapping or touching
+        double dist = Math.sqrt(distSq);
+
+        // Special case: centers exactly overlap
+        if (dist == 0) {
+            return new Vector2(r, 0);
+        }
+
+        double overlap = r - dist;
+
+        return diff.scale(1.0 / dist).scale(overlap);
+    }
+
 }
