@@ -8,7 +8,7 @@ public record Vector2(double x, double y) {
     public static final Vector2 UNIT_X = new Vector2(1, 0);
     public static final Vector2 UNIT_Y = new Vector2(0, 1);
 
-    private static final double EPSILON = 1e-5;
+    private static final double EPSILON = 1e-2;
 
 
     //adds two vectors together.
