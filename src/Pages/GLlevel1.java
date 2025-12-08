@@ -29,6 +29,7 @@ public class GLlevel1 implements GLEventListener, GameLoop {
     private double angle = 0;
     private List<Shape> shapes = new ArrayList<>();
     private boolean isLunched = false;
+    private Vector2 velocity;
 
     public GLlevel1() {
         inputManager = new InputManager();
@@ -51,13 +52,14 @@ public class GLlevel1 implements GLEventListener, GameLoop {
         actionManager.bind(Input.W, () -> setCurrentPower(currentPower + 1));
         actionManager.bind(Input.Z, () -> isLunched = true);
         actionManager.bind(Input.Escape, this::togglePause);
+        entityUtils.updatePlayerVelocity(velocity);
+        entityUtils.updateGravity(gravity);
 
         playerCircle =new Circle.Builder().color(Color.BLUE).radius(20).angle(0).center(new Point(50,40)).filled(true).build();
         GoalRectangle =new Rectangle.Builder().color(Color.YELLOW).width(20).height(20).fill(false).origin(new Point(500,500)).build();
 
         entityUtils.addShape(playerCircle);entityUtils.addShape(GoalRectangle);
         shapes=entityUtils.getShapes();
-
     }
 
     @Override
@@ -67,7 +69,8 @@ public class GLlevel1 implements GLEventListener, GameLoop {
 
     @Override
     public void display(GLAutoDrawable glAutoDrawable) {
-
+        GL2 gl = glAutoDrawable.getGL().getGL2();
+     handleLoop(loopState,gl);
     }
 
     @Override
