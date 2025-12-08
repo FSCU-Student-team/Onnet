@@ -1,54 +1,53 @@
 import Game.PageManager;
-import Pages.*;
+import Game.SoundHandler;
+import Pages.LevelSelectPage;
+import Pages.Page;
+import Pages.SingleOrCoopSelectPage;
+import Pages.MainMenuPage;
 
-public class Main {
+SingleOrCoopSelectPage selectSingleOrCoop = new SingleOrCoopSelectPage();
+MainMenuPage mainMenu = new MainMenuPage();
+LevelSelectPage levelSelectPage = new LevelSelectPage();
+boolean singlePlayer = true;
 
-    static MainMenuPage mainMenu = new MainMenuPage();
-    static SinglePlayerSelectPage singlePlayerMenu = new SinglePlayerSelectPage();
-    static SingleGamePage gamePage = new SingleGamePage();
-    static LevelSelectPage levelSelectPage = new LevelSelectPage();
+ArrayList<Page> levels = new ArrayList<>();
 
-    public static void main(String[] args) {
+void main() {
 
-        //IMPORTANT DEV NOTE:
-        //SET VM OPTIONS IN RUN CONFIGURATION TO THIS TO RUN: -Djava.library.path=Libs\Natives\Windows --enable-preview --add-exports java.base/java.lang=ALL-UNNAMED --add-exports java.desktop/sun.awt=ALL-UNNAMED --add-exports java.desktop/sun.java2d=ALL-UNNAMED
-        //IF USING LINUX CHANGE Libs\Natives\Windows WITH Libs\Natives\Linux
-        PageManager.init();
-        PageManager.showPage(mainMenu);
+    //IMPORTANT DEV NOTE:
+    //SET VM OPTIONS IN RUN CONFIGURATION TO THIS TO RUN: -Djava.library.path=Libs\Natives\Windows --enable-preview --add-exports java.base/java.lang=ALL-UNNAMED --add-exports java.desktop/sun.awt=ALL-UNNAMED --add-exports java.desktop/sun.java2d=ALL-UNNAMED
+    //IF USING LINUX CHANGE Libs\Natives\Windows WITH Libs\Natives\Linux
+    PageManager.init();
+    PageManager.showPage(mainMenu);
 
-        //load into memory without showing
-        PageManager.preLoadPage(singlePlayerMenu);
-        PageManager.preLoadPage(gamePage);
-        PageManager.preLoadPage(levelSelectPage);
+    //load into memory without showing
+    PageManager.preLoadPage(levelSelectPage);
+    PageManager.preLoadPage(selectSingleOrCoop);
 
-        mainMenu.setPlayButtonAction(() -> {
-            // Singleplayer
-            setupLevels(mainMenu, gamePage, singlePlayerMenu);
-        });
+    //Add new levels to levels arrayList here (DO NOT PRELOAD THEM FOR PERFORMANCE REASONS)
 
-        mainMenu.setLevelsButtonAction(() -> {
-            // Multiplayer (coop)
-            SinglePlayerSelectPage multiMenu = new SinglePlayerSelectPage();
-            setupLevels(mainMenu, gamePage, multiMenu);
-        });
-    }
+    mainMenu.setLevelsButtonAction(() -> PageManager.switchPage(mainMenu, selectSingleOrCoop)); //prompts you for singleplayer or coop before opening levels
+    selectSingleOrCoop.setSinglePlayerButtonAction(() -> singlePlayer = true);
+    selectSingleOrCoop.setCoopButtonAction(() -> singlePlayer = false);
 
-    private static void setupLevels(MainMenuPage startPage, SingleGamePage gamePage, SinglePlayerSelectPage multiMenu) {
-        multiMenu.setBackBtnAction(() -> PageManager.switchPage(multiMenu, startPage));
-        multiMenu.setPlayButtonAction(() -> {
-            PageManager.switchPage(multiMenu, gamePage);
-        });
+    mainMenu.setMuteButtonAction(SoundHandler::toggleMute);
 
-        multiMenu.setLevelsButtonAction(() -> {
-            // زرار Back يرجع للـ Menu
-            levelSelectPage.setBackButtonAction(() -> PageManager.switchPage(levelSelectPage, multiMenu));
+    setupLevels();
+}
 
-            for (int i = 0; i < 6; i++) {
-                levelSelectPage.setLevelAction(i, () -> PageManager.switchPage(levelSelectPage, gamePage)); //0-based i is mapped to 1-based level numbers
-            }
-            PageManager.switchPage(multiMenu, levelSelectPage);
-        });
+void setupLevels() {
+    mainMenu.setBackBtnAction(() -> PageManager.switchPage(levelSelectPage, mainMenu));
+    mainMenu.setPlayButtonAction(() -> {
+        //TODO: switch to level 1
+    });
 
-        PageManager.switchPage(startPage, multiMenu);
-    }
+    mainMenu.setLevelsButtonAction(() -> {
+        //returns to menu
+        levelSelectPage.setBackButtonAction(() -> PageManager.switchPage(levelSelectPage, mainMenu));
+
+        for (int i = 0; i < 6; i++) {
+            //TODO: make gamePage an array that takes in level number and opens the level accordingly (use singlePlayer boolean)
+        }
+        PageManager.switchPage(mainMenu, levelSelectPage);
+    });
 }

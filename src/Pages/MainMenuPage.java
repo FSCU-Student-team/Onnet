@@ -1,7 +1,7 @@
 package Pages;
 
-import Game.PageComponentAdapter;
 import Game.PageManager;
+import Game.SoundHandler;
 import Renderers.MenuBackground;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.util.FPSAnimator;
@@ -13,8 +13,8 @@ import java.awt.event.ActionEvent;
 public class MainMenuPage implements Page {
 
     private JFrame frame;
-    private JButton singleButton, multiButton;
-    private Runnable onSingle, onMulti;
+    private JButton playBtn, levelsBtn, muteBtn, backBtn;
+    private Runnable onPlay, onLevels, onMute, onBack;
 
     private GLJPanel canvas;
     private FPSAnimator animator;
@@ -29,15 +29,12 @@ public class MainMenuPage implements Page {
 
     @Override
     public void setupFrame() {
-        frame = new JFrame("Main Menu");
+        frame = new JFrame("Single Player Menu");
+        frame.setSize(800, 600);
+        frame.setResizable(false); // disable resizing
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        frame.setResizable(true);
-        frame.setMinimumSize(new Dimension(800, 600));
         PageManager.registerFrameCloseHandler(this, frame);
-        frame.pack();           // Ensure correct sizing
-        frame.setLocationRelativeTo(null); // Center on screen
-        frame.setVisible(true);
-        frame.setResizable(false); // <-- disable resizing
+        frame.setLocationRelativeTo(null);
     }
 
     @Override
@@ -50,70 +47,69 @@ public class MainMenuPage implements Page {
 
     @Override
     public void addComponents() {
-        // 1. Create canvas and renderer
+        // 1. GLJPanel for background
         canvas = new GLJPanel();
         MenuBackground renderer = new MenuBackground();
         canvas.addGLEventListener(renderer);
         canvas.addKeyListener(renderer.inputManager);
         canvas.addMouseListener(renderer.inputManager);
         canvas.addMouseMotionListener(renderer.inputManager);
+        canvas.setBounds(0, 0, 800, 600);
 
-        // 2. Main panel with BorderLayout
-        JPanel mainPanel = new JPanel(new BorderLayout());
-
-        // Add GLJPanel to center (fills window)
-        mainPanel.add(canvas, BorderLayout.CENTER);
-
-        // 3. Button panel (transparent) using GridBagLayout
+        // 2. Buttons panel
         JPanel buttonPanel = new JPanel(new GridBagLayout());
-        buttonPanel.setOpaque(false); // allow background to show
+        buttonPanel.setOpaque(false); // transparent
+        buttonPanel.setBounds(0, 0, 800, 600);
 
-        singleButton = new JButton("Single");
-        multiButton = new JButton("Multi");
-        Dimension buttonSize = new Dimension(200, 120);
-        singleButton.setPreferredSize(buttonSize);
-        multiButton.setPreferredSize(buttonSize);
+        // Buttons
+        playBtn = new JButton("Play");
+        levelsBtn = new JButton("Levels");
+        muteBtn = new JButton("Mute");
+        backBtn = new JButton("Back");
+
+        Dimension btnSize = new Dimension(200, 120);
+        playBtn.setPreferredSize(btnSize);
+        levelsBtn.setPreferredSize(btnSize);
+        muteBtn.setPreferredSize(btnSize);
+        backBtn.setPreferredSize(btnSize);
 
         GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(20, 50, 0, 50);
+
+        // Center row: Play and Levels
         gbc.gridy = 0;
-        gbc.insets = new Insets(0, 50, 0, 50);
-
         gbc.gridx = 0;
-        buttonPanel.add(singleButton, gbc);
-
+        buttonPanel.add(playBtn, gbc);
         gbc.gridx = 1;
-        buttonPanel.add(multiButton, gbc);
+        buttonPanel.add(levelsBtn, gbc);
 
-        // 4. Wrap canvas + buttons in JLayeredPane to allow layering
+        // Top-right corner buttons
+        gbc.anchor = GridBagConstraints.NORTHEAST;
+        gbc.insets = new Insets(10, 0, 0, 10);
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        buttonPanel.add(muteBtn, gbc);
+
+        gbc.gridy = 2;
+        buttonPanel.add(backBtn, gbc);
+
+        // 3. LayeredPane
         JLayeredPane layeredPane = new JLayeredPane();
-        layeredPane.setLayout(null); // use absolute positioning
-
-        // Set bounds to fill frame
-        canvas.setBounds(0, 0, 800, 600);
-        buttonPanel.setBounds(0, 0, 800, 600);
+        layeredPane.setPreferredSize(new Dimension(800, 600));
+        layeredPane.setLayout(null);
 
         layeredPane.add(canvas, Integer.valueOf(0));      // bottom
         layeredPane.add(buttonPanel, Integer.valueOf(1)); // top
 
-        // Add layeredPane to frame
         frame.setContentPane(layeredPane);
-
-        // Add a component listener to resize canvas and buttonPanel when window resizes
-        frame.addComponentListener(new PageComponentAdapter(this));
     }
-
-
-
 
     @Override
     public void addListeners() {
-        singleButton.addActionListener(e -> {
-            if (onSingle != null) onSingle.run();
-        });
-
-        multiButton.addActionListener(e -> {
-            if (onMulti != null) onMulti.run();
-        });
+        playBtn.addActionListener(e -> { if (onPlay != null) onPlay.run(); });
+        levelsBtn.addActionListener(e -> { if (onLevels != null) onLevels.run(); });
+        muteBtn.addActionListener(e -> { if (onMute != null) onMute.run(); });
+        backBtn.addActionListener(e -> { if (onBack != null) onBack.run(); });
     }
 
     @Override
@@ -140,15 +136,14 @@ public class MainMenuPage implements Page {
         if (canvas != null) canvas.repaint();
     }
 
-    public void setPlayButtonAction(Runnable r) {
-        this.onSingle = r;
+    // Button action setters
+    public void setPlayButtonAction(Runnable r) { this.onPlay = r; }
+    public void setLevelsButtonAction(Runnable r) { this.onLevels = r; }
+    public void setMuteButtonAction(Runnable r) {
+        if (SoundHandler.isMuted()) SoundHandler.unmute();
+        else SoundHandler.mute();
     }
+    public void setBackBtnAction(Runnable r) { this.onBack = r; }
 
-    public void setLevelsButtonAction(Runnable r) {
-        this.onMulti = r;
-    }
-
-    public JFrame getFrame() {
-        return frame;
-    }
+    public JFrame getFrame() { return frame; }
 }
