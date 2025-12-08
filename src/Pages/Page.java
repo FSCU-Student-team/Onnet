@@ -1,5 +1,6 @@
 package Pages;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 public interface Page {
@@ -19,4 +20,6 @@ public interface Page {
     void setVisible(boolean b);
 
     void redraw();
+     JFrame getFrame();
+
 }
