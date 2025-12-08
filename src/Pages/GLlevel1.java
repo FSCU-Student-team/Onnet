@@ -74,18 +74,38 @@ public class GLlevel1 implements GLEventListener, GameLoop {
     }
 
     @Override
-    public void reshape(GLAutoDrawable glAutoDrawable, int i, int i1, int i2, int i3) {
-
+    public void reshape(GLAutoDrawable glAutoDrawable, int x, int y, int w, int h) {
+        GL2 gl = glAutoDrawable.getGL().getGL2();
+        gl.glViewport(0, 0, w, h);
+        gl.glMatrixMode(GL2.GL_PROJECTION);
+        gl.glLoadIdentity();
+        gl.glOrtho(0, 800, 0, 600, -1, 1);
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
+        gl.glLoadIdentity();
     }
 
     @Override
     public void physicsUpdate() {
+        inputUpdate();
+        if (isLunched){
 
+        }
     }
 
     @Override
     public void renderUpdate(GL2 gl) {
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
+        gl.glPushMatrix();
 
+        for (Shape shape : shapes) {
+            shape.draw(gl);
+        }
+
+        circle.draw(gl);
+
+        gl.glPopMatrix();
+
+        entityUtils.allowBounceSounds();
     }
 
     @Override
