@@ -6,6 +6,7 @@ SingleOrCoopSelectPage selectSingleOrCoop = new SingleOrCoopSelectPage();
 MainMenuPage mainMenu = new MainMenuPage();
 LevelSelectPage levelSelectPage = new LevelSelectPage();
 boolean singlePlayer = true;
+level1Frame level1Frame=new level1Frame();
 
 ArrayList<Page> levels = new ArrayList<>();
 
@@ -28,7 +29,7 @@ void main() {
     selectSingleOrCoop.setCoopButtonAction(() -> singlePlayer = false);
 
     mainMenu.setMuteButtonAction(SoundHandler::toggleMute);
-
+levels.add(level1Frame);
     setupLevels();
 }
 
@@ -36,6 +37,7 @@ void setupLevels() {
     mainMenu.setBackBtnAction(() -> PageManager.switchPage(levelSelectPage, mainMenu));
     mainMenu.setPlayButtonAction(() -> {
         //TODO: switch to level 1
+        openLevel(1);
     });
 
     mainMenu.setLevelsButtonAction(() -> {
@@ -53,3 +55,4 @@ void setupLevels() {
 void openLevel(int i) {
     PageManager.switchPage(levelSelectPage, levels.get(i));
 }
+
