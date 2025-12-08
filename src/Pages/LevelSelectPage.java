@@ -8,14 +8,17 @@ import com.jogamp.opengl.util.FPSAnimator;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 
 public class LevelSelectPage implements Page {
 
     private JFrame frame;
     private JButton backBtn;
-    private JButton[] levelBtns = new JButton[6];
+
+    private ArrayList<JButton> levelBtns = new ArrayList<>();
+    private ArrayList<Runnable> onLevel = new ArrayList<>();
+
     private Runnable onBack;
-    private Runnable[] onLevel = new Runnable[6];
 
     private GLJPanel canvas;
     private FPSAnimator animator;
@@ -32,8 +35,7 @@ public class LevelSelectPage implements Page {
     public void setupFrame() {
         frame = new JFrame("Level Select");
         frame.setSize(800, 600);
-        frame.setResizable(false); // disable resizing
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.setResizable(false);
         PageManager.registerFrameCloseHandler(this, frame);
         frame.setLocationRelativeTo(null);
     }
@@ -48,56 +50,75 @@ public class LevelSelectPage implements Page {
 
     @Override
     public void addComponents() {
-        // 1. Background canvas
+
+        // -----------------------------
+        // 1. Background GLJPanel
+        // -----------------------------
         canvas = new GLJPanel();
         MenuBackground renderer = new MenuBackground();
+
         canvas.addGLEventListener(renderer);
         canvas.addKeyListener(renderer.inputManager);
         canvas.addMouseListener(renderer.inputManager);
         canvas.addMouseMotionListener(renderer.inputManager);
+
         canvas.setBounds(0, 0, 800, 600);
 
-        // 2. Button panel
+        // -----------------------------
+        // 2. Buttons Panel
+        // -----------------------------
         JPanel buttonPanel = new JPanel(new GridBagLayout());
-        buttonPanel.setOpaque(false); // transparent
+        buttonPanel.setOpaque(false);
         buttonPanel.setBounds(0, 0, 800, 600);
 
-        // Level buttons
+        // Create 6 level buttons + listeners array
         Dimension btnSize = new Dimension(200, 120);
+
         for (int i = 0; i < 6; i++) {
-            levelBtns[i] = new JButton("Level " + (i + 1));
-            levelBtns[i].setPreferredSize(btnSize);
+            JButton btn = new JButton("Level " + (i + 1));
+            btn.setPreferredSize(btnSize);
+
+            levelBtns.add(btn);
+            onLevel.add(null); // placeholder
         }
 
-        // GridBag layout for level buttons
+        // -----------------------------
+        // GridBag placement for levels
+        // -----------------------------
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(20, 50, 20, 50);
         gbc.anchor = GridBagConstraints.CENTER;
 
-        // Left column
+        // Left column (0,1,2)
         for (int i = 0; i < 3; i++) {
             gbc.gridx = 0;
-            gbc.gridy = i;
-            buttonPanel.add(levelBtns[i], gbc);
+            gbc.gridy = i + 1;  // start at row 1 (row 0 = back button)
+            buttonPanel.add(levelBtns.get(i), gbc);
         }
 
-        // Right column
+        // Right column (3,4,5)
         for (int i = 3; i < 6; i++) {
             gbc.gridx = 1;
-            gbc.gridy = i - 3;
-            buttonPanel.add(levelBtns[i], gbc);
+            gbc.gridy = (i - 3) + 1;
+            buttonPanel.add(levelBtns.get(i), gbc);
         }
 
-        // Back button at top-right
+        // -----------------------------
+        // Back button (Top-Right)
+        // -----------------------------
         backBtn = new JButton("Back");
         backBtn.setPreferredSize(btnSize);
+
         gbc.gridx = 1;
-        gbc.gridy = 3;
+        gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.NORTHEAST;
         gbc.insets = new Insets(10, 0, 0, 10);
+
         buttonPanel.add(backBtn, gbc);
 
+        // -----------------------------
         // 3. LayeredPane
+        // -----------------------------
         JLayeredPane layeredPane = new JLayeredPane();
         layeredPane.setPreferredSize(new Dimension(800, 600));
         layeredPane.setLayout(null);
@@ -110,10 +131,16 @@ public class LevelSelectPage implements Page {
 
     @Override
     public void addListeners() {
-        backBtn.addActionListener(e -> { if (onBack != null) onBack.run(); });
-        for (int i = 0; i < 6; i++) {
+
+        backBtn.addActionListener(e -> {
+            if (onBack != null) onBack.run();
+        });
+
+        for (int i = 0; i < levelBtns.size(); i++) {
             final int idx = i;
-            levelBtns[i].addActionListener(e -> { if (onLevel[idx] != null) onLevel[idx].run(); });
+            levelBtns.get(i).addActionListener(e -> {
+                if (onLevel.get(idx) != null) onLevel.get(idx).run();
+            });
         }
     }
 
@@ -137,10 +164,15 @@ public class LevelSelectPage implements Page {
         if (canvas != null) canvas.repaint();
     }
 
+    // -----------------------------
+    // Action setters
+    // -----------------------------
     public void setBackButtonAction(Runnable r) { this.onBack = r; }
 
-    public void playLevelAction(int levelIndex, Runnable r) {
-        if (levelIndex >= 0 && levelIndex < 6) onLevel[levelIndex] = r;
+    public void setLevelAction(int index, Runnable r) {
+        if (index >= 0 && index < 6) {
+            onLevel.set(index, r);
+        }
     }
 
     public JFrame getFrame() { return frame; }

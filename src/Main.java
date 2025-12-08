@@ -1,9 +1,6 @@
 import Game.PageManager;
 import Game.SoundHandler;
-import Pages.LevelSelectPage;
-import Pages.Page;
-import Pages.SingleOrCoopSelectPage;
-import Pages.MainMenuPage;
+import Pages.*;
 
 SingleOrCoopSelectPage selectSingleOrCoop = new SingleOrCoopSelectPage();
 MainMenuPage mainMenu = new MainMenuPage();
@@ -24,7 +21,7 @@ void main() {
     PageManager.preLoadPage(levelSelectPage);
     PageManager.preLoadPage(selectSingleOrCoop);
 
-    //Add new levels to levels arrayList here (DO NOT PRELOAD THEM FOR PERFORMANCE REASONS)
+    levels.add(new DevTestScene());
 
     mainMenu.setLevelsButtonAction(() -> PageManager.switchPage(mainMenu, selectSingleOrCoop)); //prompts you for singleplayer or coop before opening levels
     selectSingleOrCoop.setSinglePlayerButtonAction(() -> singlePlayer = true);
@@ -45,9 +42,14 @@ void setupLevels() {
         //returns to menu
         levelSelectPage.setBackButtonAction(() -> PageManager.switchPage(levelSelectPage, mainMenu));
 
-        for (int i = 0; i < 6; i++) {
-            //TODO: make gamePage an array that takes in level number and opens the level accordingly (use singlePlayer boolean)
+        for (int i = 0; i < levels.size(); i++) {
+            final int idx = i; //to bypass the lambda final constraint
+            levelSelectPage.setLevelAction(idx, () -> openLevel(idx));
         }
         PageManager.switchPage(mainMenu, levelSelectPage);
     });
+}
+
+void openLevel(int i) {
+    PageManager.switchPage(levelSelectPage, levels.get(i));
 }
