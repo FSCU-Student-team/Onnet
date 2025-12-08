@@ -99,4 +99,9 @@ public class DevFrame implements Page {
         if (canvas != null) canvas.repaint();
     }
 
+    @Override
+    public JFrame getFrame() {
+        return frame;
+    }
+
 }
