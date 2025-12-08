@@ -139,7 +139,7 @@ public class LevelSelectPage implements Page {
 
     public void setBackButtonAction(Runnable r) { this.onBack = r; }
 
-    public void setLevelAction(int levelIndex, Runnable r) {
+    public void playLevelAction(int levelIndex, Runnable r) {
         if (levelIndex >= 0 && levelIndex < 6) onLevel[levelIndex] = r;
     }
 

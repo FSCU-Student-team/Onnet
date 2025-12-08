@@ -53,6 +53,11 @@ public class SoundHandler {
             System.out.println(e.getMessage());
         }
     }
+
+    public static void toggleMute() {
+        if (mute) unmute();
+        else mute();
+    }
 }
 
 
