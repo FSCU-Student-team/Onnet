@@ -1,11 +1,10 @@
-package Pages;
+package Renderers;
 
 import Game.GameLoop;
 import Game.Input;
 import Game.InputManager;
 import Game.LoopState;
 import Physics.ActionManager;
-import Renderers.EntityUtils;
 import Shapes.*;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
