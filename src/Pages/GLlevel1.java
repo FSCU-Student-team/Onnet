@@ -28,7 +28,7 @@ public class GLlevel1 implements GLEventListener, GameLoop {
     private double minPower = 0;
     private double angle = 0;
     private List<Shape> shapes = new ArrayList<>();
-    private boolean isLunched = false,isWon=false;
+    private boolean isLunched = false, isWon = false;
     private Vector2 velocity;
     private Rectangle rectangle;
 
@@ -53,13 +53,16 @@ public class GLlevel1 implements GLEventListener, GameLoop {
         });
         actionManager.bind(Input.S, () -> {
             if (!isLunched)
-                setCurrentPower(currentPower - 1);});
+                setCurrentPower(currentPower - 1);
+        });
         actionManager.bind(Input.D, () -> {
             if (!isLunched)
-                setAngle(angle - 1);});
+                setAngle(angle - 1);
+        });
         actionManager.bind(Input.W, () -> {
             if (!isLunched)
-                setCurrentPower(currentPower + 1);});
+                setCurrentPower(currentPower + 1);
+        });
         actionManager.bind(Input.Z, () -> {
             isLunched = true;
             velocity = new Vector2(getCurrentPower() * Math.cos(Math.toRadians(angle)), getCurrentPower() * Math.sin(Math.toRadians(angle)));
@@ -71,13 +74,17 @@ public class GLlevel1 implements GLEventListener, GameLoop {
         playerCircle = new Circle.Builder().color(Color.WHITE).radius(20).angle(0).restitution(0.3).center(new Point(50, 40)).filled(true).build();
         GoalRectangle = new Rectangle.Builder().color(Color.YELLOW).width(20).height(20).fill(false).origin(new Point(700, 200)).build();
         rectangle = new Rectangle.Builder().color(Color.BLUE).origin(new Point(400, 50)).restitution(0.5).width(75).height(100).fill(false).build();
-        Rectangle rectangle = new Rectangle.Builder().color(Color.RED).rotation(10).fill(true).origin(new Point(0, 0)).restitution(0.5).width(1000).height(10).build();
-        Rectangle rectangleTop = new Rectangle.Builder().color(Color.RED).rotation(0).fill(true).origin(new Point(0, 600)).restitution(0.5).width(1000).height(10).build();
-        Rectangle rectangleLeft = new Rectangle.Builder().color(Color.RED).rotation(0).fill(true).origin(new Point(700, 0)).restitution(0.5).width(10).height(1000).build();
-        Rectangle rectangleRight = new Rectangle.Builder().color(Color.RED).rotation(0).fill(true).origin(new Point(700, 0)).restitution(0.5).width(10).height(1000).build();
+        Rectangle rectangledown = new Rectangle.Builder().color(Color.RED).rotation(10).fill(true).origin(new Point(0, 0)).restitution(0.0).width(1000).height(10).build();
+        Rectangle rectangleTop = new Rectangle.Builder().color(Color.RED).rotation(0).fill(true).origin(new Point(0, 600)).restitution(0.0).width(1000).height(10).build();
+        Rectangle rectangleLeft = new Rectangle.Builder().color(Color.RED).rotation(0).fill(true).origin(new Point(700, 0)).restitution(0.0).width(10).height(1000).build();
+        Rectangle rectangleRight = new Rectangle.Builder().color(Color.RED).rotation(0).fill(true).origin(new Point(0, 0)).restitution(0.0).width(10).height(1000).build();
         entityUtils.addShape(playerCircle);
         entityUtils.addShape(GoalRectangle);
         entityUtils.addShape(rectangle);
+        entityUtils.addShape(rectangleTop);
+        entityUtils.addShape(rectangledown);
+        entityUtils.addShape(rectangleLeft);
+        entityUtils.addShape(rectangleRight);
 
         shapes = entityUtils.getShapes();
     }
@@ -107,7 +114,7 @@ public class GLlevel1 implements GLEventListener, GameLoop {
     @Override
     public void physicsUpdate() {
         inputUpdate();
-        if (isLunched&&!isWon) {
+        if (isLunched && !isWon) {
             entityUtils.updatePlayerVelocity(velocity);
             entityUtils.checkCollisions(playerCircle);
             velocity = entityUtils.getPlayerVelocity();
@@ -173,12 +180,12 @@ public class GLlevel1 implements GLEventListener, GameLoop {
     }
 
     public void setCurrentPower(double currentPower) {
-        if (currentPower>MaxPower)
+        if (currentPower > MaxPower)
             this.currentPower = MaxPower;
-        else if (currentPower<minPower)
-            this.currentPower=minPower;
+        else if (currentPower < minPower)
+            this.currentPower = minPower;
         else
-          this.currentPower=currentPower;
+            this.currentPower = currentPower;
     }
 
     public InputManager getInputManager() {
