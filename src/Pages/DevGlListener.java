@@ -46,4 +46,9 @@ public class DevGlListener implements GLEventListener,GameLoop {
     public void renderUpdate(GL2 gl) {
 //   uses to render the components of the draw to update it
     }
+
+    @Override
+    public void inputUpdate() {
+
+    }
 }
