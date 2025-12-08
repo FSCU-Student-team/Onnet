@@ -162,4 +162,11 @@ public class GLlevel1 implements GLEventListener, GameLoop {
         else
             this.currentPower = currentPower;
     }
+    public InputManager getInputManager() {
+        return inputManager;
+    }
+
+    public void setInputManager(InputManager inputManager) {
+        this.inputManager = inputManager;
+    }
 }
