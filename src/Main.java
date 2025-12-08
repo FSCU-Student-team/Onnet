@@ -6,7 +6,6 @@ SingleOrCoopSelectPage selectSingleOrCoop = new SingleOrCoopSelectPage();
 MainMenuPage mainMenu = new MainMenuPage();
 LevelSelectPage levelSelectPage = new LevelSelectPage();
 boolean singlePlayer = true;
-level1Frame level1Frame=new level1Frame();
 
 ArrayList<Page> levels = new ArrayList<>();
 
@@ -23,13 +22,14 @@ void main() {
     PageManager.preLoadPage(selectSingleOrCoop);
 
     levels.add(new DevTestScene());
+    levels.add(new level1Frame());
 
     mainMenu.setLevelsButtonAction(() -> PageManager.switchPage(mainMenu, selectSingleOrCoop)); //prompts you for singleplayer or coop before opening levels
     selectSingleOrCoop.setSinglePlayerButtonAction(() -> singlePlayer = true);
     selectSingleOrCoop.setCoopButtonAction(() -> singlePlayer = false);
 
     mainMenu.setMuteButtonAction(SoundHandler::toggleMute);
-levels.add(level1Frame);
+
     setupLevels();
 }
 
@@ -37,14 +37,14 @@ void setupLevels() {
     mainMenu.setBackBtnAction(() -> PageManager.switchPage(levelSelectPage, mainMenu));
     mainMenu.setPlayButtonAction(() -> {
         //TODO: switch to level 1
-        openLevel(1);
+        openLevel(0);
     });
 
     mainMenu.setLevelsButtonAction(() -> {
         //returns to menu
         levelSelectPage.setBackButtonAction(() -> PageManager.switchPage(levelSelectPage, mainMenu));
 
-        for (int i = 0; i < levels.size(); i++) {
+        for (int i = 1; i < levels.size(); i++) {
             final int idx = i; //to bypass the lambda final constraint
             levelSelectPage.setLevelAction(idx, () -> openLevel(idx));
         }
