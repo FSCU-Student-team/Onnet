@@ -37,7 +37,7 @@ void setupLevels() {
     mainMenu.setBackBtnAction(() -> PageManager.switchPage(levelSelectPage, mainMenu));
     mainMenu.setPlayButtonAction(() -> {
         //TODO: switch to level 1
-        openLevel(0);
+
     });
 
     mainMenu.setLevelsButtonAction(() -> {
