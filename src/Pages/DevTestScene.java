@@ -78,6 +78,11 @@ public class DevTestScene implements Page {
     }
 
     @Override
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    @Override
     public boolean isVisible() {
         return frame.isVisible();
     }
