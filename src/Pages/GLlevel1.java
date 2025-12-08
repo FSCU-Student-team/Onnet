@@ -28,7 +28,7 @@ public class GLlevel1 implements GLEventListener, GameLoop {
     private double minPower = 0;
     private double angle = 0;
     private List<Shape> shapes = new ArrayList<>();
-    private boolean isLunched = false, isWon = false;
+    private boolean isLunched = false, isWon = false,isDead = false;
     private Vector2 velocity;
     private Rectangle rectangle;
 
@@ -114,13 +114,28 @@ public class GLlevel1 implements GLEventListener, GameLoop {
     @Override
     public void physicsUpdate() {
         inputUpdate();
-        if (isLunched && !isWon) {
+        if (isLunched && !isWon && !isDead) {
             entityUtils.updatePlayerVelocity(velocity);
             entityUtils.checkCollisions(playerCircle);
             velocity = entityUtils.getPlayerVelocity();
             playerCircle.move(velocity);
             velocity.add(gravity);
+            check_win();
+            check_die();
         }
+    }
+
+    private void check_die() {
+        //todo check each red rectangle if touched or not and gives dead
+    }
+
+    private void check_win()
+    {
+        double dx=playerCircle.getCenter().x()-GoalRectangle.getCenter().x();
+        double dy=playerCircle.getCenter().y()-GoalRectangle.getCenter().y();
+        double dis=Math.sqrt(dx*dx+dy*dy);
+        if (dis<50)
+            isWon = true;
     }
 
     @Override
