@@ -1,118 +1,54 @@
 import Game.PageManager;
-import Game.SoundHandler;
 import Pages.*;
 
 public class Main {
+
+    static MainMenuPage mainMenu = new MainMenuPage();
+    static SinglePlayerSelectPage singlePlayerMenu = new SinglePlayerSelectPage();
+    static SingleGamePage gamePage = new SingleGamePage();
+    static LevelSelectPage levelSelectPage = new LevelSelectPage();
+
     public static void main(String[] args) {
 
         //IMPORTANT DEV NOTE:
         //SET VM OPTIONS IN RUN CONFIGURATION TO THIS TO RUN: -Djava.library.path=Libs\Natives\Windows --enable-preview --add-exports java.base/java.lang=ALL-UNNAMED --add-exports java.desktop/sun.awt=ALL-UNNAMED --add-exports java.desktop/sun.java2d=ALL-UNNAMED
         //IF USING LINUX CHANGE Libs\Natives\Windows WITH Libs\Natives\Linux
         PageManager.init();
-      /*  Page test = new DevTestScene();
-        PageManager.showPage(test);
-        SoundHandler.play("Sounds/memphis-trap-wav-349366.wav");*/
-        PageManager.init();
-        SingleOrMultiPage startPage = new SingleOrMultiPage();
-        startPage.init();
-        startPage.setVisible(true);
-        startPage.setPlayButtonAction(() -> {
-            // Single
-            MainMenuPage singleMenu = new MainMenuPage();
-            singleMenu.setBackBtnAction(() -> PageManager.switchPage(singleMenu, startPage));
-            // زرار Play في الـ MainMenuPage يفتح اللعبة مباشرة
-            singleMenu.setPlayButtonAction(() -> {
-                SingleGamePage gamePage = new SingleGamePage();
-                PageManager.switchPage(singleMenu, gamePage);
-            });
+        PageManager.showPage(mainMenu);
 
-            // زرار Levels يفتح صفحة اللفلات
-            singleMenu.setLevelsButtonAction(() -> {
-                SingleLevelsPage levelsPage = new SingleLevelsPage();
+        //load into memory without showing
+        PageManager.preLoadPage(singlePlayerMenu);
+        PageManager.preLoadPage(gamePage);
+        PageManager.preLoadPage(levelSelectPage);
 
-                // زرار Back يرجع للـ Menu
-                levelsPage.setBackButtonAction(() -> PageManager.switchPage(levelsPage, singleMenu));
-                // زرار Level1 يفتح اللعبة
-                levelsPage.setLevelAction(0, () -> {
-                    SingleGamePage gamePage = new SingleGamePage();
-                    PageManager.switchPage(levelsPage, gamePage);
-                });
-                levelsPage.setLevelAction(1, () -> {
-                    SingleGamePage gamePage = new SingleGamePage();
-                    PageManager.switchPage(levelsPage, gamePage);
-                });
-
-                levelsPage.setLevelAction(2, () -> {
-                    SingleGamePage gamePage = new SingleGamePage();
-                    PageManager.switchPage(levelsPage, gamePage);
-                });
-
-                levelsPage.setLevelAction(3, () -> {
-                    SingleGamePage gamePage = new SingleGamePage();
-                    PageManager.switchPage(levelsPage, gamePage);
-                });
-
-                levelsPage.setLevelAction(4, () -> {
-                    SingleGamePage gamePage = new SingleGamePage();
-                    PageManager.switchPage(levelsPage, gamePage);
-                });
-
-                levelsPage.setLevelAction(5, () -> {
-                    SingleGamePage gamePage = new SingleGamePage();
-                    PageManager.switchPage(levelsPage, gamePage);
-                });
-
-
-                PageManager.switchPage(singleMenu, levelsPage);
-            });
-
-            PageManager.switchPage(startPage, singleMenu);
+        mainMenu.setPlayButtonAction(() -> {
+            // Singleplayer
+            setupLevels(mainMenu, gamePage, singlePlayerMenu);
         });
 
-        startPage.setLevelsButtonAction(() -> {
-            // Multi
-            MainMenuPage multiMenu = new MainMenuPage();
-            multiMenu.setBackBtnAction(() -> PageManager.switchPage(multiMenu, startPage));
-            multiMenu.setPlayButtonAction(() -> {
-                MultiGamePage gamePage = new MultiGamePage();
-                PageManager.switchPage(multiMenu, gamePage);
-            });
-
-            multiMenu.setLevelsButtonAction(() -> {
-                MultiLevelsPage levelsPage = new MultiLevelsPage();
-
-                // زرار Back يرجع للـ Menu
-                levelsPage.setBackButtonAction(() -> PageManager.switchPage(levelsPage, multiMenu));
-
-                // زرار Level1 يفتح اللعبة
-                levelsPage.setLevelAction(0,() -> {
-                    MultiGamePage gamePage = new MultiGamePage();
-                    PageManager.switchPage(levelsPage, gamePage);
-                });
-                levelsPage.setLevelAction(1,() -> {
-                    MultiGamePage gamePage = new MultiGamePage();
-                    PageManager.switchPage(levelsPage, gamePage);
-                });
-                levelsPage.setLevelAction(2,() -> {
-                    MultiGamePage gamePage = new MultiGamePage();
-                    PageManager.switchPage(levelsPage, gamePage);
-                });
-                levelsPage.setLevelAction(3,() -> {
-                    MultiGamePage gamePage = new MultiGamePage();
-                    PageManager.switchPage(levelsPage, gamePage);
-                });
-                levelsPage.setLevelAction(4,() -> {
-                    MultiGamePage gamePage = new MultiGamePage();
-                    PageManager.switchPage(levelsPage, gamePage);
-                });
-                levelsPage.setLevelAction(5,() -> {
-                    MultiGamePage gamePage = new MultiGamePage();
-                    PageManager.switchPage(levelsPage, gamePage);
-                });
-                PageManager.switchPage(multiMenu, levelsPage);
-            });
-
-            PageManager.switchPage(startPage, multiMenu);
+        mainMenu.setLevelsButtonAction(() -> {
+            // Multiplayer (coop)
+            SinglePlayerSelectPage multiMenu = new SinglePlayerSelectPage();
+            setupLevels(mainMenu, gamePage, multiMenu);
         });
+    }
+
+    private static void setupLevels(MainMenuPage startPage, SingleGamePage gamePage, SinglePlayerSelectPage multiMenu) {
+        multiMenu.setBackBtnAction(() -> PageManager.switchPage(multiMenu, startPage));
+        multiMenu.setPlayButtonAction(() -> {
+            PageManager.switchPage(multiMenu, gamePage);
+        });
+
+        multiMenu.setLevelsButtonAction(() -> {
+            // زرار Back يرجع للـ Menu
+            levelSelectPage.setBackButtonAction(() -> PageManager.switchPage(levelSelectPage, multiMenu));
+
+            for (int i = 0; i < 6; i++) {
+                levelSelectPage.setLevelAction(i, () -> PageManager.switchPage(levelSelectPage, gamePage)); //0-based i is mapped to 1-based level numbers
+            }
+            PageManager.switchPage(multiMenu, levelSelectPage);
+        });
+
+        PageManager.switchPage(startPage, multiMenu);
     }
 }

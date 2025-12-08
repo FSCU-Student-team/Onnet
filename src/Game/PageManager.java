@@ -64,6 +64,13 @@ public class PageManager {
         }
     }
 
+    public static void preLoadPage(Page page){
+        if (!openedPages.contains(page)){
+            page.init();
+            openedPages.add(page);
+        }
+    }
+
     //hides page if it exists, keeping it cached in memory
     public static void hidePage(Page page) {
         if (page != null) page.setVisible(false);
