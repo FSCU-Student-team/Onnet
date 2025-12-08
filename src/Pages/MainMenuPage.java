@@ -13,8 +13,8 @@ import java.awt.event.ActionEvent;
 public class MainMenuPage implements Page {
 
     private JFrame frame;
-    private JButton playBtn, levelsBtn, muteBtn, backBtn;
-    private Runnable onPlay, onLevels, onBack;
+    private JButton playBtn, levelsBtn, muteBtn;
+    private Runnable onPlay, onLevels;
 
     private GLJPanel canvas;
     private FPSAnimator animator;
@@ -64,13 +64,10 @@ public class MainMenuPage implements Page {
         playBtn = new JButton("Play");
         levelsBtn = new JButton("Levels");
         muteBtn = new JButton("Mute");
-        backBtn = new JButton("Back");
-
         Dimension btnSize = new Dimension(200, 120);
         playBtn.setPreferredSize(btnSize);
         levelsBtn.setPreferredSize(btnSize);
         muteBtn.setPreferredSize(btnSize);
-        backBtn.setPreferredSize(btnSize);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(20, 50, 0, 50);
@@ -89,9 +86,6 @@ public class MainMenuPage implements Page {
         gbc.gridy = 1;
         buttonPanel.add(muteBtn, gbc);
 
-        gbc.gridy = 2;
-        buttonPanel.add(backBtn, gbc);
-
         // 3. LayeredPane
         JLayeredPane layeredPane = new JLayeredPane();
         layeredPane.setPreferredSize(new Dimension(800, 600));
@@ -108,7 +102,6 @@ public class MainMenuPage implements Page {
         playBtn.addActionListener(e -> { if (onPlay != null) onPlay.run(); });
         levelsBtn.addActionListener(e -> { if (onLevels != null) onLevels.run(); });
         muteBtn.addActionListener(e -> {SoundHandler.toggleMute();});
-        backBtn.addActionListener(e -> { if (onBack != null) onBack.run(); });
     }
 
     @Override
@@ -138,7 +131,6 @@ public class MainMenuPage implements Page {
     // Button action setters
     public void setPlayButtonAction(Runnable r) { this.onPlay = r; }
     public void setLevelsButtonAction(Runnable r) { this.onLevels = r; }
-    public void setBackBtnAction(Runnable r) { this.onBack = r; }
 
     public JFrame getFrame() { return frame; }
 }
