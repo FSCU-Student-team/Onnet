@@ -1,5 +1,5 @@
 package Game;
-
+import java.awt.Dimension;
 import Pages.Page;
 
 import javax.swing.*;
@@ -28,14 +28,28 @@ public class PageManager {
     //switches between pages (disposing the current page if dispose is true)
     public static void switchPage(Page current, Page newPage, boolean dispose) {
         if (current != null) {
+            // حفظ حجم النافذة الحالي
+            Dimension currentSize = null;
+            if (current.getFrame() != null) {
+                currentSize = current.getFrame().getSize();
+            }
+
             if (dispose) {
                 disposePage(current);
             } else {
                 hidePage(current);
             }
-        }
 
-        showPage(newPage);
+            // عرض الصفحة الجديدة
+            showPage(newPage);
+
+            // استعادة حجم النافذة لو كان محفوظ
+            if (currentSize != null && newPage.getFrame() != null) {
+                newPage.getFrame().setSize(currentSize);
+            }
+        } else {
+            showPage(newPage);
+        }
     }
 
     //shows cached page if it exists, otherwise creates a new one
@@ -47,6 +61,13 @@ public class PageManager {
             openedPages.add(page);
         } else if (!page.isVisible()) {
             page.setVisible(true);
+        }
+    }
+
+    public static void preLoadPage(Page page){
+        if (!openedPages.contains(page)){
+            page.init();
+            openedPages.add(page);
         }
     }
 
