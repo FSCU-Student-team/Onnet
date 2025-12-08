@@ -44,7 +44,7 @@ void setupLevels() {
         //returns to menu
         levelSelectPage.setBackButtonAction(() -> PageManager.switchPage(levelSelectPage, mainMenu));
 
-        for (int i = 1; i < levels.size(); i++) {
+        for (int i = 0; i < levels.size(); i++) {
             final int idx = i; //to bypass the lambda final constraint
             levelSelectPage.setLevelAction(idx, () -> openLevel(idx));
         }
