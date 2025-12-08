@@ -50,16 +50,20 @@ public class GLlevel1 implements GLEventListener, GameLoop {
         actionManager.bind(Input.S, () -> setCurrentPower(currentPower - 1));
         actionManager.bind(Input.D, () -> setAngle(angle - 1));
         actionManager.bind(Input.W, () -> setCurrentPower(currentPower + 1));
-        actionManager.bind(Input.Z, () -> isLunched = true);
+        actionManager.bind(Input.Z, () -> {
+            isLunched = true;
+            velocity = new Vector2(getCurrentPower() * Math.cos(Math.toRadians(angle)), getCurrentPower() * Math.sin(Math.toRadians(angle)));
+        });
         actionManager.bind(Input.Escape, this::togglePause);
         entityUtils.updatePlayerVelocity(velocity);
         entityUtils.updateGravity(gravity);
 
-        playerCircle =new Circle.Builder().color(Color.BLUE).radius(20).angle(0).center(new Point(50,40)).filled(true).build();
-        GoalRectangle =new Rectangle.Builder().color(Color.YELLOW).width(20).height(20).fill(false).origin(new Point(500,500)).build();
+        playerCircle = new Circle.Builder().color(Color.BLUE).radius(20).angle(0).center(new Point(50, 40)).filled(true).build();
+        GoalRectangle = new Rectangle.Builder().color(Color.YELLOW).width(20).height(20).fill(false).origin(new Point(500, 500)).build();
 
-        entityUtils.addShape(playerCircle);entityUtils.addShape(GoalRectangle);
-        shapes=entityUtils.getShapes();
+        entityUtils.addShape(playerCircle);
+        entityUtils.addShape(GoalRectangle);
+        shapes = entityUtils.getShapes();
     }
 
     @Override
@@ -70,7 +74,7 @@ public class GLlevel1 implements GLEventListener, GameLoop {
     @Override
     public void display(GLAutoDrawable glAutoDrawable) {
         GL2 gl = glAutoDrawable.getGL().getGL2();
-     handleLoop(loopState,gl);
+        handleLoop(loopState, gl);
     }
 
     @Override
@@ -87,8 +91,12 @@ public class GLlevel1 implements GLEventListener, GameLoop {
     @Override
     public void physicsUpdate() {
         inputUpdate();
-        if (isLunched){
-
+        if (isLunched) {
+            entityUtils.updatePlayerVelocity(velocity);
+            entityUtils.checkCollisions(playerCircle);
+            velocity=entityUtils.getPlayerVelocity();
+            playerCircle.move(velocity);
+            velocity.add(gravity);
         }
     }
 
@@ -100,8 +108,6 @@ public class GLlevel1 implements GLEventListener, GameLoop {
         for (Shape shape : shapes) {
             shape.draw(gl);
         }
-
-        circle.draw(gl);
 
         gl.glPopMatrix();
 
