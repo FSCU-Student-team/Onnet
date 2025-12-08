@@ -14,7 +14,7 @@ public class MainMenuPage implements Page {
 
     private JFrame frame;
     private JButton playBtn, levelsBtn, muteBtn, backBtn;
-    private Runnable onPlay, onLevels, onMute, onBack;
+    private Runnable onPlay, onLevels, onBack;
 
     private GLJPanel canvas;
     private FPSAnimator animator;
@@ -32,7 +32,6 @@ public class MainMenuPage implements Page {
         frame = new JFrame("Single Player Menu");
         frame.setSize(800, 600);
         frame.setResizable(false); // disable resizing
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         PageManager.registerFrameCloseHandler(this, frame);
         frame.setLocationRelativeTo(null);
     }
@@ -108,7 +107,7 @@ public class MainMenuPage implements Page {
     public void addListeners() {
         playBtn.addActionListener(e -> { if (onPlay != null) onPlay.run(); });
         levelsBtn.addActionListener(e -> { if (onLevels != null) onLevels.run(); });
-        muteBtn.addActionListener(e -> { if (onMute != null) onMute.run(); });
+        muteBtn.addActionListener(e -> {SoundHandler.toggleMute();});
         backBtn.addActionListener(e -> { if (onBack != null) onBack.run(); });
     }
 
@@ -139,10 +138,6 @@ public class MainMenuPage implements Page {
     // Button action setters
     public void setPlayButtonAction(Runnable r) { this.onPlay = r; }
     public void setLevelsButtonAction(Runnable r) { this.onLevels = r; }
-    public void setMuteButtonAction(Runnable r) {
-        if (SoundHandler.isMuted()) SoundHandler.unmute();
-        else SoundHandler.mute();
-    }
     public void setBackBtnAction(Runnable r) { this.onBack = r; }
 
     public JFrame getFrame() { return frame; }

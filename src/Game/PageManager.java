@@ -85,6 +85,13 @@ public class PageManager {
         if (openedPages.isEmpty()) {
             System.exit(0);
         }
+
+        for (Page p : openedPages) {
+            if (p.getFrame().isVisible()) {
+                break;
+            }
+        }
+        System.exit(0);
     }
 
     //Ensures that when a page is disposed that only that page disposes, and not all pages.
