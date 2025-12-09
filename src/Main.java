@@ -46,9 +46,13 @@ public class Main {
         levelSelectPanel.setLevelAction(1, () -> openLevel(1));
         levelSelectPanel.setLevelAction(2, () -> openLevel(2));
         levelSelectPanel.setLevelAction(3, () -> openLevel(3));
+        levelSelectPanel.setLevelAction(4, () -> openLevel(4));
 
-        // Back button for level
-        levelPanel.setBackButtonAction(() -> app.setContent(mainMenuPanel));
+        levelPanel.setBackButtonAction(() -> {
+            levelSelectPanel.setLevelAction(-1, () -> openLevel(-1));
+            app.setContent(levelSelectPanel);
+        });
+
 
         // Show initial panel
         app.setContent(mainMenuPanel);
@@ -57,13 +61,17 @@ public class Main {
         app.init();
     }
 
-    /** Open a level by swapping the renderer */
+    /**
+     * Open a level by swapping the renderer
+     */
     private static void openLevel(int i) {
         switch (i) {
+            case -1 -> app.setLevelRenderer(new MenuBackground(inputManager));
             case 0 -> app.setLevelRenderer(new Level1Renderer(inputManager));
             case 1 -> app.setLevelRenderer(new Level2Renderer(inputManager));
             case 2 -> app.setLevelRenderer(new Level3Renderer(inputManager));
             case 3 -> app.setLevelRenderer(new Level4Renderer(inputManager));
+            case 4 -> app.setLevelRenderer(new Level5Renderer(inputManager));
             default -> throw new IllegalArgumentException("No renderer for level " + i);
         }
 
