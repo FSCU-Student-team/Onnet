@@ -10,8 +10,8 @@ import java.awt.event.ActionEvent;
 
 public class level1Frame implements Page{
     private JFrame frame;
-    private GLCanvas canvas;
-    private GLlevel1 level1;
+    private GLCanvas canvas=new GLCanvas();
+    private GLlevel1 level1=new GLlevel1();
     private FPSAnimator animator;
     @Override
     public void init() {
@@ -36,6 +36,7 @@ public class level1Frame implements Page{
     @Override
     public void setupAnimator() {
       animator=new FPSAnimator(canvas,60);
+      animator.start();
     }
 
     @Override
@@ -48,16 +49,15 @@ public class level1Frame implements Page{
         canvas = new GLCanvas();
         level1 = new GLlevel1();
         canvas.addGLEventListener(level1);
-
         canvas.addKeyListener(level1.getInputManager());
         canvas.addMouseListener(level1.getInputManager());
         canvas.addMouseMotionListener(level1.getInputManager());
+        canvas.requestFocus();
     }
 
     @Override
     public void handleEvents(ActionEvent e) {
         String command = e.getActionCommand();
-
     }
 
     @Override

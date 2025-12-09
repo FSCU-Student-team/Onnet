@@ -22,7 +22,7 @@ public class GLlevel1 implements GLEventListener, GameLoop {
     private Rectangle GoalRectangle;
     private double MaxPower = 100;
     private double currentPower = 0;
-    private Vector2 gravity = new Vector2(0, 0);
+    private Vector2 gravity = new Vector2(0, -9.8);
     private double minPower = 0;
     private double angle = 0;
     private List<Shape> shapes = new ArrayList<>();
