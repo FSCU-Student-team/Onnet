@@ -1,6 +1,7 @@
 package Pages;
 
-import Renderers.GLlevel1;
+import Game.PageComponentAdapter;
+import Renderers.Level1Renderer;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -11,24 +12,25 @@ import java.awt.event.ActionEvent;
 public class level1Frame implements Page{
     private JFrame frame;
     private GLCanvas canvas;
-    private GLlevel1 level1;
+    private Level1Renderer level1;
     private FPSAnimator animator;
     @Override
     public void init() {
-        frame = new JFrame("Sprite Testing");
         setupFrame();
         addComponents();
+        setupAnimator();
         addListeners();
         redraw();
-        setupAnimator();
 
         Game.PageManager.registerFrameCloseHandler(this, frame);
     }
 
     @Override
     public void setupFrame() {
-        frame.setSize(800, 600);
+        frame = new JFrame("Sprite Testing");
+        frame.setSize(800, 800);
         frame.setBackground(Color.black);
+        frame.setResizable(false);
 
         Game.PageManager.registerFrameCloseHandler(this, frame);
     }
@@ -36,22 +38,26 @@ public class level1Frame implements Page{
     @Override
     public void setupAnimator() {
       animator=new FPSAnimator(canvas,60);
+      animator.start();
     }
 
     @Override
     public void addComponents() {
-
-    }
-
-    @Override
-    public void addListeners() {
         canvas = new GLCanvas();
-        level1 = new GLlevel1();
+        level1 = new Level1Renderer();
         canvas.addGLEventListener(level1);
 
         canvas.addKeyListener(level1.getInputManager());
         canvas.addMouseListener(level1.getInputManager());
         canvas.addMouseMotionListener(level1.getInputManager());
+
+        frame.add(canvas, BorderLayout.CENTER);
+
+    }
+
+    @Override
+    public void addListeners() {
+        frame.addComponentListener(new PageComponentAdapter(this));
     }
 
     @Override
@@ -82,6 +88,7 @@ public class level1Frame implements Page{
 
     @Override
     public JFrame getFrame() {
-        return null;
+        return this.frame;
     }
+
 }

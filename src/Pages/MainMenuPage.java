@@ -3,6 +3,7 @@ package Pages;
 import Game.PageManager;
 import Game.SoundHandler;
 import Renderers.MenuBackground;
+import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -23,8 +24,9 @@ public class MainMenuPage implements Page {
     public void init() {
         setupFrame();
         addComponents();
-        addListeners();
         setupAnimator();
+        addListeners();
+        redraw();
     }
 
     @Override
@@ -99,13 +101,20 @@ public class MainMenuPage implements Page {
 
     @Override
     public void addListeners() {
-        playBtn.addActionListener(e -> { if (onPlay != null) onPlay.run(); });
-        levelsBtn.addActionListener(e -> { if (onLevels != null) onLevels.run(); });
-        muteBtn.addActionListener(e -> {SoundHandler.toggleMute();});
+        playBtn.addActionListener(e -> {
+            if (onPlay != null) onPlay.run();
+        });
+        levelsBtn.addActionListener(e -> {
+            if (onLevels != null) onLevels.run();
+        });
+        muteBtn.addActionListener(e -> {
+            SoundHandler.toggleMute();
+        });
     }
 
     @Override
-    public void handleEvents(ActionEvent e) {}
+    public void handleEvents(ActionEvent e) {
+    }
 
     @Override
     public void dispose() {
@@ -129,8 +138,16 @@ public class MainMenuPage implements Page {
     }
 
     // Button action setters
-    public void setPlayButtonAction(Runnable r) { this.onPlay = r; }
-    public void setLevelsButtonAction(Runnable r) { this.onLevels = r; }
+    public void setPlayButtonAction(Runnable r) {
+        this.onPlay = r;
+    }
 
-    public JFrame getFrame() { return frame; }
+    public void setLevelsButtonAction(Runnable r) {
+        this.onLevels = r;
+    }
+
+    public JFrame getFrame() {
+        return frame;
+    }
+
 }

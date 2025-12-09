@@ -27,8 +27,9 @@ public class LevelSelectPage implements Page {
     public void init() {
         setupFrame();
         addComponents();
-        addListeners();
         setupAnimator();
+        addListeners();
+        redraw();
     }
 
     @Override
@@ -176,4 +177,6 @@ public class LevelSelectPage implements Page {
     }
 
     public JFrame getFrame() { return frame; }
+
+
 }

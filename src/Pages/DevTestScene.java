@@ -22,9 +22,9 @@ public class DevTestScene implements Page {
         frame = new JFrame("Sprite Testing");
         setupFrame();
         addComponents();
+        setupAnimator();
         addListeners();
         redraw();
-        setupAnimator();
 
         Game.PageManager.registerFrameCloseHandler(this, frame);
     }
@@ -34,8 +34,6 @@ public class DevTestScene implements Page {
         frame.setSize(800, 600);
         frame.setLayout(new BorderLayout());
         frame.setBackground(Color.black);
-
-        Game.PageManager.registerFrameCloseHandler(this, frame);
     }
 
     @Override
@@ -81,6 +79,7 @@ public class DevTestScene implements Page {
     public JFrame getFrame() {
         return frame;
     }
+
 
     @Override
     public boolean isVisible() {

@@ -23,8 +23,9 @@ public class SingleOrCoopSelectPage implements Page {
     public void init() {
         setupFrame();
         addComponents();
-        addListeners();
         setupAnimator();
+        addListeners();
+        redraw();
     }
 
     @Override
