@@ -28,13 +28,12 @@ void main() {
     selectSingleOrCoop.setSinglePlayerButtonAction(() -> singlePlayer = true);
     selectSingleOrCoop.setCoopButtonAction(() -> singlePlayer = false);
 
-    mainMenu.setMuteButtonAction(SoundHandler::toggleMute);
-
     setupLevels();
+
+    SoundHandler.play("Sounds/memphis-trap-wav-349366.wav");
 }
 
 void setupLevels() {
-    mainMenu.setBackBtnAction(() -> PageManager.switchPage(levelSelectPage, mainMenu));
     mainMenu.setPlayButtonAction(() -> {
         //TODO: switch to level 1
 
