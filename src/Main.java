@@ -22,6 +22,7 @@ void main() {
     PageManager.preLoadPage(selectSingleOrCoop);
 
     levels.add(new DevTestScene());
+    levels.add(new level1Frame());
 
     mainMenu.setLevelsButtonAction(() -> PageManager.switchPage(mainMenu, selectSingleOrCoop)); //prompts you for singleplayer or coop before opening levels
     selectSingleOrCoop.setSinglePlayerButtonAction(() -> singlePlayer = true);
@@ -35,6 +36,7 @@ void main() {
 void setupLevels() {
     mainMenu.setPlayButtonAction(() -> {
         //TODO: switch to level 1
+
     });
 
     mainMenu.setLevelsButtonAction(() -> {
@@ -52,3 +54,4 @@ void setupLevels() {
 void openLevel(int i) {
     PageManager.switchPage(levelSelectPage, levels.get(i));
 }
+

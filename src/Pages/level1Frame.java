@@ -1,6 +1,6 @@
 package Pages;
 
-import Renderers.DevRendererTest;
+import Renderers.GLlevel1;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
 

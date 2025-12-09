@@ -1,11 +1,10 @@
-package Pages;
+package Renderers;
 
 import Game.GameLoop;
 import Game.Input;
 import Game.InputManager;
 import Game.LoopState;
 import Physics.ActionManager;
-import Renderers.EntityUtils;
 import Shapes.*;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
@@ -23,13 +22,13 @@ public class GLlevel1 implements GLEventListener, GameLoop {
     private Rectangle GoalRectangle;
     private double MaxPower = 100;
     private double currentPower = 0;
-    private Vector2 Force = new Vector2(0, 0);
     private Vector2 gravity = new Vector2(0, 0);
     private double minPower = 0;
     private double angle = 0;
     private List<Shape> shapes = new ArrayList<>();
-    private boolean isLunched = false;
+    private boolean isLunched = false, isWon = false,isDead = false;
     private Vector2 velocity;
+    private Rectangle rectangle;
 
     public GLlevel1() {
         inputManager = new InputManager();
@@ -46,10 +45,22 @@ public class GLlevel1 implements GLEventListener, GameLoop {
         gl.glLoadIdentity();
         gl.glOrtho(0, 800, 0, 600, -1, 1);
 
-        actionManager.bind(Input.A, () -> setAngle(angle + 1));
-        actionManager.bind(Input.S, () -> setCurrentPower(currentPower - 1));
-        actionManager.bind(Input.D, () -> setAngle(angle - 1));
-        actionManager.bind(Input.W, () -> setCurrentPower(currentPower + 1));
+        actionManager.bind(Input.A, () -> {
+            if (!isLunched)
+                setAngle(angle + 1);
+        });
+        actionManager.bind(Input.S, () -> {
+            if (!isLunched)
+                setCurrentPower(currentPower - 1);
+        });
+        actionManager.bind(Input.D, () -> {
+            if (!isLunched)
+                setAngle(angle - 1);
+        });
+        actionManager.bind(Input.W, () -> {
+            if (!isLunched)
+                setCurrentPower(currentPower + 1);
+        });
         actionManager.bind(Input.Z, () -> {
             isLunched = true;
             velocity = new Vector2(getCurrentPower() * Math.cos(Math.toRadians(angle)), getCurrentPower() * Math.sin(Math.toRadians(angle)));
@@ -58,11 +69,21 @@ public class GLlevel1 implements GLEventListener, GameLoop {
         entityUtils.updatePlayerVelocity(velocity);
         entityUtils.updateGravity(gravity);
 
-        playerCircle = new Circle.Builder().color(Color.BLUE).radius(20).angle(0).center(new Point(50, 40)).filled(true).build();
-        GoalRectangle = new Rectangle.Builder().color(Color.YELLOW).width(20).height(20).fill(false).origin(new Point(500, 500)).build();
-
+        playerCircle = new Circle.Builder().color(Color.WHITE).radius(20).angle(0).restitution(0.3).center(new Point(50, 40)).filled(true).build();
+        GoalRectangle = new Rectangle.Builder().color(Color.YELLOW).width(20).height(20).fill(false).origin(new Point(700, 200)).build();
+        rectangle = new Rectangle.Builder().color(Color.BLUE).origin(new Point(400, 50)).restitution(0.5).width(75).height(100).fill(false).build();
+        Rectangle rectangledown = new Rectangle.Builder().color(Color.RED).rotation(10).fill(true).origin(new Point(0, 0)).restitution(0.0).width(1000).height(10).build();
+        Rectangle rectangleTop = new Rectangle.Builder().color(Color.RED).rotation(0).fill(true).origin(new Point(0, 600)).restitution(0.0).width(1000).height(10).build();
+        Rectangle rectangleLeft = new Rectangle.Builder().color(Color.RED).rotation(0).fill(true).origin(new Point(700, 0)).restitution(0.0).width(10).height(1000).build();
+        Rectangle rectangleRight = new Rectangle.Builder().color(Color.RED).rotation(0).fill(true).origin(new Point(0, 0)).restitution(0.0).width(10).height(1000).build();
         entityUtils.addShape(playerCircle);
         entityUtils.addShape(GoalRectangle);
+        entityUtils.addShape(rectangle);
+        entityUtils.addShape(rectangleTop);
+        entityUtils.addShape(rectangledown);
+        entityUtils.addShape(rectangleLeft);
+        entityUtils.addShape(rectangleRight);
+
         shapes = entityUtils.getShapes();
     }
 
@@ -91,13 +112,28 @@ public class GLlevel1 implements GLEventListener, GameLoop {
     @Override
     public void physicsUpdate() {
         inputUpdate();
-        if (isLunched) {
+        if (isLunched && !isWon && !isDead) {
             entityUtils.updatePlayerVelocity(velocity);
             entityUtils.checkCollisions(playerCircle);
-            velocity=entityUtils.getPlayerVelocity();
+            velocity = entityUtils.getPlayerVelocity();
             playerCircle.move(velocity);
             velocity.add(gravity);
+            check_win();
+            check_die();
         }
+    }
+
+    private void check_die() {
+        //todo check each red rectangle if touched or not and gives dead
+    }
+
+    private void check_win()
+    {
+        double dx=playerCircle.getCenter().x()-GoalRectangle.getCenter().x();
+        double dy=playerCircle.getCenter().y()-GoalRectangle.getCenter().y();
+        double dis=Math.sqrt(dx*dx+dy*dy);
+        if (dis<50)
+            isWon = true;
     }
 
     @Override
@@ -157,11 +193,14 @@ public class GLlevel1 implements GLEventListener, GameLoop {
     }
 
     public void setCurrentPower(double currentPower) {
-        if (currentPower < minPower)
+        if (currentPower > MaxPower)
+            this.currentPower = MaxPower;
+        else if (currentPower < minPower)
             this.currentPower = minPower;
         else
             this.currentPower = currentPower;
     }
+
     public InputManager getInputManager() {
         return inputManager;
     }

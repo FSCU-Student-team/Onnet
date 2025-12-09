@@ -76,4 +76,9 @@ public class GameRenderer implements GLEventListener, GameLoop {
         player.draw(gl);
         gl.glPopMatrix();
     }
+
+    @Override
+    public void inputUpdate() {
+        actionManager.update();
+    }
 }
