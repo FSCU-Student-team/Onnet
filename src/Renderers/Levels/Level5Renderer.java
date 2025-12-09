@@ -7,10 +7,16 @@ import Game.LoopState;
 import Physics.ActionManager;
 import Renderers.EntityUtils;
 import Shapes.*;
+import Shapes.Color;
+import Shapes.Point;
+import Shapes.Rectangle;
+import Shapes.Shape;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.util.awt.TextRenderer;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +46,9 @@ public class Level5Renderer implements GLEventListener, GameLoop {
     private boolean isDead = false;
 
     private Vector2 velocity = new Vector2(0, 0);
+    private double Tries = 3;
+    private double score = 0;
+    private TextRenderer textRenderer;
 
     public Level5Renderer() {
         inputManager = new InputManager();
@@ -147,7 +156,6 @@ public class Level5Renderer implements GLEventListener, GameLoop {
                 .build();
 
 
-
         Rectangle middleBottomWall = new Rectangle.Builder()
                 .color(Color.BLUE)
                 .rotation(0)
@@ -204,7 +212,6 @@ public class Level5Renderer implements GLEventListener, GameLoop {
                 .build();
 
 
-
         // IMPORTANT: don't add playerCircle to entityUtils shapes list (avoid self-collision)
         entityUtils.addShape(goalRectangle);
         entityUtils.addShape(floor);
@@ -218,7 +225,6 @@ public class Level5Renderer implements GLEventListener, GameLoop {
         entityUtils.addShape(middleTopWall2);
         entityUtils.addShape(rightTopWall);
         entityUtils.addShape(RightMidCircle);
-
 
 
         // set up entity utils with starting velocity and gravity
@@ -239,7 +245,6 @@ public class Level5Renderer implements GLEventListener, GameLoop {
         shapes.add(middleTopWall2);
         shapes.add(rightTopWall);
         shapes.add(RightMidCircle);
-
 
 
     }
@@ -269,7 +274,7 @@ public class Level5Renderer implements GLEventListener, GameLoop {
     @Override
     public void physicsUpdate() {
         inputUpdate();
-        middleTopWall.rotate(30/360.0);
+        middleTopWall.rotate(30 / 360.0);
 
 
         if (isLaunched && !isWon && !isDead) {
@@ -297,15 +302,50 @@ public class Level5Renderer implements GLEventListener, GameLoop {
     }
 
     private void checkDie() {
-        // placeholder: you can check overlap with red rectangles here and set isDead
-        for (Shape Dead:shapes){
-            if (Dead.getColor()==Color.RED){
-                double dx = playerCircle.getCenter().x() - Dead.getCenter().x();
-                double dy = playerCircle.getCenter().y() - Dead.getCenter().y();
-                double dist = Math.sqrt(dx*dx+dy*dy);
-                if (dist<30){
-                    isDead=true;
-                    resetLevel(); // not always but as a try
+        for (Shape shape : shapes) {
+
+            // 1. تجاهل اللاعب نفسه
+            if (shape == playerCircle) {
+                continue;
+            }
+
+            // 2. فحص الأجسام الحمراء فقط
+            if (shape.getColor().toString().equals(Color.RED.toString())) {
+
+                // --- بداية الكود الجديد ---
+
+                // إحداثيات ونصف قطر اللاعب
+                double pX = playerCircle.getCenter().x();
+                double pY = playerCircle.getCenter().y();
+                double pRadius = playerCircle.getWidth() / 2.0;
+
+                // إحداثيات وأبعاد الجسم الأحمر (الحائط/الأرضية)
+                double sX = shape.getCenter().x();
+                double sY = shape.getCenter().y();
+                double sHalfWidth = shape.getWidth() / 2.0;
+                double sHalfHeight = shape.getHeight() / 2.0;
+
+                // حساب حدود المستطيل
+                double left = sX - sHalfWidth;
+                double right = sX + sHalfWidth;
+                double bottom = sY - sHalfHeight;
+                double top = sY + sHalfHeight;
+
+                // أهم خطوة: إيجاد أقرب نقطة من المستطيل لمركز اللاعب (Clamping)
+                // هذه الدالة تجبر إحداثيات اللاعب أن تكون داخل حدود المستطيل
+                double closestX = Math.max(left, Math.min(pX, right));
+                double closestY = Math.max(bottom, Math.min(pY, top));
+
+                // حساب المسافة بين مركز اللاعب وهذه النقطة القريبة
+                double dx = pX - closestX;
+                double dy = pY - closestY;
+
+                // إذا كانت المسافة أقل من نصف قطر اللاعب، فهذا يعني تلامس حقيقي
+                if ((dx * dx + dy * dy) < (pRadius * pRadius)) {
+                    isDead = true;
+                    Tries -= 1;
+                    resetLevel();
+                    return;
                 }
             }
         }
@@ -317,6 +357,8 @@ public class Level5Renderer implements GLEventListener, GameLoop {
         double dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < 30) {
             isWon = true;
+            score = Tries * 1000;
+            System.out.println(score);
         }
     }
 
@@ -353,6 +395,24 @@ public class Level5Renderer implements GLEventListener, GameLoop {
         }
 
         gl.glPopMatrix();
+        if (isWon) {
+            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
+            textRenderer.beginRendering(800, 600);
+
+            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f); // أخضر
+            textRenderer.draw("YOU WIN!", 250, 300);
+
+            textRenderer.endRendering();
+        }
+        if (!isWon && Tries <= 0) {
+            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
+            textRenderer.beginRendering(800, 600);
+
+            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
+            textRenderer.draw("YOU Lose!", 250, 300);
+
+            textRenderer.endRendering();
+        }
 
         // play any bounce sounds queued by entityUtils
         entityUtils.allowBounceSounds();
