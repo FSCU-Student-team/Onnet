@@ -343,7 +343,7 @@ public class Level3Renderer implements GLEventListener, GameLoop {
         double dx = playerCircle.getCenter().x() - goalRectangle.getCenter().x();
         double dy = playerCircle.getCenter().y() - goalRectangle.getCenter().y();
         double dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 30) {
+        if (dist <= Math.max(goalRectangle.getWidth()/2,goalRectangle.getHeight()/2)) {
             isWon = true;
             score=Tries*1000;
             System.out.println(score);
@@ -391,6 +391,7 @@ public class Level3Renderer implements GLEventListener, GameLoop {
 
             textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f); // أخضر
             textRenderer.draw("YOU WIN!", 250, 300);
+            textRenderer.draw("yourScore:"+(score),150,150);
 
             textRenderer.endRendering();
         }

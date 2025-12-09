@@ -290,7 +290,7 @@ public class Level1Renderer implements GLEventListener, GameLoop {
         double dx = playerCircle.getCenter().x() - goalRectangle.getCenter().x();
         double dy = playerCircle.getCenter().y() - goalRectangle.getCenter().y();
         double dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 30) {
+        if (dist <= Math.max(goalRectangle.getWidth()/2,goalRectangle.getHeight()/2)) {
             isWon = true;
             score+=Tries*1000;
             System.out.println(score);
