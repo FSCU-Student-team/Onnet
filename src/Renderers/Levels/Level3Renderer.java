@@ -41,9 +41,10 @@ public class Level3Renderer implements GLEventListener, GameLoop {
 
     private Vector2 velocity = new Vector2(0, 0);
 
-    public Level3Renderer() {
-        inputManager = new InputManager();
+    public Level3Renderer(InputManager inputManager) {
+        this.inputManager = inputManager;
     }
+
 
     @Override
     public void init(GLAutoDrawable glAutoDrawable) {

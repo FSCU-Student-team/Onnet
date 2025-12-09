@@ -41,8 +41,8 @@ public class Level2Renderer implements GLEventListener, GameLoop {
 
     private Vector2 velocity = new Vector2(0, 0);
 
-    public Level2Renderer() {
-        inputManager = new InputManager();
+    public Level2Renderer(InputManager inputManager) {
+        this.inputManager = inputManager;
     }
 
     @Override

@@ -51,7 +51,9 @@ public class SinglePageApplication implements Page {
         frame.setContentPane(layeredPane);
     }
 
-    /** Swap the current content JPanel with a new one */
+    /**
+     * Swap the current content JPanel with a new one
+     */
     public void setContent(JPanel newPanel) {
         contentPanel.removeAll();
         contentPanel.add(newPanel, BorderLayout.CENTER);
@@ -59,7 +61,9 @@ public class SinglePageApplication implements Page {
         contentPanel.repaint();
     }
 
-    /** Add a button (or any component) to the overlay */
+    /**
+     * Add a button (or any component) to the overlay
+     */
     public void addOverlayComponent(JComponent comp, int x, int y, int width, int height) {
         comp.setBounds(x, y, width, height);
         glassPane.add(comp);
@@ -82,7 +86,7 @@ public class SinglePageApplication implements Page {
 
         // Add GLJPanel asynchronously to avoid blocking EDT
         SwingUtilities.invokeLater(() -> {
-            canvas.setBounds(0, 0, frame.getWidth(), frame.getHeight());
+            canvas.setBounds(0, 0, frame.getContentPane().getWidth(), frame.getContentPane().getHeight());
             layeredPane.add(canvas, Integer.valueOf(0));
             layeredPane.revalidate();
             layeredPane.repaint();
@@ -93,12 +97,8 @@ public class SinglePageApplication implements Page {
     public void setupAnimator() {
         if (canvas != null && (animator == null || !animator.isStarted())) {
             animator = new FPSAnimator(canvas, 60);
-
-            // Start animator asynchronously
-            SwingUtilities.invokeLater(() -> {
-                animator.start();
-                canvas.display(); // force first GL context creation
-            });
+            animator.start();
+            canvas.display();
         }
     }
 
@@ -124,32 +124,41 @@ public class SinglePageApplication implements Page {
     }
 
     @Override
-    public boolean isVisible() { return frame.isVisible(); }
+    public boolean isVisible() {
+        return frame.isVisible();
+    }
 
     @Override
-    public void setVisible(boolean b) { frame.setVisible(b); }
+    public void setVisible(boolean b) {
+        frame.setVisible(b);
+    }
 
     @Override
-    public void redraw() { if (canvas != null) canvas.display(); }
+    public void redraw() {
+        if (canvas != null) canvas.display();
+    }
 
     @Override
-    public JFrame getFrame() { return frame; }
+    public JFrame getFrame() {
+        return frame;
+    }
 
-    public JPanel getContentPanel() { return contentPanel; }
-    public JPanel getGlassPanePanel() { return glassPane; }
+    public JPanel getContentPanel() {
+        return contentPanel;
+    }
+
+    public JPanel getGlassPanePanel() {
+        return glassPane;
+    }
 
     //sets new level renderer
     public void setLevelRenderer(GLEventListener renderer) {
-        // Remove all previous listeners
         for (int i = 0; i < canvas.getGLEventListenerCount(); i++) {
             canvas.removeGLEventListener(canvas.getGLEventListener(i));
         }
 
         // Add the new level renderer
         canvas.addGLEventListener(renderer);
-
-        // Force a redraw
-        canvas.display();
     }
 
 }

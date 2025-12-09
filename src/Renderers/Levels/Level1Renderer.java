@@ -10,6 +10,7 @@ import Shapes.*;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.util.FPSAnimator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +42,8 @@ public class Level1Renderer implements GLEventListener, GameLoop {
 
     private Vector2 velocity = new Vector2(0, 0);
 
-    public Level1Renderer() {
-        inputManager = new InputManager();
+    public Level1Renderer(InputManager inputManager) {
+        this.inputManager = inputManager;
     }
 
     @Override
@@ -61,15 +62,19 @@ public class Level1Renderer implements GLEventListener, GameLoop {
         // --- INPUT BINDINGS (small increments, only when not launched) ---
         actionManager.bind(Input.A, () -> {
             if (!isLaunched) angle = (angle + ANGLE_INCREMENT) % 360;
+            System.out.println(angle);
         });
         actionManager.bind(Input.D, () -> {
             if (!isLaunched) angle = (angle - ANGLE_INCREMENT + 360) % 360;
+            System.out.println(angle);
         });
         actionManager.bind(Input.W, () -> {
             if (!isLaunched) setCurrentPower(currentPower + POWER_INCREMENT);
+            System.out.println(currentPower);
         });
         actionManager.bind(Input.S, () -> {
             if (!isLaunched) setCurrentPower(currentPower - POWER_INCREMENT);
+            System.out.println(currentPower);
         });
 
         actionManager.bind(Input.R, this::resetLevel);

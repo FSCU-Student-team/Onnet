@@ -28,8 +28,8 @@ public class MenuBackground implements GLEventListener, GameLoop {
     Vector2 velocity = new Vector2(0, 0);
     Vector2 gravity = new Vector2(0, -0.01);
 
-    public MenuBackground() {
-        inputManager = new InputManager();
+    public MenuBackground(InputManager input) {
+        inputManager = input;
     }
 
     @Override
