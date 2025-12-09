@@ -257,14 +257,14 @@ public class Level1Renderer implements GLEventListener, GameLoop {
                 gl.glColor3f(0f, 1f, 0f);
             else if ((currentPower / MAX_POWER) * 100 <= 70)//Yellow
                 gl.glColor3f(1f, 1f, 0f);
-            else if ((currentPower/MAX_POWER)*100>=70)//red
+            else if ((currentPower / MAX_POWER) * 100 >= 70)//red
                 gl.glColor3f(1f, 0f, 0f);
 
             double len = Math.max(10, currentPower * 0.4); // visual length; tweak multiplier if desired
-            double radius=playerCircle.getWidth()/2.0;
+            double radius = playerCircle.getWidth() / 2.0;
             double rad = Math.toRadians(angle);
-            double x1 = playerCircle.getCenter().x()+3+radius*Math.cos(rad);
-            double y1 = playerCircle.getCenter().y()+3+radius*Math.sin(rad);
+            double x1 = playerCircle.getCenter().x() + radius * Math.cos(rad);
+            double y1 = playerCircle.getCenter().y() + radius * Math.sin(rad);
             double x2 = x1 + len * Math.cos(rad);
             double y2 = y1 + len * Math.sin(rad);
 
