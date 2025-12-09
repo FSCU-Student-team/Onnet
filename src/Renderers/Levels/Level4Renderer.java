@@ -272,7 +272,17 @@ public class Level4Renderer implements GLEventListener, GameLoop {
     }
 
     private void checkDie() {
-
+        for (Shape Dead:shapes){
+            if (Dead.getColor()==Color.RED){
+                double dx = playerCircle.getCenter().x() - Dead.getCenter().x();
+                double dy = playerCircle.getCenter().y() - Dead.getCenter().y();
+                double dist = Math.sqrt(dx*dx+dy*dy);
+                if (dist<30){
+                    isDead=true;
+                    resetLevel(); // not always but as a try
+                }
+            }
+        }
     }
 
     private void checkWin() {

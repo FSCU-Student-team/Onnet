@@ -298,6 +298,17 @@ public class Level5Renderer implements GLEventListener, GameLoop {
 
     private void checkDie() {
         // placeholder: you can check overlap with red rectangles here and set isDead
+        for (Shape Dead:shapes){
+            if (Dead.getColor()==Color.RED){
+                double dx = playerCircle.getCenter().x() - Dead.getCenter().x();
+                double dy = playerCircle.getCenter().y() - Dead.getCenter().y();
+                double dist = Math.sqrt(dx*dx+dy*dy);
+                if (dist<30){
+                    isDead=true;
+                    resetLevel(); // not always but as a try
+                }
+            }
+        }
     }
 
     private void checkWin() {

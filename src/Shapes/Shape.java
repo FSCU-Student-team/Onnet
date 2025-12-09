@@ -26,4 +26,6 @@ public interface Shape {
      void draw(GL2 gl);
 
      <T> T copy();
+
+     Color getColor();
 }

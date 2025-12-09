@@ -27,6 +27,10 @@ public class Triangle implements Shape {
         collider = new TriangleCollider(points);
     }
 
+    public Color getColor() {
+        return color;
+    }
+
     // Quality of life: to avoid repition
     private Point p1() {
         return points.getFirst();
