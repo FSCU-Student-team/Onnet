@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
-public class level1Frame implements Page{
+public class Level1 implements Page{
     private JFrame frame;
     private GLCanvas canvas;
     private Level1Renderer level1;
