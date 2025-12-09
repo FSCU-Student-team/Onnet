@@ -50,9 +50,10 @@ public class Level3Renderer implements GLEventListener, GameLoop {
     private double score=0;
     private TextRenderer textRenderer;
 
-    public Level3Renderer() {
-        inputManager = new InputManager();
+    public Level3Renderer(InputManager inputManager) {
+        this.inputManager = inputManager;
     }
+
 
     @Override
     public void init(GLAutoDrawable glAutoDrawable) {

@@ -50,8 +50,8 @@ public class Level5Renderer implements GLEventListener, GameLoop {
     private double score = 0;
     private TextRenderer textRenderer;
 
-    public Level5Renderer() {
-        inputManager = new InputManager();
+    public Level5Renderer(InputManager inputManager) {
+        this.inputManager = inputManager;
     }
 
     @Override

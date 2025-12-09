@@ -26,7 +26,6 @@ public class DevTestScene implements Page {
         addListeners();
         redraw();
 
-        Game.PageManager.registerFrameCloseHandler(this, frame);
     }
 
     @Override
