@@ -1,7 +1,7 @@
 package Pages;
 
 import Game.PageComponentAdapter;
-import Renderers.Levels.Level1Renderer;
+import Renderers.Levels.Level2Renderer;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -9,11 +9,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
-public class level1Frame implements Page{
+public class Level2 implements Page {
     private JFrame frame;
     private GLCanvas canvas;
-    private Level1Renderer level1;
+    private Level2Renderer level2;
     private FPSAnimator animator;
+
     @Override
     public void init() {
         setupFrame();
@@ -37,19 +38,19 @@ public class level1Frame implements Page{
 
     @Override
     public void setupAnimator() {
-      animator=new FPSAnimator(canvas,60);
-      animator.start();
+        animator = new FPSAnimator(canvas, 60);
+        animator.start();
     }
 
     @Override
     public void addComponents() {
         canvas = new GLCanvas();
-        level1 = new Level1Renderer();
-        canvas.addGLEventListener(level1);
+        level2 = new Level2Renderer();
+        canvas.addGLEventListener(level2);
 
-        canvas.addKeyListener(level1.getInputManager());
-        canvas.addMouseListener(level1.getInputManager());
-        canvas.addMouseMotionListener(level1.getInputManager());
+        canvas.addKeyListener(level2.getInputManager());
+        canvas.addMouseListener(level2.getInputManager());
+        canvas.addMouseMotionListener(level2.getInputManager());
 
         frame.add(canvas, BorderLayout.CENTER);
 
@@ -68,7 +69,7 @@ public class level1Frame implements Page{
 
     @Override
     public void dispose() {
-       frame.dispose();
+        frame.dispose();
     }
 
     @Override
@@ -77,18 +78,17 @@ public class level1Frame implements Page{
     }
 
     @Override
-    public void setVisible(boolean b){
+    public void setVisible(boolean b) {
         frame.setVisible(b);
     }
 
     @Override
     public void redraw() {
-       frame.repaint();
+        frame.repaint();
     }
 
     @Override
     public JFrame getFrame() {
         return this.frame;
     }
-
 }
