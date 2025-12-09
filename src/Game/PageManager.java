@@ -1,111 +1,34 @@
 package Game;
-import java.awt.Dimension;
-import Pages.Page;
 
 import javax.swing.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.HashSet;
+import java.awt.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class PageManager {
-    //all opened pages
-    private static HashSet<Page> openedPages;
 
-    //private constructor to prevent instantiation
-    private PageManager() {
+    private static JFrame mainFrame;
+    private static JPanel currentPanel;
+    private static ExecutorService asyncLoader;
+
+    public static void init(JFrame frame) {
+        mainFrame = frame;
+        asyncLoader = Executors.newFixedThreadPool(2);
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    //initializes the opened pages set
-    public static void init() {
-        openedPages = new HashSet<>();
+    public static void switchPage(JPanel newPanel) {
+        if (currentPanel != null) mainFrame.remove(currentPanel);
+        currentPanel = newPanel;
+        mainFrame.add(currentPanel, BorderLayout.CENTER);
+        mainFrame.revalidate();
+        mainFrame.repaint();
     }
 
-    //switches between pages (keeping the page cached in memory)
-    public static void switchPage(Page current, Page newPage) {
-        switchPage(current, newPage, false);
-    }
-
-    //switches between pages (disposing the current page if dispose is true)
-    public static void switchPage(Page current, Page newPage, boolean dispose) {
-        if (current != null) {
-            // حفظ حجم النافذة الحالي
-            Dimension currentSize = null;
-            if (current.getFrame() != null) {
-                currentSize = current.getFrame().getSize();
-            }
-
-            if (dispose) {
-                disposePage(current);
-            } else {
-                hidePage(current);
-            }
-
-            // عرض الصفحة الجديدة
-            showPage(newPage);
-
-            // استعادة حجم النافذة لو كان محفوظ
-            if (currentSize != null && newPage.getFrame() != null) {
-                newPage.getFrame().setSize(currentSize);
-            }
-        } else {
-            showPage(newPage);
-        }
-    }
-
-    //shows cached page if it exists, otherwise creates a new one
-    public static void showPage(Page page) {
-        if (page == null) return;
-        if (!openedPages.contains(page)) {
-            page.init();
-            page.setVisible(true);
-            openedPages.add(page);
-        } else if (!page.isVisible()) {
-            page.setVisible(true);
-        }
-    }
-
-    public static void preLoadPage(Page page){
-        if (!openedPages.contains(page)){
-            page.init();
-            openedPages.add(page);
-        }
-    }
-
-    //hides page if it exists, keeping it cached in memory
-    public static void hidePage(Page page) {
-        if (page != null) page.setVisible(false);
-    }
-
-    //closes the page and removes it from the opened pages set (and from memory)
-    public static void disposePage(Page page) {
-        if (page != null) {
-            page.dispose();
-            openedPages.remove(page);
-        }
-        if (openedPages.isEmpty()) {
-            System.exit(0);
-        }
-
-        for (Page p : openedPages) {
-            if (p.getFrame().isVisible()) {
-                break;
-            }
-        }
-        System.exit(0);
-    }
-
-    //Ensures that when a page is disposed that only that page disposes, and not all pages.
-    public static void registerFrameCloseHandler(Page page, JFrame frame) {
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                disposePage(page);
-            }
+    public static void preLoadPageAsync(JPanel panel, Runnable callback) {
+        asyncLoader.submit(() -> {
+            // optional heavy init
+            if (callback != null) SwingUtilities.invokeLater(callback);
         });
-    }
-
-    //returns all opened pages
-    public static HashSet<Page> getOpenedPages() {
-        return openedPages;
     }
 }

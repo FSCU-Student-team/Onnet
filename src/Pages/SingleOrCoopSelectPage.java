@@ -1,10 +1,7 @@
 package Pages;
 
-import Game.PageComponentAdapter;
 import Game.PageManager;
-import Renderers.MenuBackground;
-import com.jogamp.opengl.awt.GLJPanel;
-import com.jogamp.opengl.util.FPSAnimator;
+import com.jogamp.opengl.awt.GLCanvas;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,143 +9,77 @@ import java.awt.event.ActionEvent;
 
 public class SingleOrCoopSelectPage implements Page {
 
+    private final GLCanvas canvas; // shared canvas
     private JFrame frame;
-    private JButton singleButton, multiButton;
+    private JButton singleButton, coopButton;
     private Runnable onSingle, onMulti;
 
-    private GLJPanel canvas;
-    private FPSAnimator animator;
+    public SingleOrCoopSelectPage(GLCanvas sharedCanvas) {
+        this.canvas = sharedCanvas;
+    }
 
     @Override
     public void init() {
         setupFrame();
         addComponents();
-        setupAnimator();
         addListeners();
-        redraw();
+
+        SwingUtilities.invokeLater(canvas::display);
     }
 
     @Override
     public void setupFrame() {
-        frame = new JFrame("Main Menu");
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        frame.setResizable(true);
-        frame.setMinimumSize(new Dimension(800, 600));
-        PageManager.registerFrameCloseHandler(this, frame);
-        frame.pack();           // Ensure correct sizing
-        frame.setLocationRelativeTo(null); // Center on screen
-        frame.setResizable(false); // <-- disable resizing
-    }
-
-    @Override
-    public void setupAnimator() {
-        if (canvas != null) {
-            animator = new FPSAnimator(canvas, 60);
-            animator.start();
-        }
+        frame = new JFrame("Single or Coop Select");
+        frame.setSize(800, 600);
+        frame.setResizable(false);
+        frame.setLayout(new BorderLayout());
+        frame.setLocationRelativeTo(null);
     }
 
     @Override
     public void addComponents() {
-        // 1. Create canvas and renderer
-        canvas = new GLJPanel();
-        MenuBackground renderer = new MenuBackground();
-        canvas.addGLEventListener(renderer);
-        canvas.addKeyListener(renderer.inputManager);
-        canvas.addMouseListener(renderer.inputManager);
-        canvas.addMouseMotionListener(renderer.inputManager);
+        frame.add(canvas, BorderLayout.CENTER);
 
-        // 2. Main panel with BorderLayout
-        JPanel mainPanel = new JPanel(new BorderLayout());
-
-        // Add GLJPanel to center (fills window)
-        mainPanel.add(canvas, BorderLayout.CENTER);
-
-        // 3. Button panel (transparent) using GridBagLayout
-        JPanel buttonPanel = new JPanel(new GridBagLayout());
-        buttonPanel.setOpaque(false); // allow background to show
+        JPanel glass = (JPanel) frame.getGlassPane();
+        glass.setOpaque(false);
+        glass.setLayout(null);
+        glass.setVisible(true);
 
         singleButton = new JButton("Single");
-        multiButton = new JButton("Multi");
-        Dimension buttonSize = new Dimension(200, 120);
-        singleButton.setPreferredSize(buttonSize);
-        multiButton.setPreferredSize(buttonSize);
+        coopButton = new JButton("Coop");
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridy = 0;
-        gbc.insets = new Insets(0, 50, 0, 50);
+        singleButton.setBounds(150, 200, 200, 120);
+        coopButton.setBounds(450, 200, 200, 120);
 
-        gbc.gridx = 0;
-        buttonPanel.add(singleButton, gbc);
-
-        gbc.gridx = 1;
-        buttonPanel.add(multiButton, gbc);
-
-        // 4. Wrap canvas + buttons in JLayeredPane to allow layering
-        JLayeredPane layeredPane = new JLayeredPane();
-        layeredPane.setLayout(null); // use absolute positioning
-
-        // Set bounds to fill frame
-        canvas.setBounds(0, 0, 800, 600);
-        buttonPanel.setBounds(0, 0, 800, 600);
-
-        layeredPane.add(canvas, Integer.valueOf(0));      // bottom
-        layeredPane.add(buttonPanel, Integer.valueOf(1)); // top
-
-        // Add layeredPane to frame
-        frame.setContentPane(layeredPane);
-
-        // Add a component listener to resize canvas and buttonPanel when window resizes
-        frame.addComponentListener(new PageComponentAdapter(this));
+        glass.add(singleButton);
+        glass.add(coopButton);
     }
-
-
-
 
     @Override
     public void addListeners() {
-        singleButton.addActionListener(e -> {
-            if (onSingle != null) onSingle.run();
-        });
-
-        multiButton.addActionListener(e -> {
-            if (onMulti != null) onMulti.run();
-        });
+        singleButton.addActionListener(e -> { if (onSingle != null) onSingle.run(); });
+        coopButton.addActionListener(e -> { if (onMulti != null) onMulti.run(); });
     }
+
+    @Override
+    public void setupAnimator() { /* handled by shared canvas */ }
 
     @Override
     public void handleEvents(ActionEvent e) {}
 
     @Override
-    public void dispose() {
-        if (animator != null && animator.isStarted()) animator.stop();
-        frame.dispose();
-    }
+    public void dispose() { frame.dispose(); }
 
     @Override
-    public boolean isVisible() {
-        return frame.isVisible();
-    }
+    public boolean isVisible() { return frame.isVisible(); }
 
     @Override
-    public void setVisible(boolean b) {
-        frame.setVisible(b);
-    }
+    public void setVisible(boolean b) { frame.setVisible(b); }
 
     @Override
-    public void redraw() {
-        if (canvas != null) canvas.repaint();
-    }
+    public void redraw() { canvas.display(); }
 
-    public void setSinglePlayerButtonAction(Runnable r) {
-        this.onSingle = r;
-    }
-
-    public void setCoopButtonAction(Runnable r) {
-        this.onMulti = r;
-    }
-
-    public JFrame getFrame() {
-        return frame;
-    }
+    public void setSinglePlayerButtonAction(Runnable r) { this.onSingle = r; }
+    public void setCoopButtonAction(Runnable r) { this.onMulti = r; }
+    public JFrame getFrame() { return frame; }
 }

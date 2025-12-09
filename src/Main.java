@@ -1,76 +1,91 @@
-import Game.PageManager;
+import Game.InputManager;
 import Pages.*;
+import Pages.ContentPanels.Level;
+import Pages.ContentPanels.LevelSelectPanel;
+import Pages.ContentPanels.MainMenuPanel;
+import Renderers.Levels.*;
+import Renderers.MenuBackground;
+import com.jogamp.opengl.awt.GLJPanel;
 
-import java.util.ArrayList;
-
-//IMPORTANT DEV NOTE:
-//SET VM OPTIONS IN RUN CONFIGURATION TO THIS TO RUN: -Djava.library.path=Libs\Natives\Windows --enable-preview --add-exports java.base/java.lang=ALL-UNNAMED --add-exports java.desktop/sun.awt=ALL-UNNAMED --add-exports java.desktop/sun.java2d=ALL-UNNAMED
-//IF USING LINUX CHANGE Libs\Natives\Windows WITH Libs\Natives\Linux
+import javax.swing.*;
 
 public class Main {
 
-    private static final SingleOrCoopSelectPage selectSingleOrCoop = new SingleOrCoopSelectPage();
-    private static final MainMenuPage mainMenu = new MainMenuPage();
-    private static final LevelSelectPage levelSelectPage = new LevelSelectPage();
-    private static final level1Frame level1 = new level1Frame();
-    private static final Level2 level2 = new Level2();
-    private static final Level3 level3 = new Level3();
-    private static final Level4 level4 = new Level4();
-    private static final Level5 level5 = new Level5();
-
     private static boolean singlePlayer = true;
-    private static ArrayList<Page> levels = new ArrayList<>();
+
+    // Shared canvas + SPA
+    private static GLJPanel sharedCanvas;
+    private static SinglePageApplication app;
+
+    // Panels
+    private static MainMenuPanel mainMenuPanel;
+    private static LevelSelectPanel levelSelectPanel;
+    private static Level levelPanel; // single level panel
+    private static InputManager inputManager;
 
     public static void main(String[] args) {
-        PageManager.init();
 
-        // Preload pages
-        PageManager.preLoadPage(level1);
-        PageManager.preLoadPage(level2);
-        PageManager.preLoadPage(level3);
-        PageManager.preLoadPage(level4);
-        PageManager.preLoadPage(level5);
-        PageManager.preLoadPage(levelSelectPage);
-        PageManager.preLoadPage(selectSingleOrCoop);
-        PageManager.preLoadPage(mainMenu);
+        inputManager = new InputManager();
+        // Create shared GLJPanel
+        sharedCanvas = createSharedCanvas();
 
-        // Show main menu
-        PageManager.showPage(mainMenu);
+        // Single frame SPA
+        app = new SinglePageApplication(sharedCanvas, "Onnet");
 
-        // Load levels into memory
-        levels.add(level1);
-        levels.add(level2);
-        levels.add(level3);
-        levels.add(level4);
-        levels.add(level5);
+        // Child panels
+        mainMenuPanel = new MainMenuPanel(sharedCanvas);
+        levelSelectPanel = new LevelSelectPanel(sharedCanvas);
+        levelPanel = new Level(sharedCanvas);
 
-        // Set button actions
-        mainMenu.setLevelsButtonAction(() -> PageManager.switchPage(mainMenu, selectSingleOrCoop));
-        selectSingleOrCoop.setSinglePlayerButtonAction(() -> singlePlayer = true);
-        selectSingleOrCoop.setCoopButtonAction(() -> singlePlayer = false);
+        // Panel actions
+        mainMenuPanel.setPlayButtonAction(() -> openLevel(0));
+        mainMenuPanel.setLevelsButtonAction(() -> app.setContent(levelSelectPanel));
 
-        setupLevels();
-    }
+        levelSelectPanel.setBackButtonAction(() -> app.setContent(mainMenuPanel));
+        levelSelectPanel.setLevelAction(0, () -> openLevel(0));
+        levelSelectPanel.setLevelAction(1, () -> openLevel(1));
+        levelSelectPanel.setLevelAction(2, () -> openLevel(2));
+        levelSelectPanel.setLevelAction(3, () -> openLevel(3));
+        levelSelectPanel.setLevelAction(4, () -> openLevel(4));
 
-    private static void setupLevels() {
-        mainMenu.setPlayButtonAction(() -> {
-            // TODO: switch to level 1
+        levelPanel.setBackButtonAction(() -> {
+            openLevel(-1);
+            app.setContent(levelSelectPanel);
         });
 
-        mainMenu.setLevelsButtonAction(() -> {
-            // Return to menu
-            levelSelectPage.setBackButtonAction(() -> PageManager.switchPage(levelSelectPage, mainMenu));
 
-            for (int i = 0; i < levels.size(); i++) {
-                final int idx = i; // To bypass lambda final constraint
-                levelSelectPage.setLevelAction(idx, () -> openLevel(idx));
-            }
+        // Show initial panel
+        app.setContent(mainMenuPanel);
 
-            PageManager.switchPage(mainMenu, levelSelectPage);
-        });
+        // Start SPA
+        app.init();
     }
 
+    /**
+     * Open a level by swapping the renderer
+     */
     private static void openLevel(int i) {
-        PageManager.switchPage(levelSelectPage, levels.get(i));
+        switch (i) {
+            case -1 -> app.setLevelRenderer(new MenuBackground(inputManager));
+            case 0 -> app.setLevelRenderer(new Level1Renderer(inputManager));
+            case 1 -> app.setLevelRenderer(new Level2Renderer(inputManager));
+            case 2 -> app.setLevelRenderer(new Level3Renderer(inputManager));
+            case 3 -> app.setLevelRenderer(new Level4Renderer(inputManager));
+            case 4 -> app.setLevelRenderer(new Level5Renderer(inputManager));
+            default -> throw new IllegalArgumentException("No renderer for level " + i);
+        }
+
+        // Show the single shared level panel
+        app.setContent(levelPanel);
+    }
+
+    private static GLJPanel createSharedCanvas() {
+        GLJPanel canvas = new GLJPanel();
+        MenuBackground renderer = new MenuBackground(inputManager);
+        canvas.addGLEventListener(renderer);
+        canvas.addKeyListener(inputManager);
+        canvas.addMouseListener(inputManager);
+        canvas.addMouseMotionListener(inputManager);
+        return canvas;
     }
 }
