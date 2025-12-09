@@ -1,9 +1,7 @@
 package Pages;
 
 import Game.PageManager;
-import Renderers.MenuBackground;
-import com.jogamp.opengl.awt.GLJPanel;
-import com.jogamp.opengl.util.FPSAnimator;
+import com.jogamp.opengl.awt.GLCanvas;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,24 +10,25 @@ import java.util.ArrayList;
 
 public class LevelSelectPage implements Page {
 
+    private final GLCanvas canvas; // shared canvas
     private JFrame frame;
     private JButton backBtn;
-
-    private ArrayList<JButton> levelBtns = new ArrayList<>();
-    private ArrayList<Runnable> onLevel = new ArrayList<>();
-
+    private final ArrayList<JButton> levelBtns = new ArrayList<>();
+    private final ArrayList<Runnable> onLevel = new ArrayList<>();
     private Runnable onBack;
 
-    private GLJPanel canvas;
-    private FPSAnimator animator;
+    public LevelSelectPage(GLCanvas sharedCanvas) {
+        this.canvas = sharedCanvas;
+    }
 
     @Override
     public void init() {
         setupFrame();
         addComponents();
-        setupAnimator();
         addListeners();
-        redraw();
+
+        // Force first draw after frame is visible
+        SwingUtilities.invokeLater(canvas::display);
     }
 
     @Override
@@ -37,106 +36,43 @@ public class LevelSelectPage implements Page {
         frame = new JFrame("Level Select");
         frame.setSize(800, 600);
         frame.setResizable(false);
-        PageManager.registerFrameCloseHandler(this, frame);
+        frame.setLayout(new BorderLayout());
         frame.setLocationRelativeTo(null);
-    }
-
-    @Override
-    public void setupAnimator() {
-        if (canvas != null) {
-            animator = new FPSAnimator(canvas, 60);
-            animator.start();
-        }
+        PageManager.registerFrameCloseHandler(this, frame);
     }
 
     @Override
     public void addComponents() {
+        frame.add(canvas, BorderLayout.CENTER);
+        addButtons();
+        frame.getGlassPane().setVisible(true);
+    }
 
-        // -----------------------------
-        // 1. Background GLJPanel
-        // -----------------------------
-        canvas = new GLJPanel();
-        MenuBackground renderer = new MenuBackground();
+    private void addButtons() {
+        JPanel glass = (JPanel) frame.getGlassPane();
+        glass.setOpaque(false);
+        glass.setLayout(null);
 
-        canvas.addGLEventListener(renderer);
-        canvas.addKeyListener(renderer.inputManager);
-        canvas.addMouseListener(renderer.inputManager);
-        canvas.addMouseMotionListener(renderer.inputManager);
-
-        canvas.setBounds(0, 0, 800, 600);
-
-        // -----------------------------
-        // 2. Buttons Panel
-        // -----------------------------
-        JPanel buttonPanel = new JPanel(new GridBagLayout());
-        buttonPanel.setOpaque(false);
-        buttonPanel.setBounds(0, 0, 800, 600);
-
-        // Create 6 level buttons + listeners array
+        // Level buttons
         Dimension btnSize = new Dimension(200, 120);
-
         for (int i = 0; i < 6; i++) {
             JButton btn = new JButton("Level " + (i + 1));
-            btn.setPreferredSize(btnSize);
-
+            int row = i % 3;
+            int col = i / 3;
+            btn.setBounds(150 + col * 300, 100 + row * 150, btnSize.width, btnSize.height);
             levelBtns.add(btn);
-            onLevel.add(null); // placeholder
+            onLevel.add(null);
+            glass.add(btn);
         }
 
-        // -----------------------------
-        // GridBag placement for levels
-        // -----------------------------
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(20, 50, 20, 50);
-        gbc.anchor = GridBagConstraints.CENTER;
-
-        // Left column (0,1,2)
-        for (int i = 0; i < 3; i++) {
-            gbc.gridx = 0;
-            gbc.gridy = i + 1;  // start at row 1 (row 0 = back button)
-            buttonPanel.add(levelBtns.get(i), gbc);
-        }
-
-        // Right column (3,4,5)
-        for (int i = 3; i < 6; i++) {
-            gbc.gridx = 1;
-            gbc.gridy = (i - 3) + 1;
-            buttonPanel.add(levelBtns.get(i), gbc);
-        }
-
-        // -----------------------------
-        // Back button (Top-Right)
-        // -----------------------------
         backBtn = new JButton("Back");
-        backBtn.setPreferredSize(btnSize);
-
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.NORTHEAST;
-        gbc.insets = new Insets(10, 0, 0, 10);
-
-        buttonPanel.add(backBtn, gbc);
-
-        // -----------------------------
-        // 3. LayeredPane
-        // -----------------------------
-        JLayeredPane layeredPane = new JLayeredPane();
-        layeredPane.setPreferredSize(new Dimension(800, 600));
-        layeredPane.setLayout(null);
-
-        layeredPane.add(canvas, Integer.valueOf(0));
-        layeredPane.add(buttonPanel, Integer.valueOf(1));
-
-        frame.setContentPane(layeredPane);
+        backBtn.setBounds(670, 10, 100, 50);
+        glass.add(backBtn);
     }
 
     @Override
     public void addListeners() {
-
-        backBtn.addActionListener(e -> {
-            if (onBack != null) onBack.run();
-        });
-
+        backBtn.addActionListener(e -> { if (onBack != null) onBack.run(); });
         for (int i = 0; i < levelBtns.size(); i++) {
             final int idx = i;
             levelBtns.get(i).addActionListener(e -> {
@@ -146,13 +82,15 @@ public class LevelSelectPage implements Page {
     }
 
     @Override
+    public void setupAnimator() {
+        // Animator is managed by shared canvas in MainMenuPage
+    }
+
+    @Override
     public void handleEvents(ActionEvent e) {}
 
     @Override
-    public void dispose() {
-        if (animator != null && animator.isStarted()) animator.stop();
-        frame.dispose();
-    }
+    public void dispose() { frame.dispose(); }
 
     @Override
     public boolean isVisible() { return frame.isVisible(); }
@@ -161,22 +99,9 @@ public class LevelSelectPage implements Page {
     public void setVisible(boolean b) { frame.setVisible(b); }
 
     @Override
-    public void redraw() {
-        if (canvas != null) canvas.repaint();
-    }
+    public void redraw() { canvas.display(); }
 
-    // -----------------------------
-    // Action setters
-    // -----------------------------
     public void setBackButtonAction(Runnable r) { this.onBack = r; }
-
-    public void setLevelAction(int index, Runnable r) {
-        if (index >= 0 && index < 6) {
-            onLevel.set(index, r);
-        }
-    }
-
+    public void setLevelAction(int index, Runnable r) { if (index >= 0 && index < 6) onLevel.set(index, r); }
     public JFrame getFrame() { return frame; }
-
-
 }

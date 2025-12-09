@@ -1,5 +1,10 @@
 import Game.PageManager;
 import Pages.*;
+        import Renderers.MenuBackground;
+import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.util.FPSAnimator;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -9,11 +14,6 @@ import java.util.Objects;
 //IF USING LINUX CHANGE Libs\Natives\Windows WITH Libs\Natives\Linux
 
 public class Main {
-
-    // Lightweight pages (OK to instantiate immediately)
-    private static final SingleOrCoopSelectPage selectSingleOrCoop = new SingleOrCoopSelectPage();
-    private static final MainMenuPage mainMenu = new MainMenuPage();
-    private static final LevelSelectPage levelSelectPage = new LevelSelectPage();
 
     // Heavy level pages — created lazily
     private static Level1 level1 = null;
@@ -26,8 +26,16 @@ public class Main {
     // stable index-based list for levels
     private static final ArrayList<Page> levels = new ArrayList<>();
 
+    private static MainMenuPage mainMenu;
+    private static LevelSelectPage levelSelectPage;
+    private static SingleOrCoopSelectPage selectSingleOrCoop;
 
     public static void main(String[] args) {
+
+        GLCanvas sharedCanvas = createSharedCanvas(); // your GLCanvas with MenuBackground
+        mainMenu = new MainMenuPage(sharedCanvas);
+        levelSelectPage = new LevelSelectPage(sharedCanvas);
+        selectSingleOrCoop = new SingleOrCoopSelectPage(sharedCanvas);
 
         PageManager.init();
 
@@ -119,4 +127,22 @@ public class Main {
             default -> throw new IllegalArgumentException("No level mapped for index " + index);
         };
     }
+
+    private static GLCanvas createSharedCanvas() {
+        GLProfile.initSingleton();
+        GLProfile profile = GLProfile.get(GLProfile.GL2);
+        GLCapabilities caps = new GLCapabilities(profile);
+        caps.setDoubleBuffered(true);
+        caps.setHardwareAccelerated(true);
+
+        GLCanvas canvas = new GLCanvas(caps);
+        MenuBackground renderer = new MenuBackground();
+        canvas.addGLEventListener(renderer);
+        canvas.addKeyListener(renderer.inputManager);
+        canvas.addMouseListener(renderer.inputManager);
+        canvas.addMouseMotionListener(renderer.inputManager);
+
+        return canvas;
+    }
+
 }

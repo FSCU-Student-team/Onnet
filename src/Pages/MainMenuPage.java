@@ -2,11 +2,8 @@ package Pages;
 
 import Game.PageManager;
 import Game.SoundHandler;
-import Renderers.MenuBackground;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
-import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLProfile;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,89 +11,67 @@ import java.awt.event.ActionEvent;
 
 public class MainMenuPage implements Page {
 
+    private final GLCanvas canvas;  // shared canvas
+    private FPSAnimator animator;
+
     private JFrame frame;
     private JButton playBtn, levelsBtn, muteBtn;
     private Runnable onPlay, onLevels;
 
-    private GLCanvas canvas;
-    private FPSAnimator animator;
+    public MainMenuPage(GLCanvas sharedCanvas) {
+        this.canvas = sharedCanvas;
+    }
 
     @Override
     public void init() {
         setupFrame();
-        addComponents();    // adds canvas + buttons
+        addComponents();
         addListeners();
+        setupAnimator();
 
-        // Lazy GL initialization in background
-        new Thread(() -> {
-            SwingUtilities.invokeLater(() -> {
-                // forces GL context creation without blocking UI
-                canvas.display();
-            });
-        }).start();
-
-        setupAnimator();    // animator starts after display
-    }
-
-    @Override
-    public void setupAnimator() {
-        animator = new FPSAnimator(canvas, 60);
-        // Start later, after first display to ensure context is ready
-        SwingUtilities.invokeLater(() -> {
-            if (!animator.isStarted()) animator.start();
-        });
+        // Force first draw after frame is visible
+        SwingUtilities.invokeLater(canvas::display);
     }
 
     @Override
     public void setupFrame() {
-        frame = new JFrame("Single Player Menu");
+        frame = new JFrame("Main Menu");
         frame.setSize(800, 600);
         frame.setResizable(false);
-        frame.setLocationRelativeTo(null);
         frame.setLayout(new BorderLayout());
+        frame.setLocationRelativeTo(null);
         PageManager.registerFrameCloseHandler(this, frame);
     }
 
-    private void addCanvas() {
-        // Create GLCanvas with hardware acceleration
-        GLProfile.initSingleton();
-        GLProfile profile = GLProfile.get(GLProfile.GL2);
-        GLCapabilities caps = new GLCapabilities(profile);
-        caps.setDoubleBuffered(true);
-        caps.setHardwareAccelerated(true);
+    @Override
+    public void setupAnimator() {
+        if (animator == null && canvas != null) {
+            animator = new FPSAnimator(canvas, 60);
+            animator.start();
+        }
+    }
 
-        canvas = new GLCanvas(caps);
-        MenuBackground renderer = new MenuBackground();
-        canvas.addGLEventListener(renderer);
-        canvas.addKeyListener(renderer.inputManager);
-        canvas.addMouseListener(renderer.inputManager);
-        canvas.addMouseMotionListener(renderer.inputManager);
-
+    @Override
+    public void addComponents() {
         frame.add(canvas, BorderLayout.CENTER);
+        addButtons();
+
+        // Ensure buttons appear
+        frame.getGlassPane().setVisible(true);
     }
 
     private void addButtons() {
-        // Use the GlassPane for button overlay
         JPanel glass = (JPanel) frame.getGlassPane();
-        glass.setVisible(true);
-        glass.setOpaque(false);
         glass.setLayout(null);
+        glass.setOpaque(false);
 
-        // Buttons
         playBtn = new JButton("Play");
         levelsBtn = new JButton("Levels");
         muteBtn = new JButton("Mute");
-        Dimension btnSize = new Dimension(200, 120);
-        playBtn.setSize(btnSize);
-        levelsBtn.setSize(btnSize);
-        btnSize.height = 50;
-        btnSize.width = 100;
-        muteBtn.setSize(btnSize);
 
-        // Position buttons manually
-        playBtn.setLocation(150, 200);
-        levelsBtn.setLocation(450, 200);
-        muteBtn.setLocation(670, 10);
+        playBtn.setBounds(150, 200, 200, 120);
+        levelsBtn.setBounds(450, 200, 200, 120);
+        muteBtn.setBounds(670, 10, 100, 50);
 
         glass.add(playBtn);
         glass.add(levelsBtn);
@@ -111,13 +86,7 @@ public class MainMenuPage implements Page {
     }
 
     @Override
-    public void addComponents() {
-        addCanvas();
-        addButtons();
-    }
-
-    @Override
-    public void handleEvents(ActionEvent e) { }
+    public void handleEvents(ActionEvent e) {}
 
     @Override
     public void dispose() {
@@ -126,21 +95,14 @@ public class MainMenuPage implements Page {
     }
 
     @Override
-    public boolean isVisible() {
-        return frame.isVisible();
-    }
+    public boolean isVisible() { return frame.isVisible(); }
 
     @Override
-    public void setVisible(boolean b) {
-        frame.setVisible(b);
-    }
+    public void setVisible(boolean b) { frame.setVisible(b); }
 
     @Override
-    public void redraw() {
-        if (canvas != null) canvas.display();
-    }
+    public void redraw() { canvas.display(); }
 
-    // Button action setters
     public void setPlayButtonAction(Runnable r) { this.onPlay = r; }
     public void setLevelsButtonAction(Runnable r) { this.onLevels = r; }
     public JFrame getFrame() { return frame; }

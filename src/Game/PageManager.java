@@ -76,7 +76,6 @@ public class PageManager {
         }
     }
 
-    // 🔥 **ASYNC preload** — does NOT block main thread
     public static void preLoadPageAsync(Page page, Runnable callback) {
         if (openedPages.contains(page)) {
             if (callback != null) SwingUtilities.invokeLater(callback);
