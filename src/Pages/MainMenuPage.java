@@ -4,8 +4,9 @@ import Game.PageManager;
 import Game.SoundHandler;
 import Renderers.MenuBackground;
 import com.jogamp.opengl.awt.GLCanvas;
-import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.util.FPSAnimator;
+import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLProfile;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,104 +18,106 @@ public class MainMenuPage implements Page {
     private JButton playBtn, levelsBtn, muteBtn;
     private Runnable onPlay, onLevels;
 
-    private GLJPanel canvas;
+    private GLCanvas canvas;
     private FPSAnimator animator;
 
     @Override
     public void init() {
         setupFrame();
-        addComponents();
-        setupAnimator();
+        addComponents();    // adds canvas + buttons
         addListeners();
-        redraw();
+
+        // Lazy GL initialization in background
+        new Thread(() -> {
+            SwingUtilities.invokeLater(() -> {
+                // forces GL context creation without blocking UI
+                canvas.display();
+            });
+        }).start();
+
+        setupAnimator();    // animator starts after display
+    }
+
+    @Override
+    public void setupAnimator() {
+        animator = new FPSAnimator(canvas, 60);
+        // Start later, after first display to ensure context is ready
+        SwingUtilities.invokeLater(() -> {
+            if (!animator.isStarted()) animator.start();
+        });
     }
 
     @Override
     public void setupFrame() {
         frame = new JFrame("Single Player Menu");
         frame.setSize(800, 600);
-        frame.setResizable(false); // disable resizing
-        PageManager.registerFrameCloseHandler(this, frame);
+        frame.setResizable(false);
         frame.setLocationRelativeTo(null);
+        frame.setLayout(new BorderLayout());
+        PageManager.registerFrameCloseHandler(this, frame);
     }
 
-    @Override
-    public void setupAnimator() {
-        if (canvas != null) {
-            animator = new FPSAnimator(canvas, 60);
-            animator.start();
-        }
-    }
+    private void addCanvas() {
+        // Create GLCanvas with hardware acceleration
+        GLProfile.initSingleton();
+        GLProfile profile = GLProfile.get(GLProfile.GL2);
+        GLCapabilities caps = new GLCapabilities(profile);
+        caps.setDoubleBuffered(true);
+        caps.setHardwareAccelerated(true);
 
-    @Override
-    public void addComponents() {
-        // 1. GLJPanel for background
-        canvas = new GLJPanel();
+        canvas = new GLCanvas(caps);
         MenuBackground renderer = new MenuBackground();
         canvas.addGLEventListener(renderer);
         canvas.addKeyListener(renderer.inputManager);
         canvas.addMouseListener(renderer.inputManager);
         canvas.addMouseMotionListener(renderer.inputManager);
-        canvas.setBounds(0, 0, 800, 600);
 
-        // 2. Buttons panel
-        JPanel buttonPanel = new JPanel(new GridBagLayout());
-        buttonPanel.setOpaque(false); // transparent
-        buttonPanel.setBounds(0, 0, 800, 600);
+        frame.add(canvas, BorderLayout.CENTER);
+    }
+
+    private void addButtons() {
+        // Use the GlassPane for button overlay
+        JPanel glass = (JPanel) frame.getGlassPane();
+        glass.setVisible(true);
+        glass.setOpaque(false);
+        glass.setLayout(null);
 
         // Buttons
         playBtn = new JButton("Play");
         levelsBtn = new JButton("Levels");
         muteBtn = new JButton("Mute");
         Dimension btnSize = new Dimension(200, 120);
-        playBtn.setPreferredSize(btnSize);
-        levelsBtn.setPreferredSize(btnSize);
-        muteBtn.setPreferredSize(btnSize);
+        playBtn.setSize(btnSize);
+        levelsBtn.setSize(btnSize);
+        btnSize.height = 50;
+        btnSize.width = 100;
+        muteBtn.setSize(btnSize);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(20, 50, 0, 50);
+        // Position buttons manually
+        playBtn.setLocation(150, 200);
+        levelsBtn.setLocation(450, 200);
+        muteBtn.setLocation(670, 10);
 
-        // Center row: Play and Levels
-        gbc.gridy = 0;
-        gbc.gridx = 0;
-        buttonPanel.add(playBtn, gbc);
-        gbc.gridx = 1;
-        buttonPanel.add(levelsBtn, gbc);
-
-        // Top-right corner buttons
-        gbc.anchor = GridBagConstraints.NORTHEAST;
-        gbc.insets = new Insets(10, 0, 0, 10);
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        buttonPanel.add(muteBtn, gbc);
-
-        // 3. LayeredPane
-        JLayeredPane layeredPane = new JLayeredPane();
-        layeredPane.setPreferredSize(new Dimension(800, 600));
-        layeredPane.setLayout(null);
-
-        layeredPane.add(canvas, Integer.valueOf(0));      // bottom
-        layeredPane.add(buttonPanel, Integer.valueOf(1)); // top
-
-        frame.setContentPane(layeredPane);
+        glass.add(playBtn);
+        glass.add(levelsBtn);
+        glass.add(muteBtn);
     }
 
     @Override
     public void addListeners() {
-        playBtn.addActionListener(e -> {
-            if (onPlay != null) onPlay.run();
-        });
-        levelsBtn.addActionListener(e -> {
-            if (onLevels != null) onLevels.run();
-        });
-        muteBtn.addActionListener(e -> {
-            SoundHandler.toggleMute();
-        });
+        playBtn.addActionListener(e -> { if (onPlay != null) onPlay.run(); });
+        levelsBtn.addActionListener(e -> { if (onLevels != null) onLevels.run(); });
+        muteBtn.addActionListener(e -> SoundHandler.toggleMute());
     }
 
     @Override
-    public void handleEvents(ActionEvent e) {
+    public void addComponents() {
+        addCanvas();
+        addButtons();
     }
+
+    @Override
+    public void handleEvents(ActionEvent e) { }
 
     @Override
     public void dispose() {
@@ -134,20 +137,11 @@ public class MainMenuPage implements Page {
 
     @Override
     public void redraw() {
-        if (canvas != null) canvas.repaint();
+        if (canvas != null) canvas.display();
     }
 
     // Button action setters
-    public void setPlayButtonAction(Runnable r) {
-        this.onPlay = r;
-    }
-
-    public void setLevelsButtonAction(Runnable r) {
-        this.onLevels = r;
-    }
-
-    public JFrame getFrame() {
-        return frame;
-    }
-
+    public void setPlayButtonAction(Runnable r) { this.onPlay = r; }
+    public void setLevelsButtonAction(Runnable r) { this.onLevels = r; }
+    public JFrame getFrame() { return frame; }
 }
