@@ -1,109 +1,91 @@
-import Game.PageManager;
 import Pages.*;
-        import Renderers.MenuBackground;
+import Pages.ContentPanels.LevelSelectPanel;
+import Pages.ContentPanels.MainMenuPanel;
+import Renderers.MenuBackground;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
-import com.jogamp.opengl.util.FPSAnimator;
+import com.jogamp.opengl.awt.GLJPanel;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
-//IMPORTANT DEV NOTE:
-//SET VM OPTIONS IN RUN CONFIGURATION TO THIS TO RUN: -Djava.library.path=Libs\Natives\Windows --enable-preview --add-exports java.base/java.lang=ALL-UNNAMED --add-exports java.desktop/sun.awt=ALL-UNNAMED --add-exports java.desktop/sun.java2d=ALL-UNNAMED
-//IF USING LINUX CHANGE Libs\Natives\Windows WITH Libs\Natives\Linux
-
 public class Main {
 
-    // Heavy level pages — created lazily
+    // Levels
     private static Level1 level1 = null;
     private static Level2 level2 = null;
     private static Level3 level3 = null;
     private static Level4 level4 = null;
 
     private static boolean singlePlayer = true;
-
-    // stable index-based list for levels
     private static final ArrayList<Page> levels = new ArrayList<>();
 
-    private static MainMenuPage mainMenu;
-    private static LevelSelectPage levelSelectPage;
-    private static SingleOrCoopSelectPage selectSingleOrCoop;
+    // Shared canvas + application
+    private static GLJPanel sharedCanvas;
+    private static SinglePageApplication app;
+
+    // Panels
+    private static MainMenuPanel mainMenuPanel;
+    private static LevelSelectPanel levelSelectPanel;
+//    private static SingleOrCoopSelectPage selectSingleOrCoopPanel;
 
     public static void main(String[] args) {
 
-        GLCanvas sharedCanvas = createSharedCanvas(); // your GLCanvas with MenuBackground
-        mainMenu = new MainMenuPage(sharedCanvas);
-        levelSelectPage = new LevelSelectPage(sharedCanvas);
-        selectSingleOrCoop = new SingleOrCoopSelectPage(sharedCanvas);
+        // Create shared GLCanvas
+        sharedCanvas = createSharedCanvas();
 
-        PageManager.init();
+        // Create single frame application
+        app = new SinglePageApplication(sharedCanvas, "Onnet");
 
-        long t = System.nanoTime();
+        // Create child panels
+        mainMenuPanel = new MainMenuPanel(sharedCanvas);
+        levelSelectPanel = new LevelSelectPanel(sharedCanvas);
+//        selectSingleOrCoopPanel = new SingleOrCoopSelectPanel(sharedCanvas);
 
-        // preload only lightweight menus
-        PageManager.preLoadPage(mainMenu);
-        PageManager.preLoadPage(selectSingleOrCoop);
-        PageManager.preLoadPage(levelSelectPage);
+        // Initialize level placeholders
+        for (int i = 0; i < 4; i++) levels.add(null);
 
-        System.out.println("Preload time: " + (System.nanoTime() - t) / 1_000_000 + " ms");
+        // Setup panel actions
+        mainMenuPanel.setPlayButtonAction(() -> openLevel(0));
+        mainMenuPanel.setLevelsButtonAction(() -> app.setContent(levelSelectPanel));
 
-        // init placeholders for levels
-        int numberOfLevels = 4;
-        for (int i = 0; i < numberOfLevels; i++) {
-            levels.add(null);
+//        selectSingleOrCoopPanel.setSinglePlayerButtonAction(() -> singlePlayer = true);
+//        selectSingleOrCoopPanel.setCoopButtonAction(() -> singlePlayer = false);
+
+        levelSelectPanel.setBackButtonAction(() -> app.setContent(mainMenuPanel));
+        for (int i = 0; i < levels.size(); i++) {
+            final int idx = i;
+            levelSelectPanel.setLevelAction(i, () -> openLevel(idx));
         }
 
-        // show main menu
-        PageManager.showPage(mainMenu);
+        // Show initial panel
+        app.setContent(mainMenuPanel);
 
-        // menu actions
-        mainMenu.setLevelsButtonAction(() -> PageManager.switchPage(mainMenu, selectSingleOrCoop));
-        selectSingleOrCoop.setSinglePlayerButtonAction(() -> singlePlayer = true);
-        selectSingleOrCoop.setCoopButtonAction(() -> singlePlayer = false);
-
-        setupLevels();
+        // Start animator is handled by SinglePageApplication
+        app.init();
     }
 
-    private static void setupLevels() {
-        mainMenu.setPlayButtonAction(() -> openLevel(0));
-
-        mainMenu.setLevelsButtonAction(() -> {
-            levelSelectPage.setBackButtonAction(() -> PageManager.switchPage(levelSelectPage, mainMenu));
-
-            for (int i = 0; i < levels.size(); i++) {
-                final int idx = i;
-                levelSelectPage.setLevelAction(idx, () -> openLevel(idx));
-            }
-
-            PageManager.switchPage(mainMenu, levelSelectPage);
-        });
-    }
-
+    /**
+     * Swap the content panel to the requested level
+     */
     private static void openLevel(int i) {
+        if (i < 0 || i >= levels.size()) throw new IllegalArgumentException("Invalid level index: " + i);
 
-        if (i < 0 || i >= levels.size()) {
-            throw new IllegalArgumentException("Invalid level index: " + i);
-        }
-
-        // already loaded?
+        // Already loaded
         if (levels.get(i) != null) {
-            PageManager.switchPage(levelSelectPage, levels.get(i));
+            if (levels.get(i) instanceof JPanel panel) app.setContent(panel);
             return;
         }
 
-        // show loading page
-
-        // create level instance (cheap)
+        // Create level lazily
         Page created = createLevel(i);
-        Objects.requireNonNull(created);
-
         levels.set(i, created);
 
-        // async preload (no blocking)
-        PageManager.preLoadPageAsync(created, () -> {
-            // once loaded: switch to the level
-        });
+        if (created instanceof JPanel panel) {
+            app.setContent(panel);
+        }
     }
 
     private static Page createLevel(int index) {
@@ -128,14 +110,8 @@ public class Main {
         };
     }
 
-    private static GLCanvas createSharedCanvas() {
-        GLProfile.initSingleton();
-        GLProfile profile = GLProfile.get(GLProfile.GL2);
-        GLCapabilities caps = new GLCapabilities(profile);
-        caps.setDoubleBuffered(true);
-        caps.setHardwareAccelerated(true);
-
-        GLCanvas canvas = new GLCanvas(caps);
+    private static GLJPanel createSharedCanvas() {
+        GLJPanel canvas = new GLJPanel();
         MenuBackground renderer = new MenuBackground();
         canvas.addGLEventListener(renderer);
         canvas.addKeyListener(renderer.inputManager);
@@ -144,5 +120,4 @@ public class Main {
 
         return canvas;
     }
-
 }

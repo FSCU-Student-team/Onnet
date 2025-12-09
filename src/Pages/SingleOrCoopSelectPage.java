@@ -34,7 +34,6 @@ public class SingleOrCoopSelectPage implements Page {
         frame.setResizable(false);
         frame.setLayout(new BorderLayout());
         frame.setLocationRelativeTo(null);
-        PageManager.registerFrameCloseHandler(this, frame);
     }
 
     @Override

@@ -22,8 +22,6 @@ public class Level2 implements Page {
         setupAnimator();
         addListeners();
         redraw();
-
-        Game.PageManager.registerFrameCloseHandler(this, frame);
     }
 
     @Override
@@ -32,8 +30,6 @@ public class Level2 implements Page {
         frame.setSize(800, 800);
         frame.setBackground(Color.black);
         frame.setResizable(false);
-
-        Game.PageManager.registerFrameCloseHandler(this, frame);
     }
 
     @Override

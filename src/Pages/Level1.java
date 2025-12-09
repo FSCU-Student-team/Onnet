@@ -22,7 +22,6 @@ public class Level1 implements Page{
         addListeners();
         redraw();
 
-        Game.PageManager.registerFrameCloseHandler(this, frame);
     }
 
     @Override
@@ -31,8 +30,6 @@ public class Level1 implements Page{
         frame.setSize(800, 800);
         frame.setBackground(Color.black);
         frame.setResizable(false);
-
-        Game.PageManager.registerFrameCloseHandler(this, frame);
     }
 
     @Override
