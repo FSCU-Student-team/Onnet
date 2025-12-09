@@ -15,6 +15,7 @@ public class Main {
     private static final level1Frame level1 = new level1Frame();
     private static final Level2 level2 = new Level2();
     private static final Level3 level3 = new Level3();
+    private static final Level4 level4 = new Level4();
 
     private static boolean singlePlayer = true;
     private static ArrayList<Page> levels = new ArrayList<>();
@@ -26,6 +27,7 @@ public class Main {
         PageManager.preLoadPage(level1);
         PageManager.preLoadPage(level2);
         PageManager.preLoadPage(level3);
+        PageManager.preLoadPage(level4);
         PageManager.preLoadPage(levelSelectPage);
         PageManager.preLoadPage(selectSingleOrCoop);
         PageManager.preLoadPage(mainMenu);
@@ -37,6 +39,7 @@ public class Main {
         levels.add(level1);
         levels.add(level2);
         levels.add(level3);
+        levels.add(level4);
 
         // Set button actions
         mainMenu.setLevelsButtonAction(() -> PageManager.switchPage(mainMenu, selectSingleOrCoop));
