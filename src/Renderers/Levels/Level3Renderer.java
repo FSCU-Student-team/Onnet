@@ -29,7 +29,7 @@ public class Level3Renderer implements GLEventListener, GameLoop {
     private static final double POWER_SCALE = 0.05;     // converts "power" -> velocity (pixels per physics step)
     // lower = slower launch, raise to speed up
 
-    private double currentPower = 50.0;   // sensible default
+    private double currentPower = 20.0;   // sensible default
     private Vector2 gravity = new Vector2(0, -0.05); // tuned for visible arc (you can lower magnitude if too fast)
     private double angle = 45.0;          // degrees (0 -> right, 90 -> up)
 
@@ -307,12 +307,18 @@ public class Level3Renderer implements GLEventListener, GameLoop {
         if (!isLaunched) {
             gl.glBegin(GL2.GL_LINES);
             // use white (or whatever color your shapes use)
-            gl.glColor3f(1f, 1f, 1f);
+            if ((currentPower / MAX_POWER) * 100 <= 30)//green
+                gl.glColor3f(0f, 1f, 0f);
+            else if ((currentPower / MAX_POWER) * 100 <= 70)//Yellow
+                gl.glColor3f(1f, 1f, 0f);
+            else if ((currentPower / MAX_POWER) * 100 >= 70)//red
+                gl.glColor3f(1f, 0f, 0f);
 
-            double len = Math.max(30, currentPower * 0.4); // visual length; tweak multiplier if desired
+            double len = Math.max(10, currentPower * 0.4); // visual length; tweak multiplier if desired
+            double radius = playerCircle.getWidth() / 2.0;
             double rad = Math.toRadians(angle);
-            double x1 = playerCircle.getCenter().x();
-            double y1 = playerCircle.getCenter().y();
+            double x1 = playerCircle.getCenter().x() + radius * Math.cos(rad);
+            double y1 = playerCircle.getCenter().y() + radius * Math.sin(rad);
             double x2 = x1 + len * Math.cos(rad);
             double y2 = y1 + len * Math.sin(rad);
 
