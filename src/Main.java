@@ -1,5 +1,6 @@
 import Game.PageManager;
 import Pages.*;
+
 import java.util.ArrayList;
 
 public class Main {
@@ -7,8 +8,9 @@ public class Main {
     private static final SingleOrCoopSelectPage selectSingleOrCoop = new SingleOrCoopSelectPage();
     private static final MainMenuPage mainMenu = new MainMenuPage();
     private static final LevelSelectPage levelSelectPage = new LevelSelectPage();
-    private static final DevTestScene devTestScene = new DevTestScene();
     private static final level1Frame level1 = new level1Frame();
+    private static final Level2 level2 = new Level2();
+    private static final Level3 level3 = new Level3();
 
     private static boolean singlePlayer = true;
     private static ArrayList<Page> levels = new ArrayList<>();
@@ -17,8 +19,9 @@ public class Main {
         PageManager.init();
 
         // Preload pages
-        PageManager.preLoadPage(devTestScene);
         PageManager.preLoadPage(level1);
+        PageManager.preLoadPage(level2);
+        PageManager.preLoadPage(level3);
         PageManager.preLoadPage(levelSelectPage);
         PageManager.preLoadPage(selectSingleOrCoop);
         PageManager.preLoadPage(mainMenu);
@@ -27,8 +30,9 @@ public class Main {
         PageManager.showPage(mainMenu);
 
         // Load levels into memory
-        levels.add(devTestScene);
         levels.add(level1);
+        levels.add(level2);
+        levels.add(level3);
 
         // Set button actions
         mainMenu.setLevelsButtonAction(() -> PageManager.switchPage(mainMenu, selectSingleOrCoop));
