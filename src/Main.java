@@ -49,7 +49,7 @@ public class Main {
         levelSelectPanel.setLevelAction(4, () -> openLevel(4));
 
         levelPanel.setBackButtonAction(() -> {
-            levelSelectPanel.setLevelAction(-1, () -> openLevel(-1));
+            openLevel(-1);
             app.setContent(levelSelectPanel);
         });
 
