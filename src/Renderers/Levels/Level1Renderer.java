@@ -7,11 +7,17 @@ import Game.LoopState;
 import Physics.ActionManager;
 import Renderers.EntityUtils;
 import Shapes.*;
+import Shapes.Color;
+import Shapes.Point;
+import Shapes.Rectangle;
+import Shapes.Shape;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.util.FPSAnimator;
+import com.jogamp.opengl.util.awt.TextRenderer;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +47,9 @@ public class Level1Renderer implements GLEventListener, GameLoop {
     private boolean isDead = false;
 
     private Vector2 velocity = new Vector2(0, 0);
+    private double score;
+    private double Tries;
+    private TextRenderer textRenderer;
 
     public Level1Renderer(InputManager inputManager) {
         this.inputManager = inputManager;
@@ -232,15 +241,63 @@ public class Level1Renderer implements GLEventListener, GameLoop {
     }
 
     private void checkDie() {
-        // placeholder: you can check overlap with red rectangles here and set isDead
+        for (Shape shape : shapes) {
+
+            // 1. تجاهل اللاعب نفسه
+            if (shape == playerCircle) {
+                continue;
+            }
+
+            // 2. فحص الأجسام الحمراء فقط
+            if (shape.getColor().toString().equals(Color.RED.toString())) {
+
+                // --- بداية الكود الجديد ---
+
+                // إحداثيات ونصف قطر اللاعب
+                double pX = playerCircle.getCenter().x();
+                double pY = playerCircle.getCenter().y();
+                double pRadius = playerCircle.getWidth() / 2.0;
+
+                // إحداثيات وأبعاد الجسم الأحمر (الحائط/الأرضية)
+                double sX = shape.getCenter().x();
+                double sY = shape.getCenter().y();
+                double sHalfWidth = shape.getWidth() / 2.0;
+                double sHalfHeight = shape.getHeight() / 2.0;
+
+                // حساب حدود المستطيل
+                double left = sX - sHalfWidth;
+                double right = sX + sHalfWidth;
+                double bottom = sY - sHalfHeight;
+                double top = sY + sHalfHeight;
+
+                // أهم خطوة: إيجاد أقرب نقطة من المستطيل لمركز اللاعب (Clamping)
+                // هذه الدالة تجبر إحداثيات اللاعب أن تكون داخل حدود المستطيل
+                double closestX = Math.max(left, Math.min(pX, right));
+                double closestY = Math.max(bottom, Math.min(pY, top));
+
+                // حساب المسافة بين مركز اللاعب وهذه النقطة القريبة
+                double dx = pX - closestX;
+                double dy = pY - closestY;
+
+                // إذا كانت المسافة أقل من نصف قطر اللاعب، فهذا يعني تلامس حقيقي
+                if ((dx * dx + dy * dy) < (pRadius * pRadius)) {
+                    isDead = true;
+                    Tries -= 1;
+                    resetLevel();
+                    return;
+                }
+            }
+        }
     }
 
     private void checkWin() {
         double dx = playerCircle.getCenter().x() - goalRectangle.getCenter().x();
         double dy = playerCircle.getCenter().y() - goalRectangle.getCenter().y();
         double dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 30) {
+        if (dist <= Math.max(goalRectangle.getWidth() / 2, goalRectangle.getHeight() / 2)) {
             isWon = true;
+            score += Tries * 1000;
+            System.out.println(score);
         }
     }
 
@@ -279,6 +336,25 @@ public class Level1Renderer implements GLEventListener, GameLoop {
         }
 
         gl.glPopMatrix();
+        if (isWon) {
+            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
+            textRenderer.beginRendering(800, 600);
+
+            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f); // أخضر
+            textRenderer.draw("YOU WIN!\n", 250, 300);
+            textRenderer.draw("yourScore:" + (score), 150, 150);
+
+            textRenderer.endRendering();
+        }
+        if (!isWon && Tries <= 0) {
+            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
+            textRenderer.beginRendering(800, 600);
+
+            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
+            textRenderer.draw("YOU Lose!", 250, 300);
+
+            textRenderer.endRendering();
+        }
 
         // play any bounce sounds queued by entityUtils
         entityUtils.allowBounceSounds();
