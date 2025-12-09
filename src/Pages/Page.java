@@ -1,5 +1,7 @@
 package Pages;
 
+import com.jogamp.opengl.awt.GLCanvas;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
@@ -21,5 +23,4 @@ public interface Page {
 
     void redraw();
      JFrame getFrame();
-
 }

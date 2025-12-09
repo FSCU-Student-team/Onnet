@@ -1,57 +1,70 @@
 import Game.PageManager;
-import Game.SoundHandler;
 import Pages.*;
 
-SingleOrCoopSelectPage selectSingleOrCoop = new SingleOrCoopSelectPage();
-MainMenuPage mainMenu = new MainMenuPage();
-LevelSelectPage levelSelectPage = new LevelSelectPage();
-boolean singlePlayer = true;
+import java.util.ArrayList;
 
-ArrayList<Page> levels = new ArrayList<>();
+//IMPORTANT DEV NOTE:
+//SET VM OPTIONS IN RUN CONFIGURATION TO THIS TO RUN: -Djava.library.path=Libs\Natives\Windows --enable-preview --add-exports java.base/java.lang=ALL-UNNAMED --add-exports java.desktop/sun.awt=ALL-UNNAMED --add-exports java.desktop/sun.java2d=ALL-UNNAMED
+//IF USING LINUX CHANGE Libs\Natives\Windows WITH Libs\Natives\Linux
 
-void main() {
+public class Main {
 
-    //IMPORTANT DEV NOTE:
-    //SET VM OPTIONS IN RUN CONFIGURATION TO THIS TO RUN: -Djava.library.path=Libs\Natives\Windows --enable-preview --add-exports java.base/java.lang=ALL-UNNAMED --add-exports java.desktop/sun.awt=ALL-UNNAMED --add-exports java.desktop/sun.java2d=ALL-UNNAMED
-    //IF USING LINUX CHANGE Libs\Natives\Windows WITH Libs\Natives\Linux
-    PageManager.init();
-    PageManager.showPage(mainMenu);
+    private static final SingleOrCoopSelectPage selectSingleOrCoop = new SingleOrCoopSelectPage();
+    private static final MainMenuPage mainMenu = new MainMenuPage();
+    private static final LevelSelectPage levelSelectPage = new LevelSelectPage();
+    private static final level1Frame level1 = new level1Frame();
+    private static final Level2 level2 = new Level2();
+    private static final Level3 level3 = new Level3();
 
-    //load into memory without showing
-    PageManager.preLoadPage(levelSelectPage);
-    PageManager.preLoadPage(selectSingleOrCoop);
+    private static boolean singlePlayer = true;
+    private static ArrayList<Page> levels = new ArrayList<>();
 
-    levels.add(new DevTestScene());
-    levels.add(new level1Frame());
+    public static void main(String[] args) {
+        PageManager.init();
 
-    mainMenu.setLevelsButtonAction(() -> PageManager.switchPage(mainMenu, selectSingleOrCoop)); //prompts you for singleplayer or coop before opening levels
-    selectSingleOrCoop.setSinglePlayerButtonAction(() -> singlePlayer = true);
-    selectSingleOrCoop.setCoopButtonAction(() -> singlePlayer = false);
+        // Preload pages
+        PageManager.preLoadPage(level1);
+        PageManager.preLoadPage(level2);
+        PageManager.preLoadPage(level3);
+        PageManager.preLoadPage(levelSelectPage);
+        PageManager.preLoadPage(selectSingleOrCoop);
+        PageManager.preLoadPage(mainMenu);
 
-    setupLevels();
+        // Show main menu
+        PageManager.showPage(mainMenu);
 
-    SoundHandler.play("Sounds/memphis-trap-wav-349366.wav");
+        // Load levels into memory
+        levels.add(level1);
+        levels.add(level2);
+        levels.add(level3);
+
+        // Set button actions
+        mainMenu.setLevelsButtonAction(() -> PageManager.switchPage(mainMenu, selectSingleOrCoop));
+        selectSingleOrCoop.setSinglePlayerButtonAction(() -> singlePlayer = true);
+        selectSingleOrCoop.setCoopButtonAction(() -> singlePlayer = false);
+
+        setupLevels();
+    }
+
+    private static void setupLevels() {
+        mainMenu.setPlayButtonAction(() -> {
+            // TODO: switch to level 1
+        });
+
+        mainMenu.setLevelsButtonAction(() -> {
+            // Return to menu
+            levelSelectPage.setBackButtonAction(() -> PageManager.switchPage(levelSelectPage, mainMenu));
+
+            for (int i = 0; i < levels.size(); i++) {
+                final int idx = i; // To bypass lambda final constraint
+                levelSelectPage.setLevelAction(idx, () -> openLevel(idx));
+            }
+
+            PageManager.switchPage(mainMenu, levelSelectPage);
+        });
+    }
+
+    private static void openLevel(int i) {
+        PageManager.switchPage(levelSelectPage, levels.get(i));
+    }
 }
-
-void setupLevels() {
-    mainMenu.setPlayButtonAction(() -> {
-        //TODO: switch to level 1
-
-    });
-
-    mainMenu.setLevelsButtonAction(() -> {
-        //returns to menu
-        levelSelectPage.setBackButtonAction(() -> PageManager.switchPage(levelSelectPage, mainMenu));
-
-        for (int i = 0; i < levels.size(); i++) {
-            final int idx = i; //to bypass the lambda final constraint
-            levelSelectPage.setLevelAction(idx, () -> openLevel(idx));
-        }
-        PageManager.switchPage(mainMenu, levelSelectPage);
-    });
-}
-
-void openLevel(int i) {
-    PageManager.switchPage(levelSelectPage, levels.get(i));
-}
-
