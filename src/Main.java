@@ -54,6 +54,7 @@ public class Main {
         levelSelectPanel.setLevelAction(6, () -> openLevel(6));
         levelSelectPanel.setLevelAction(7, () -> openLevel(7));
         levelSelectPanel.setLevelAction(8, () -> openLevel(8));
+        levelSelectPanel.setLevelAction(10,() -> openLevel(10));
 
         levelPanel.setBackButtonAction(() -> {
             openLevel(-1);
@@ -83,6 +84,7 @@ public class Main {
             case 6 -> app.setLevelRenderer(new Level7Renderer(inputManager));
             case 7 -> app.setLevelRenderer(new Level8Renderer(inputManager));
             case 8 -> app.setLevelRenderer(new Level9Renderer(inputManager));
+            case 10 -> app.setLevelRenderer((new Level11Renderer(inputManager)));
             default -> throw new IllegalArgumentException("No renderer for level " + i);
         }
 

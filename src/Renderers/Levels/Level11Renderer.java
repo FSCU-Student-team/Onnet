@@ -29,14 +29,18 @@ public class Level11Renderer implements GLEventListener, GameLoop {
     private Rectangle goalRectangle;
 
     // Tunables
-    private static final double MAX_POWER = 200.0;
+    private static final double MAX_POWER = 250.0;
     private static final double POWER_INCREMENT = 1.0;
     private static final double ANGLE_INCREMENT = 0.5;
     private static final double POWER_SCALE = 0.05;
 
     private double currentPower = 20.0;
-    private Vector2 gravity = new Vector2(0, -0.1);
+    private Vector2 gravity = new Vector2(-0.05, -0.08); // Zero gravity in space
     private double angle = 45.0;
+    private double score;
+
+    private long timeElapsed;
+    private TextRenderer textRenderer;
 
     private List<Shape> shapes = new ArrayList<>();
 
@@ -45,96 +49,24 @@ public class Level11Renderer implements GLEventListener, GameLoop {
     private boolean isDead = false;
 
     private Vector2 velocity = new Vector2(0, 0);
-    private double score = 0;
 
-    private long timeElapsed;  // NEW — timer for scoring
+    // Level 11 Specific: Black Hole & Orbiting Asteroids
+    private Circle blackHole;
+    private Circle asteroid1;
+    private Circle asteroid2;
+    private Circle asteroid3;
 
-    private TextRenderer textRenderer;
+    // Orbit variables
+    private double orbitAngle1 = 0.0;
+    private double orbitAngle2 = 2.0; // Start at different angle
+    private double orbitAngle3 = 4.0; // Start at different angle
+    private final double ORBIT_SPEED = 0.01; // Speed of rotation
+    private final Point CENTER_POINT = new Point(380, 250); // Center of Black Hole
 
-    @Override
-    public void physicsUpdate() {
-        inputUpdate();
+    private final double BLACK_HOLE_GRAVITY_STRENGTH = 100.0;
 
-        if (isLaunched && !isWon && !isDead) {
-            entityUtils.updatePlayerVelocity(velocity);
-
-            entityUtils.checkCollisions(playerCircle);
-
-            velocity = entityUtils.getPlayerVelocity();
-
-            playerCircle.move(velocity);
-
-            velocity = velocity.add(gravity);
-
-            checkWin();
-            checkDie();
-        }
-    }
-
-    private void checkDie() {
-        if (entityUtils.checkPlayerDying(playerCircle)) {
-            isDead = true;
-            resetLevel(); // immediate reset, no tries, no losing
-        }
-    }
-
-    private void checkWin() {
-        if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
-            isWon = true;
-            long time = System.currentTimeMillis() - timeElapsed;
-            score = Math.max(100000 - time, 0);
-        }
-    }
-
-    @Override
-    public void renderUpdate(GL2 gl) {
-        gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
-        gl.glPushMatrix();
-
-        for (Shape shape : shapes) shape.draw(gl);
-
-        if (!isLaunched) {
-            gl.glBegin(GL2.GL_LINES);
-
-            if ((currentPower / MAX_POWER) * 100 <= 30)
-                gl.glColor3f(0f, 1f, 0f);
-            else if ((currentPower / MAX_POWER) * 100 <= 70)
-                gl.glColor3f(1f, 1f, 0f);
-            else
-                gl.glColor3f(1f, 0f, 0f);
-
-            double len = Math.max(10, currentPower * 0.4);
-            double radius = playerCircle.getWidth() / 2.0;
-            double rad = Math.toRadians(angle);
-            double x1 = playerCircle.getCenter().x() + radius * Math.cos(rad);
-            double y1 = playerCircle.getCenter().y() + radius * Math.sin(rad);
-            double x2 = x1 + len * Math.cos(rad);
-            double y2 = y1 + len * Math.sin(rad);
-
-            gl.glVertex2d(x1, y1);
-            gl.glVertex2d(x2, y2);
-            gl.glEnd();
-        }
-
-        gl.glPopMatrix();
-
-        if (isWon) {
-            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
-            textRenderer.beginRendering(800, 600);
-
-            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
-            textRenderer.draw("YOU WIN!", 250, 300);
-            textRenderer.draw("yourScore:" + (score), 150, 150);
-
-            textRenderer.endRendering();
-        }
-
-        entityUtils.allowBounceSounds();
-    }
-
-    @Override
-    public void inputUpdate() {
-        actionManager.update();
+    public Level11Renderer(InputManager inputManager) {
+        this.inputManager = inputManager;
     }
 
     @Override
@@ -143,13 +75,13 @@ public class Level11Renderer implements GLEventListener, GameLoop {
         actionManager = new ActionManager(inputManager);
 
         GL2 gl = glAutoDrawable.getGL().getGL2();
-        gl.glClearColor(0, 0, 0, 1);
+        gl.glClearColor(0.05f, 0.0f, 0.1f, 1); // Deep Space Dark Blue
 
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
         gl.glOrtho(0, 800, 0, 600, -1, 1);
 
-        // INPUT
+        // --- Inputs ---
         actionManager.bind(Input.A, () -> {
             if (!isLaunched) angle = (angle + ANGLE_INCREMENT) % 360;
         });
@@ -162,9 +94,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
         actionManager.bind(Input.S, () -> {
             if (!isLaunched) setCurrentPower(currentPower - POWER_INCREMENT);
         });
-
         actionManager.bind(Input.R, this::resetLevel);
-
         actionManager.bind(Input.Space, () -> {
             if (!isLaunched) {
                 isLaunched = true;
@@ -172,46 +102,70 @@ public class Level11Renderer implements GLEventListener, GameLoop {
                 double speed = currentPower * POWER_SCALE;
                 velocity = new Vector2(speed * Math.cos(rad), speed * Math.sin(rad));
                 entityUtils.updatePlayerVelocity(velocity);
-
-                // start timer on launch
-                timeElapsed = System.currentTimeMillis();
             }
         });
-
         actionManager.bind(Input.Escape, this::togglePause);
+
+        // Player
         playerCircle = new Circle.Builder()
-                .filled(true)
-                .center(new Point(50, 50))
-                .angle(0)
-                .radius(20)
                 .color(Color.WHITE)
-                .restitution(0.5)
+                .radius(15)
+                .angle(0)
+                .center(new Point(80, 80))
+                .filled(true)
                 .build();
+
+        // Goal (Hidden behind the black hole)
         goalRectangle = new Rectangle.Builder()
-                .fill(false)
-                .restitution(0.01)
-                .origin(new Point(640, 520))
-                .height(50)
-                .width(50)
-                .rotation(0)
                 .color(Color.YELLOW)
+                .width(40)
+                .height(40)
+                .fill(false)
+                .origin(new Point(700, 500))
                 .build();
-        Circle circleDie1=new Circle.Builder()
+
+        // The Black Hole (Gravity Well)
+        blackHole = new Circle.Builder()
+                .color(new Color(0.4f, 0.0f, 0.6f)) // Dark Purple
                 .filled(true)
-                .center(new Point(600, 500))
+                .center(CENTER_POINT)
+                .restitution(0.0) // No bounce, it absorbs
+                .radius(40)
                 .angle(0)
-                .radius(20)
-                .color(Color.RED)
-                .restitution(0.01)
                 .build();
-        Circle circleDie2=new Circle.Builder()
-                .filled(true)
-                .center(new Point(450, 400))
-                .angle(0)
-                .radius(20)
-                .color(Color.RED)
-                .restitution(0.01)
-                .build();
+
+        // Boundaries
+        Rectangle floor = new Rectangle.Builder().color(Color.GRAY).fill(true).origin(new Point(0, 0)).width(800).height(10).build();
+        Rectangle ceiling = new Rectangle.Builder().color(Color.GRAY).fill(true).origin(new Point(0, 590)).width(800).height(10).build();
+        Rectangle leftWall = new Rectangle.Builder().color(Color.GRAY).fill(true).origin(new Point(0, 0)).width(10).height(600).build();
+        Rectangle rightWall = new Rectangle.Builder().color(Color.GRAY).fill(true).origin(new Point(790, 0)).width(10).height(600).build();
+
+        // Asteroids (Obstacles) - Initial positions will be updated in physics loop
+        asteroid1 = new Circle.Builder().color(Color.DARK_GRAY).filled(true).center(new Point(250, 400)).radius(25).build();
+        asteroid2 = new Circle.Builder().color(Color.DARK_GRAY).filled(true).center(new Point(550, 200)).radius(30).build();
+        asteroid3 = new Circle.Builder().color(Color.DARK_GRAY).filled(true).center(new Point(400, 100)).radius(20).build();
+
+        // Add to EntityUtils
+        entityUtils.clearShapes();
+        entityUtils.addShape(goalRectangle);
+        entityUtils.addShape(floor);
+        entityUtils.addShape(ceiling);
+        entityUtils.addShape(leftWall);
+        entityUtils.addShape(rightWall);
+        entityUtils.addShape(blackHole);
+        entityUtils.addShape(asteroid1);
+        entityUtils.addShape(asteroid2);
+        entityUtils.addShape(asteroid3);
+
+        entityUtils.updatePlayerVelocity(velocity);
+        entityUtils.updateGravity(gravity);
+
+        // Render List
+        shapes.clear();
+        shapes.add(playerCircle);
+        shapes.addAll(entityUtils.getShapes());
+
+        timeElapsed = System.currentTimeMillis();
     }
 
     @Override
@@ -235,31 +189,157 @@ public class Level11Renderer implements GLEventListener, GameLoop {
         gl.glLoadIdentity();
     }
 
-    public void setCurrentPower(double newPower) {
-        if (newPower > MAX_POWER)
-            this.currentPower = MAX_POWER;
-        else
-            this.currentPower = Math.max(newPower, 5);
+    @Override
+    public void physicsUpdate() {
+        inputUpdate();
+
+        // --- ORBIT LOGIC (Always running) ---
+        // Update angles
+        orbitAngle1 += ORBIT_SPEED;
+        orbitAngle2 += ORBIT_SPEED * 0.8; // Different speed
+        orbitAngle3 += ORBIT_SPEED * 1.2; // Faster
+
+        // Radius of orbit (distance from center)
+        double r1 = 110;
+        double r2 = 140;
+        double r3 = 90;
+
+        // Calculate new positions
+        // x = center_x + radius * cos(angle)
+        // y = center_y + radius * sin(angle)
+        asteroid1.setOrigin(new Point(
+                CENTER_POINT.x() + r1 * Math.cos(orbitAngle1),
+                CENTER_POINT.y() + r1 * Math.sin(orbitAngle1)
+        ));
+
+        asteroid2.setOrigin(new Point(
+                CENTER_POINT.x() + r2 * Math.cos(orbitAngle2),
+                CENTER_POINT.y() + r2 * Math.sin(orbitAngle2)
+        ));
+
+        asteroid3.setOrigin(new Point(
+                CENTER_POINT.x() + r3 * Math.cos(orbitAngle3),
+                CENTER_POINT.y() + r3 * Math.sin(orbitAngle3)
+        ));
+        if (isLaunched && !isWon && !isDead) {
+
+            // --- Custom Gravity Logic (Black Hole Pull) ---
+            Point pPos = playerCircle.getCenter();
+            Point holePos = blackHole.getCenter();
+
+            double dx = holePos.x() - pPos.x();
+            double dy = holePos.y() - pPos.y();
+            double dist = Math.sqrt(dx * dx + dy * dy);
+
+            // Avoid division by zero and extreme forces at center
+            dist = Math.max(dist, 10);
+
+            // Normalize vector
+            double dirX = dx / dist;
+            double dirY = dy / dist;
+
+            // Force formula (inverse square law approximation)
+            double force = BLACK_HOLE_GRAVITY_STRENGTH / (dist * 0.1);
+
+            // Apply force to velocity
+            Vector2 gravityPull = new Vector2(dirX * force * GameLoop.PHYSICS_STEP, dirY * force * GameLoop.PHYSICS_STEP);
+            velocity = velocity.add(gravityPull);
+
+
+            entityUtils.updatePlayerVelocity(velocity);
+            entityUtils.checkCollisions(playerCircle);
+            velocity = entityUtils.getPlayerVelocity();
+            playerCircle.move(velocity);
+            velocity = velocity.add(gravity);
+
+            checkWin();
+            checkDie();
+        }
     }
 
-    public InputManager getInputManager() {
-        return inputManager;
+    private void checkDie() {
+        // If player hits the black hole or other hazards
+        if (entityUtils.checkPlayerDying(playerCircle)) {
+            isDead = true;
+            resetLevel();
+        }
+    }
+
+    private void checkWin() {
+        if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
+            isWon = true;
+            score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
+        }
+    }
+
+    @Override
+    public void renderUpdate(GL2 gl) {
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
+        gl.glPushMatrix();
+
+        for (Shape shape : shapes) {
+            shape.draw(gl);
+        }
+
+        if (!isLaunched) {
+            gl.glBegin(GL2.GL_LINES);
+            // Power indicator color
+            if ((currentPower / MAX_POWER) * 100 <= 30) gl.glColor3f(0f, 1f, 0f);
+            else if ((currentPower / MAX_POWER) * 100 <= 70) gl.glColor3f(1f, 1f, 0f);
+            else gl.glColor3f(1f, 0f, 0f);
+
+            double len = Math.max(10, currentPower * 0.4);
+            double rad = Math.toRadians(angle);
+            double x1 = playerCircle.getCenter().x();
+            double y1 = playerCircle.getCenter().y();
+            double x2 = x1 + len * Math.cos(rad);
+            double y2 = y1 + len * Math.sin(rad);
+
+            gl.glVertex2d(x1, y1);
+            gl.glVertex2d(x2, y2);
+            gl.glEnd();
+        }
+
+        gl.glPopMatrix();
+
+        // UI
+        if (isWon) {
+            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
+            textRenderer.beginRendering(800, 600);
+            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
+            textRenderer.draw("YOU WIN!", 250, 300);
+            textRenderer.draw("Score: " + (int) score, 250, 200);
+            textRenderer.endRendering();
+        }
+
+        entityUtils.allowBounceSounds();
+    }
+
+    @Override
+    public void inputUpdate() {
+        actionManager.update();
     }
 
     public double getCurrentPower() {
         return currentPower;
     }
 
+    public void setCurrentPower(double newPower) {
+        if (newPower > MAX_POWER) this.currentPower = MAX_POWER;
+        else this.currentPower = Math.max(newPower, 5);
+    }
+
+    public InputManager getInputManager() {
+        return inputManager;
+    }
+
     private void resetLevel() {
         isLaunched = false;
         isWon = false;
         isDead = false;
-
-        playerCircle.setOrigin(new Point(100, 100));
-
+        playerCircle.setOrigin(new Point(80, 80));
         velocity = new Vector2(0, 0);
         entityUtils.updatePlayerVelocity(velocity);
-
         currentPower = 20.0;
         angle = 45.0;
     }
