@@ -196,6 +196,22 @@ public class Level11Renderer implements GLEventListener, GameLoop {
                 .rotation(0)
                 .color(Color.YELLOW)
                 .build();
+        Circle circleDie1=new Circle.Builder()
+                .filled(true)
+                .center(new Point(600, 500))
+                .angle(0)
+                .radius(20)
+                .color(Color.RED)
+                .restitution(0.01)
+                .build();
+        Circle circleDie2=new Circle.Builder()
+                .filled(true)
+                .center(new Point(450, 400))
+                .angle(0)
+                .radius(20)
+                .color(Color.RED)
+                .restitution(0.01)
+                .build();
     }
 
     @Override
