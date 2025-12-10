@@ -276,7 +276,6 @@ public class Level4Renderer implements GLEventListener, GameLoop {
     }
 
     private void checkDie() {
-
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
             Tries += 1;

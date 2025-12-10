@@ -294,7 +294,9 @@ public class Level3Renderer implements GLEventListener, GameLoop {
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
             Tries += 1;
-            resetLevel();
+            if (Tries < 3)
+                resetLevel();
+            else System.out.println("Die");
         }
     }
 
@@ -350,7 +352,7 @@ public class Level3Renderer implements GLEventListener, GameLoop {
 
             textRenderer.endRendering();
         }
-        if (!isWon && Tries <= 0) {
+        if (!isWon && Tries >= 3) {
             textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
             textRenderer.beginRendering(800, 600);
 
@@ -384,17 +386,19 @@ public class Level3Renderer implements GLEventListener, GameLoop {
 
     private void resetLevel() {
         // Reset flags
-        isLaunched = false;
-        isWon = false;
-        isDead = false;
+        if (Tries < 3) {
+            isLaunched = false;
+            isWon = false;
+            isDead = false;
 
-        // Reset player position
-        playerCircle.setOrigin(new Point(100, 100));
+            // Reset player position
+            playerCircle.setOrigin(new Point(100, 100));
 
-        velocity = new Vector2(0, 0);
-        entityUtils.updatePlayerVelocity(velocity);
+            velocity = new Vector2(0, 0);
+            entityUtils.updatePlayerVelocity(velocity);
 
-        currentPower = 50.0;
-        angle = 45.0;
+            currentPower = 50.0;
+            angle = 45.0;
+        }
     }
 }
