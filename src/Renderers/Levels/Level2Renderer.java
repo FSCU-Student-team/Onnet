@@ -1,9 +1,6 @@
 package Renderers.Levels;
 
-import Game.GameLoop;
-import Game.Input;
-import Game.InputManager;
-import Game.LoopState;
+import Game.*;
 import Physics.ActionManager;
 import Renderers.EntityUtils;
 import Shapes.*;
@@ -261,6 +258,7 @@ public class Level2Renderer implements GLEventListener, GameLoop {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
             score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
+            LeaderboardHandler.save(2, new LeaderboardEntry(GlobalVariables.playerName, score));
         }
     }
 

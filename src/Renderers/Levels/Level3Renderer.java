@@ -1,9 +1,6 @@
 package Renderers.Levels;
 
-import Game.GameLoop;
-import Game.Input;
-import Game.InputManager;
-import Game.LoopState;
+import Game.*;
 import Physics.ActionManager;
 import Renderers.EntityUtils;
 import Shapes.*;
@@ -257,6 +254,7 @@ public class Level3Renderer implements GLEventListener, GameLoop {
             isWon = true;
             long time = System.currentTimeMillis() - timeElapsed;
             score = Math.max(100000 - time, 0);
+            LeaderboardHandler.save(3, new LeaderboardEntry(GlobalVariables.playerName, score));
         }
     }
 
