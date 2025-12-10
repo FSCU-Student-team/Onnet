@@ -24,11 +24,15 @@ public class Level9Renderer implements GLEventListener, GameLoop {
     private EntityUtils entityUtils = new EntityUtils();
     private Circle playerCircle;
     private Rectangle goalRectangle;
+    private Rectangle   movingPlatform ;
+    private double platformSpeed = 100.0;
+    private boolean platformMovingRight = true;
     // Tunables
     private static final double MAX_POWER = 200.0;
-    private static final double POWER_INCREMENT = 0.6;
-    private static final double ANGLE_INCREMENT = 0.25;
+    private static final double POWER_INCREMENT = .5;
+    private static final double ANGLE_INCREMENT = 0.1;
     private static final double POWER_SCALE = 0.05;
+
 
     private double currentPower = 50.0;
     private Vector2 gravity = new Vector2(0, -0.05);
@@ -69,18 +73,11 @@ public class Level9Renderer implements GLEventListener, GameLoop {
         gl.glLoadIdentity();
         gl.glOrtho(0, 800, 0, 600, -1, 1);
 
-        actionManager.bind(Input.A, () -> {
-            if (!isLaunched) angle = (angle + ANGLE_INCREMENT) % 360;
-        });
-        actionManager.bind(Input.D, () -> {
-            if (!isLaunched) angle = (angle - ANGLE_INCREMENT + 360) % 360;
-        });
-        actionManager.bind(Input.W, () -> {
-            if (!isLaunched) setCurrentPower(currentPower + POWER_INCREMENT);
-        });
-        actionManager.bind(Input.S, () -> {
-            if (!isLaunched) setCurrentPower(currentPower - POWER_INCREMENT);
-        });
+        // Key bindings
+        actionManager.bind(Input.A, () -> { if (!isLaunched) angle = (angle + ANGLE_INCREMENT) % 360; });
+        actionManager.bind(Input.D, () -> { if (!isLaunched) angle = (angle - ANGLE_INCREMENT + 360) % 360; });
+        actionManager.bind(Input.W, () -> { if (!isLaunched) setCurrentPower(currentPower + POWER_INCREMENT); });
+        actionManager.bind(Input.S, () -> { if (!isLaunched) setCurrentPower(currentPower - POWER_INCREMENT); });
         actionManager.bind(Input.R, this::resetLevel);
         actionManager.bind(Input.Space, () -> {
             if (!isLaunched) {
@@ -108,12 +105,12 @@ public class Level9Renderer implements GLEventListener, GameLoop {
                 .width(40)
                 .height(40)
                 .fill(false)
-                .origin(new Point(700, 100))
+                .origin(new Point(700, 150))
                 .build();
 
         // Boundaries
         Rectangle floor = new Rectangle.Builder()
-                .color(Color.GREEN)
+                .color(Color.RED)
                 .rotation(0)
                 .fill(true)
                 .origin(new Point(0, 0))
@@ -123,7 +120,7 @@ public class Level9Renderer implements GLEventListener, GameLoop {
                 .build();
 
         Rectangle ceiling = new Rectangle.Builder()
-                .color(Color.GREEN)
+                .color(Color.RED)
                 .rotation(0)
                 .fill(true)
                 .origin(new Point(0, 590))
@@ -133,7 +130,7 @@ public class Level9Renderer implements GLEventListener, GameLoop {
                 .build();
 
         Rectangle leftWall = new Rectangle.Builder()
-                .color(Color.GREEN)
+                .color(Color.RED)
                 .rotation(0)
                 .fill(true)
                 .origin(new Point(0, 0))
@@ -152,47 +149,49 @@ public class Level9Renderer implements GLEventListener, GameLoop {
                 .height(600)
                 .build();
 
-        // Wind zones (invisible but apply force)
-        windZoneLeft = new Rectangle.Builder()
-                .color(new Color(0.7f, 0.7f, 1.0f, 0.3f))
+        Rectangle g3 = new Rectangle.Builder()
+                .color(Color.RED)
+                .rotation(0)
+                .fill(true)
+                .origin(new Point(650, 100))
+                .restitution(0.0)
+                .width(30)
+                .height(150)
+                .build();
+
+        movingPlatform = new Rectangle.Builder()
+                .color(Color.RED)
+                .rotation(0)
+                .fill(true)
+                .origin(new Point(400, 300))
+                .restitution(0.8)
+                .width(50)
+                .height(20)
+                .build();
+
+
+        Rectangle bigRect = new Rectangle.Builder()
+                .color(Color.GREEN)
                 .rotation(0)
                 .fill(true)
                 .origin(new Point(200, 100))
-                .restitution(0.5)
-                .width(150)
-                .height(400)
+                .restitution(0.0)
+                .width(500)
+                .height(30)
                 .build();
 
-        windZoneRight = new Rectangle.Builder()
-                .color(new Color(1.0f, 0.7f, 0.7f, 0.3f))
+        Rectangle bigRect1 = new Rectangle.Builder()
+                .color(Color.GREEN)
                 .rotation(0)
                 .fill(true)
-                .origin(new Point(450, 100))
-                .restitution(0.5)
-                .width(150)
-                .height(400)
+                .origin(new Point(300, 500))
+                .restitution(0.0)
+                .width(500)
+                .height(30)
                 .build();
 
-        // Obstacles
-        Rectangle obstacle1 = new Rectangle.Builder()
-                .color(Color.BLUE)
-                .rotation(0)
-                .fill(true)
-                .origin(new Point(350, 0))
-                .restitution(0.7)
-                .width(100)
-                .height(200)
-                .build();
 
-        Rectangle obstacle2 = new Rectangle.Builder()
-                .color(Color.BLUE)
-                .rotation(0)
-                .fill(true)
-                .origin(new Point(550, 300))
-                .restitution(0.7)
-                .width(100)
-                .height(150)
-                .build();
+
 
         // Add to entity utils
         entityUtils.addShape(goalRectangle);
@@ -200,20 +199,21 @@ public class Level9Renderer implements GLEventListener, GameLoop {
         entityUtils.addShape(ceiling);
         entityUtils.addShape(leftWall);
         entityUtils.addShape(rightWall);
-        entityUtils.addShape(windZoneLeft);
-        entityUtils.addShape(windZoneRight);
-        entityUtils.addShape(obstacle1);
-        entityUtils.addShape(obstacle2);
+        entityUtils.addShape(g3);
+        entityUtils.addShape(bigRect);
+        entityUtils.addShape(bigRect1);
+        entityUtils.addShape(movingPlatform);
+
+        // Player
+        shapes.add(playerCircle);
 
         entityUtils.updatePlayerVelocity(velocity);
         entityUtils.updateGravity(gravity);
-
-        shapes.clear();
-        shapes.add(playerCircle);
         shapes.addAll(entityUtils.getShapes());
 
         timeElapsed = System.currentTimeMillis();
     }
+
 
     @Override
     public void dispose(GLAutoDrawable glAutoDrawable) {
@@ -239,16 +239,13 @@ public class Level9Renderer implements GLEventListener, GameLoop {
     @Override
     public void physicsUpdate() {
         inputUpdate();
-
+        movingPlatform.move(new Vector2((platformMovingRight ? platformSpeed : -platformSpeed) * GameLoop.PHYSICS_STEP, 0));
+        if (movingPlatform.getCenter().x() > 715) platformMovingRight = false;
+        else if (movingPlatform.getCenter().x() < 85) platformMovingRight = true;
         if (isLaunched && !isWon && !isDead) {
             // Apply wind forces if player is in wind zones
             Point playerPos = playerCircle.getCenter();
-            if (windZoneLeft.getCollider().intersects(playerCircle.getCollider())) {
-                velocity = velocity.add(windForceLeft.scale(GameLoop.PHYSICS_STEP));
-            }
-            if (windZoneRight.getCollider().intersects(playerCircle.getCollider())) {
-                velocity = velocity.add(windForceRight.scale(GameLoop.PHYSICS_STEP));
-            }
+
 
             entityUtils.updatePlayerVelocity(velocity);
             entityUtils.checkCollisions(playerCircle);
@@ -275,7 +272,6 @@ public class Level9Renderer implements GLEventListener, GameLoop {
             isWon = true;
             score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
             LeaderboardHandler.save(9, new LeaderboardEntry(GlobalVariables.playerName, score));
-            timeElapsed = System.currentTimeMillis();
         }
     }
 
