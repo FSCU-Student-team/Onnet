@@ -279,10 +279,10 @@ public class Level7Renderer implements GLEventListener, GameLoop {
 
         if (isLaunched && !isWon && !isDead) {
             // Apply water drag if player is in water
-//            if (waterArea1.getCollider().intersects(playerCircle.getCollider()) ||
-//                    waterArea2.getCollider().intersects(playerCircle.getCollider())) {
-//                velocity = velocity.scale(WATER_DRAG); // Slow down in water
-//            }
+            if (waterArea1.getCollider().intersects(playerCircle.getCollider()) ||
+                    waterArea2.getCollider().intersects(playerCircle.getCollider())) {
+                velocity = velocity.scale(WATER_DRAG); // Slow down in water
+            }
 
             entityUtils.updatePlayerVelocity(velocity);
             entityUtils.checkCollisions(playerCircle);
