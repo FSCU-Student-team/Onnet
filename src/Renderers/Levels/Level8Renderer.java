@@ -7,10 +7,16 @@ import Game.LoopState;
 import Physics.ActionManager;
 import Renderers.EntityUtils;
 import Shapes.*;
+import Shapes.Color;
+import Shapes.Point;
+import Shapes.Rectangle;
+import Shapes.Shape;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.util.awt.TextRenderer;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +36,8 @@ public class Level8Renderer implements GLEventListener, GameLoop {
     private double currentPower = 50.0;
     private Vector2 gravity = new Vector2(0, -0.05);
     private double angle = 45.0;
+    private double Tries;
+    private double score;
 
     private List<Shape> shapes = new ArrayList<>();
 
@@ -44,6 +52,7 @@ public class Level8Renderer implements GLEventListener, GameLoop {
     private Rectangle rotatingObstacle2;
     private Circle movingTarget;
     private boolean targetMovingUp = true;
+    private TextRenderer textRenderer;
 
     public Level8Renderer(InputManager inputManager) {
         this.inputManager = inputManager;
@@ -216,6 +225,7 @@ public class Level8Renderer implements GLEventListener, GameLoop {
                 .build();
 
         // Add to entity utils
+        entityUtils.addShape(playerCircle);
         entityUtils.addShape(goalRectangle);
         entityUtils.addShape(floor);
         entityUtils.addShape(ceiling);
@@ -248,7 +258,8 @@ public class Level8Renderer implements GLEventListener, GameLoop {
     }
 
     @Override
-    public void dispose(GLAutoDrawable glAutoDrawable) {}
+    public void dispose(GLAutoDrawable glAutoDrawable) {
+    }
 
     @Override
     public void display(GLAutoDrawable glAutoDrawable) {
@@ -272,8 +283,8 @@ public class Level8Renderer implements GLEventListener, GameLoop {
         inputUpdate();
 
         // Rotating obstacles
-        rotatingObstacle1.rotate(40/360.0);
-        rotatingObstacle2.rotate(-30/360.0);
+        rotatingObstacle1.rotate(40 / 360.0);
+        rotatingObstacle2.rotate(-30 / 360.0);
 
         // Moving target
         if (targetMovingUp) {
@@ -298,6 +309,14 @@ public class Level8Renderer implements GLEventListener, GameLoop {
 
     private void checkDie() {
         // placeholder: you can check overlap with red rectangles here and set isDead
+        if (entityUtils.checkPlayerDying(playerCircle)) {
+            isDead = true;
+            Tries++;
+            if (Tries < 3)
+                resetLevel();
+            else
+                System.out.println("Die");
+        }
     }
 
 //    private void checkWin() {
@@ -310,8 +329,9 @@ public class Level8Renderer implements GLEventListener, GameLoop {
 //    }
 
     private void checkWin() {
-        if (playerCircle.getCollider().intersects(goalRectangle.getCollider())) {
+        if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
+            score = (-Tries + 3) * 1000;
         }
     }
 
@@ -324,23 +344,44 @@ public class Level8Renderer implements GLEventListener, GameLoop {
 
         if (!isLaunched) {
             gl.glBegin(GL2.GL_LINES);
-            if ((currentPower / MAX_POWER) * 100 <= 30)
+            // use white (or whatever color your shapes use)
+            if ((currentPower / MAX_POWER) * 100 <= 30)//green
                 gl.glColor3f(0f, 1f, 0f);
-            else if ((currentPower / MAX_POWER) * 100 <= 70)
+            else if ((currentPower / MAX_POWER) * 100 <= 70)//Yellow
                 gl.glColor3f(1f, 1f, 0f);
-            else
+            else if ((currentPower / MAX_POWER) * 100 >= 70)//red
                 gl.glColor3f(1f, 0f, 0f);
 
-            double len = Math.max(30, currentPower * 0.4);
+            double len = Math.max(10, currentPower * 0.4); // visual length; tweak multiplier if desired
+            double radius = playerCircle.getWidth() / 2.0;
             double rad = Math.toRadians(angle);
-            double x1 = playerCircle.getCenter().x();
-            double y1 = playerCircle.getCenter().y();
+            double x1 = playerCircle.getCenter().x() + radius * Math.cos(rad);
+            double y1 = playerCircle.getCenter().y() + radius * Math.sin(rad);
             double x2 = x1 + len * Math.cos(rad);
             double y2 = y1 + len * Math.sin(rad);
 
             gl.glVertex2d(x1, y1);
             gl.glVertex2d(x2, y2);
             gl.glEnd();
+        }
+        if (isWon) {
+            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
+            textRenderer.beginRendering(800, 600);
+
+            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f); // أخضر
+            textRenderer.draw("YOU WIN!", 250, 300);
+            textRenderer.draw("yourScore:" + (score), 150, 150);
+
+            textRenderer.endRendering();
+        }
+        if (!isWon && Tries >= 3) {
+            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
+            textRenderer.beginRendering(800, 600);
+
+            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
+            textRenderer.draw("YOU Lose!", 250, 300);
+
+            textRenderer.endRendering();
         }
 
         gl.glPopMatrix();
@@ -367,17 +408,19 @@ public class Level8Renderer implements GLEventListener, GameLoop {
 
     private void resetLevel() {
         // Reset flags
-        isLaunched = false;
-        isWon = false;
-        isDead = false;
+        if (Tries < 3) {
+            isLaunched = false;
+            isWon = false;
+            isDead = false;
 
-        // Reset player position
-        playerCircle.setOrigin(new Point(100, 100));
+            // Reset player position
+            playerCircle.setOrigin(new Point(100, 100));
 
-        velocity = new Vector2(0, 0);
-        entityUtils.updatePlayerVelocity(velocity);
+            velocity = new Vector2(0, 0);
+            entityUtils.updatePlayerVelocity(velocity);
 
-        currentPower = 50.0;
-        angle = 45.0;
+            currentPower = 20.0;
+            angle = 45.0;
+        }
     }
 }

@@ -254,7 +254,7 @@ public class Level1Renderer implements GLEventListener, GameLoop {
     private void checkWin() {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
-            score = Tries * 1000;
+            score = (-Tries + 3) * 1000;
         }
     }
 
@@ -348,7 +348,7 @@ public class Level1Renderer implements GLEventListener, GameLoop {
             velocity = new Vector2(0, 0);
             entityUtils.updatePlayerVelocity(velocity);
 
-            currentPower = 50.0;
+            currentPower = 20.0;
             angle = 45.0;
         }
     }
