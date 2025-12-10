@@ -29,15 +29,14 @@ public class Level3Renderer implements GLEventListener, GameLoop {
     private Rectangle goalRectangle;
 
     // Tunables
-    private static final double MAX_POWER = 200.0;      // max "power" the player can set
-    private static final double POWER_INCREMENT = 1.0;  // amount W/S changes power
-    private static final double ANGLE_INCREMENT = 0.5;  // degrees per A/D press
-    private static final double POWER_SCALE = 0.05;     // converts "power" -> velocity (pixels per physics step)
-    // lower = slower launch, raise to speed up
+    private static final double MAX_POWER = 200.0;
+    private static final double POWER_INCREMENT = 1.0;
+    private static final double ANGLE_INCREMENT = 0.5;
+    private static final double POWER_SCALE = 0.05;
 
-    private double currentPower = 20.0;   // sensible default
-    private Vector2 gravity = new Vector2(0, -0.05); // tuned for visible arc (you can lower magnitude if too fast)
-    private double angle = 45.0;          // degrees (0 -> right, 90 -> up)
+    private double currentPower = 20.0;
+    private Vector2 gravity = new Vector2(0, -0.05);
+    private double angle = 45.0;
 
     private List<Shape> shapes = new ArrayList<>();
 
@@ -46,14 +45,15 @@ public class Level3Renderer implements GLEventListener, GameLoop {
     private boolean isDead = false;
 
     private Vector2 velocity = new Vector2(0, 0);
-    private double Tries;
     private double score = 0;
+
+    private long timeElapsed;  // NEW — timer for scoring
+
     private TextRenderer textRenderer;
 
     public Level3Renderer(InputManager inputManager) {
         this.inputManager = inputManager;
     }
-
 
     @Override
     public void init(GLAutoDrawable glAutoDrawable) {
@@ -63,28 +63,18 @@ public class Level3Renderer implements GLEventListener, GameLoop {
         GL2 gl = glAutoDrawable.getGL().getGL2();
         gl.glClearColor(0, 0, 0, 1);
 
-        // change these values to match that size.
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
         gl.glOrtho(0, 800, 0, 600, -1, 1);
 
-        // --- INPUT BINDINGS (small increments, only when not launched) ---
-        actionManager.bind(Input.A, () -> {
-            if (!isLaunched) angle = (angle + ANGLE_INCREMENT) % 360;
-        });
-        actionManager.bind(Input.D, () -> {
-            if (!isLaunched) angle = (angle - ANGLE_INCREMENT + 360) % 360;
-        });
-        actionManager.bind(Input.W, () -> {
-            if (!isLaunched) setCurrentPower(currentPower + POWER_INCREMENT);
-        });
-        actionManager.bind(Input.S, () -> {
-            if (!isLaunched) setCurrentPower(currentPower - POWER_INCREMENT);
-        });
+        // INPUT
+        actionManager.bind(Input.A, () -> { if (!isLaunched) angle = (angle + ANGLE_INCREMENT) % 360; });
+        actionManager.bind(Input.D, () -> { if (!isLaunched) angle = (angle - ANGLE_INCREMENT + 360) % 360; });
+        actionManager.bind(Input.W, () -> { if (!isLaunched) setCurrentPower(currentPower + POWER_INCREMENT); });
+        actionManager.bind(Input.S, () -> { if (!isLaunched) setCurrentPower(currentPower - POWER_INCREMENT); });
 
         actionManager.bind(Input.R, this::resetLevel);
 
-        // Launch: compute velocity using POWER_SCALE to avoid unit mismatch
         actionManager.bind(Input.Space, () -> {
             if (!isLaunched) {
                 isLaunched = true;
@@ -92,22 +82,22 @@ public class Level3Renderer implements GLEventListener, GameLoop {
                 double speed = currentPower * POWER_SCALE;
                 velocity = new Vector2(speed * Math.cos(rad), speed * Math.sin(rad));
                 entityUtils.updatePlayerVelocity(velocity);
+
+                // start timer on launch
+                timeElapsed = System.currentTimeMillis();
             }
         });
 
         actionManager.bind(Input.Escape, this::togglePause);
 
-        // shapes
-        // player: start near bottom-left
+        // SHAPES
         playerCircle = new Circle.Builder()
                 .color(Color.WHITE)
                 .radius(15)
-                .angle(0)
-                .center(new Point(100, 100)) // start pos
+                .center(new Point(100, 100))
                 .filled(true)
                 .build();
 
-        // goal
         goalRectangle = new Rectangle.Builder()
                 .color(Color.YELLOW)
                 .width(30)
@@ -116,102 +106,72 @@ public class Level3Renderer implements GLEventListener, GameLoop {
                 .origin(new Point(690, 50))
                 .build();
 
-        // static environment (platforms / walls)
         Rectangle floor = new Rectangle.Builder()
-                .color(Color.RED)
-                .rotation(0)
-                .fill(true)
+                .color(Color.RED).fill(true)
                 .origin(new Point(0, 0))
-                .restitution(0.0)
-                .width(1000)
-                .height(10)
+                .width(1000).height(10)
                 .build();
 
         Rectangle ceiling = new Rectangle.Builder()
-                .color(Color.RED)
-                .rotation(0)
-                .fill(true)
+                .color(Color.RED).fill(true)
                 .origin(new Point(0, 600))
-                .restitution(0.0)
-                .width(1000)
-                .height(10)
+                .width(1000).height(10)
                 .build();
 
         Rectangle leftWall = new Rectangle.Builder()
-                .color(Color.RED)
-                .rotation(0)
-                .fill(true)
+                .color(Color.RED).fill(true)
                 .origin(new Point(0, 0))
-                .restitution(0.0)
-                .width(10)
-                .height(1000)
+                .width(10).height(1000)
                 .build();
 
         Rectangle rightWall = new Rectangle.Builder()
-                .color(Color.RED)
-                .rotation(0)
-                .fill(true)
+                .color(Color.RED).fill(true)
                 .origin(new Point(790, 0))
-                .restitution(0.0)
-                .width(10)
-                .height(1000)
+                .width(10).height(1000)
                 .build();
 
         Rectangle middleBottomWall = new Rectangle.Builder()
-                .color(Color.BLUE)
-                .rotation(0)
-                .fill(true)
+                .color(Color.BLUE).fill(true)
                 .origin(new Point(490, 0))
+                .width(50).height(370)
                 .restitution(0.5)
-                .width(50)
-                .height(370)
                 .build();
+
         Rectangle middleTopWall = new Rectangle.Builder()
-                .color(Color.BLUE)
-                .rotation(0)
-                .fill(true)
+                .color(Color.BLUE).fill(true)
                 .origin(new Point(490, 450))
+                .width(50).height(150)
                 .restitution(0.5)
-                .width(50)
-                .height(150)
                 .build();
+
         Rectangle afterGateStand = new Rectangle.Builder()
-                .color(Color.BLUE)
-                .rotation(0)
-                .fill(true)
+                .color(Color.BLUE).fill(true)
                 .origin(new Point(490, 370))
+                .width(100).height(20)
                 .restitution(0.5)
-                .width(100)
-                .height(20)
                 .build();
 
         Rectangle secondGateTop = new Rectangle.Builder()
-                .color(Color.BLUE)
-                .rotation(0)
-                .fill(true)
+                .color(Color.BLUE).fill(true)
                 .origin(new Point(590, 450))
+                .width(50).height(150)
                 .restitution(0.5)
-                .width(50)
-                .height(150)
                 .build();
 
         Triangle ramp1 = new Triangle.Builder()
-                .color(Color.BLUE)
-                .fill(true)
-                .restitution(0.5)
+                .color(Color.BLUE).fill(true).restitution(0.5)
                 .addPoint(new Point(800, 250))
                 .addPoint(new Point(800, 150))
-                .addPoint(new Point(670, 150)).build();
+                .addPoint(new Point(670, 150))
+                .build();
 
         Triangle ramp2 = new Triangle.Builder()
-                .color(Color.BLUE)
-                .fill(true)
-                .restitution(0.5)
+                .color(Color.BLUE).fill(true).restitution(0.5)
                 .addPoint(new Point(490, 150))
                 .addPoint(new Point(490, 50))
-                .addPoint(new Point(670, 50)).build();
+                .addPoint(new Point(670, 50))
+                .build();
 
-        // IMPORTANT: don't add playerCircle to entityUtils shapes list (avoid self-collision)
         entityUtils.addShape(goalRectangle);
         entityUtils.addShape(floor);
         entityUtils.addShape(ceiling);
@@ -224,7 +184,6 @@ public class Level3Renderer implements GLEventListener, GameLoop {
         entityUtils.addShape(ramp1);
         entityUtils.addShape(ramp2);
 
-        // set up entity utils with starting velocity and gravity
         entityUtils.updatePlayerVelocity(velocity);
         entityUtils.updateGravity(gravity);
 
@@ -241,12 +200,13 @@ public class Level3Renderer implements GLEventListener, GameLoop {
         shapes.add(secondGateTop);
         shapes.add(ramp1);
         shapes.add(ramp2);
+
+        // NEW — timer start on level load
+        timeElapsed = System.currentTimeMillis();
     }
 
     @Override
-    public void dispose(GLAutoDrawable glAutoDrawable) {
-        // nothing special needed here
-    }
+    public void dispose(GLAutoDrawable glAutoDrawable) {}
 
     @Override
     public void display(GLAutoDrawable glAutoDrawable) {
@@ -270,19 +230,14 @@ public class Level3Renderer implements GLEventListener, GameLoop {
         inputUpdate();
 
         if (isLaunched && !isWon && !isDead) {
-            // inform entity utils of the current velocity
             entityUtils.updatePlayerVelocity(velocity);
 
-            // check collisions (may modify internal player velocity)
             entityUtils.checkCollisions(playerCircle);
 
-            // read back updated velocity from collisions
             velocity = entityUtils.getPlayerVelocity();
 
-            // move player according to velocity
             playerCircle.move(velocity);
 
-            // apply gravity for next frame
             velocity = velocity.add(gravity);
 
             checkWin();
@@ -293,17 +248,15 @@ public class Level3Renderer implements GLEventListener, GameLoop {
     private void checkDie() {
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
-            Tries += 1;
-            if (Tries < 3)
-                resetLevel();
-            else System.out.println("Die");
+            resetLevel(); // immediate reset, no tries, no losing
         }
     }
 
     private void checkWin() {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
-            score = (-Tries + 3) * 1000;
+            long time = System.currentTimeMillis() - timeElapsed;
+            score = Math.max(100000 - time, 0);
         }
     }
 
@@ -312,23 +265,19 @@ public class Level3Renderer implements GLEventListener, GameLoop {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
         gl.glPushMatrix();
 
-        // Draw all shapes
-        for (Shape shape : shapes) {
-            shape.draw(gl);
-        }
+        for (Shape shape : shapes) shape.draw(gl);
 
-        // Aim line (visible only before launch). Length scales with currentPower.
         if (!isLaunched) {
             gl.glBegin(GL2.GL_LINES);
-            // use white (or whatever color your shapes use)
-            if ((currentPower / MAX_POWER) * 100 <= 30)//green
+
+            if ((currentPower / MAX_POWER) * 100 <= 30)
                 gl.glColor3f(0f, 1f, 0f);
-            else if ((currentPower / MAX_POWER) * 100 <= 70)//Yellow
+            else if ((currentPower / MAX_POWER) * 100 <= 70)
                 gl.glColor3f(1f, 1f, 0f);
-            else if ((currentPower / MAX_POWER) * 100 >= 70)//red
+            else
                 gl.glColor3f(1f, 0f, 0f);
 
-            double len = Math.max(10, currentPower * 0.4); // visual length; tweak multiplier if desired
+            double len = Math.max(10, currentPower * 0.4);
             double radius = playerCircle.getWidth() / 2.0;
             double rad = Math.toRadians(angle);
             double x1 = playerCircle.getCenter().x() + radius * Math.cos(rad);
@@ -342,27 +291,18 @@ public class Level3Renderer implements GLEventListener, GameLoop {
         }
 
         gl.glPopMatrix();
+
         if (isWon) {
             textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
             textRenderer.beginRendering(800, 600);
 
-            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f); // أخضر
+            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
             textRenderer.draw("YOU WIN!", 250, 300);
             textRenderer.draw("yourScore:" + (score), 150, 150);
 
             textRenderer.endRendering();
         }
-        if (!isWon && Tries >= 3) {
-            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
-            textRenderer.beginRendering(800, 600);
 
-            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
-            textRenderer.draw("YOU Lose!", 250, 300);
-
-            textRenderer.endRendering();
-        }
-
-        // play any bounce sounds queued by entityUtils
         entityUtils.allowBounceSounds();
     }
 
@@ -376,8 +316,10 @@ public class Level3Renderer implements GLEventListener, GameLoop {
     }
 
     public void setCurrentPower(double newPower) {
-        if (newPower > MAX_POWER) this.currentPower = MAX_POWER;
-        else this.currentPower = Math.max(newPower, 5);
+        if (newPower > MAX_POWER)
+            this.currentPower = MAX_POWER;
+        else
+            this.currentPower = Math.max(newPower, 5);
     }
 
     public InputManager getInputManager() {
@@ -385,20 +327,16 @@ public class Level3Renderer implements GLEventListener, GameLoop {
     }
 
     private void resetLevel() {
-        // Reset flags
-        if (Tries < 3) {
-            isLaunched = false;
-            isWon = false;
-            isDead = false;
+        isLaunched = false;
+        isWon = false;
+        isDead = false;
 
-            // Reset player position
-            playerCircle.setOrigin(new Point(100, 100));
+        playerCircle.setOrigin(new Point(100, 100));
 
-            velocity = new Vector2(0, 0);
-            entityUtils.updatePlayerVelocity(velocity);
+        velocity = new Vector2(0, 0);
+        entityUtils.updatePlayerVelocity(velocity);
 
-            currentPower = 20.0;
-            angle = 45.0;
-        }
+        currentPower = 20.0;
+        angle = 45.0;
     }
 }

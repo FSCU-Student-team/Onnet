@@ -46,6 +46,8 @@ public class Level7Renderer implements GLEventListener, GameLoop {
     private boolean isWon = false;
     private boolean isDead = false;
 
+    private long timeElapsed;
+
     private Vector2 velocity = new Vector2(0, 0);
 
     // Level 7 specific: Water areas with drag
@@ -247,6 +249,8 @@ public class Level7Renderer implements GLEventListener, GameLoop {
         shapes.clear();
         shapes.add(playerCircle);
         shapes.addAll(entityUtils.getShapes());
+
+        timeElapsed = System.currentTimeMillis();
     }
 
     @Override
@@ -299,17 +303,14 @@ public class Level7Renderer implements GLEventListener, GameLoop {
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
             Tries++;
-            if (Tries < 3)
-                resetLevel();
-            else
-                System.out.println("Die");
+            resetLevel();
         }
     }
 
     private void checkWin() {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
-            score = (-Tries + 3) * 1000;
+            score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
         }
     }
 
@@ -351,15 +352,6 @@ public class Level7Renderer implements GLEventListener, GameLoop {
 
             textRenderer.endRendering();
         }
-        if (!isWon && Tries >= 3) {
-            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
-            textRenderer.beginRendering(800, 600);
-
-            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
-            textRenderer.draw("YOU Lose!", 250, 300);
-
-            textRenderer.endRendering();
-        }
 
 
         gl.glPopMatrix();
@@ -385,15 +377,13 @@ public class Level7Renderer implements GLEventListener, GameLoop {
     }
 
     private void resetLevel() {
-        if (Tries < 3) {
-            isLaunched = false;
-            isWon = false;
-            isDead = false;
-            playerCircle.setOrigin(new Point(100, 100));
-            velocity = new Vector2(0, 0);
-            entityUtils.updatePlayerVelocity(velocity);
-            currentPower = 20.0;
-            angle = 45.0;
-        }
+        isLaunched = false;
+        isWon = false;
+        isDead = false;
+        playerCircle.setOrigin(new Point(100, 100));
+        velocity = new Vector2(0, 0);
+        entityUtils.updatePlayerVelocity(velocity);
+        currentPower = 20.0;
+        angle = 45.0;
     }
 }

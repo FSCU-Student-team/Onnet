@@ -42,6 +42,8 @@ public class Level6Renderer implements GLEventListener, GameLoop {
     private double Tries;
     private double score;
 
+    private long timeElapsed;
+
     private List<Shape> shapes = new ArrayList<>();
 
     private boolean isLaunched = false;
@@ -243,6 +245,7 @@ public class Level6Renderer implements GLEventListener, GameLoop {
         shapes.add(obstacle2);
         shapes.add(ramp);
 
+        timeElapsed = System.currentTimeMillis();
     }
 
     @Override
@@ -317,18 +320,16 @@ public class Level6Renderer implements GLEventListener, GameLoop {
         // placeholder: you can check overlap with red rectangles here and set isDead
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
-            Tries+=1;
-            if (Tries < 3)
-                resetLevel();
-            else
-                System.out.println("Die");
+            Tries += 1;
+            resetLevel();
+
         }
     }
 
     private void checkWin() {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
-            score = (-Tries + 3) * 1000;
+            score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
         }
     }
 
@@ -373,15 +374,6 @@ public class Level6Renderer implements GLEventListener, GameLoop {
 
             textRenderer.endRendering();
         }
-        if (!isWon && Tries >= 3) {
-            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
-            textRenderer.beginRendering(800, 600);
-
-            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
-            textRenderer.draw("YOU Lose!", 250, 300);
-
-            textRenderer.endRendering();
-        }
 
         gl.glPopMatrix();
 
@@ -409,7 +401,6 @@ public class Level6Renderer implements GLEventListener, GameLoop {
 
     private void resetLevel() {
         // Reset flags
-        if (Tries < 3) {
             isLaunched = false;
             isWon = false;
             isDead = false;
@@ -422,6 +413,5 @@ public class Level6Renderer implements GLEventListener, GameLoop {
 
             currentPower = 20.0;
             angle = 45.0;
-        }
     }
 }

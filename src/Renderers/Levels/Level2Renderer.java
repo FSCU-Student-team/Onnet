@@ -27,6 +27,7 @@ public class Level2Renderer implements GLEventListener, GameLoop {
     private EntityUtils entityUtils = new EntityUtils();
     private Circle playerCircle;
     private Rectangle goalRectangle;
+    private long timeElapsed;
 
     // Tunables
     private static final double MAX_POWER = 200.0;      // max "power" the player can set
@@ -46,7 +47,7 @@ public class Level2Renderer implements GLEventListener, GameLoop {
     private boolean isDead = false;
 
     private Vector2 velocity = new Vector2(0, 0);
-    private double Tries ;
+    private double Tries;
     private double score = 0;
     private TextRenderer textRenderer;
 
@@ -109,10 +110,10 @@ public class Level2Renderer implements GLEventListener, GameLoop {
         // goal
         goalRectangle = new Rectangle.Builder()
                 .color(Color.YELLOW)
-                .width(30)
-                .height(30)
+                .width(70)
+                .height(70)
                 .fill(false)
-                .origin(new Point(700, 120))
+                .origin(new Point(700, 300))
                 .build();
 
         // static environment (platforms / walls)
@@ -197,6 +198,8 @@ public class Level2Renderer implements GLEventListener, GameLoop {
         shapes.add(rightWall);
         shapes.add(middleBottomWall);
         shapes.add(middleTopWall);
+
+        timeElapsed = System.currentTimeMillis();
     }
 
     @Override
@@ -249,19 +252,15 @@ public class Level2Renderer implements GLEventListener, GameLoop {
     private void checkDie() {
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
-            Tries += 1;
-            if (Tries < 3)
-                resetLevel();
-            else
-                System.out.println("Die");
+            Tries++;
+            resetLevel();
         }
     }
-
 
     private void checkWin() {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
-            score = (-Tries + 3) * 1000;
+            score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
         }
     }
 
@@ -308,15 +307,6 @@ public class Level2Renderer implements GLEventListener, GameLoop {
 
             textRenderer.endRendering();
         }
-        if (!isWon && Tries >= 3) {
-            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
-            textRenderer.beginRendering(800, 600);
-
-            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
-            textRenderer.draw("YOU Lose!", 250, 300);
-
-            textRenderer.endRendering();
-        }
 
         gl.glPopMatrix();
 
@@ -344,19 +334,17 @@ public class Level2Renderer implements GLEventListener, GameLoop {
 
     private void resetLevel() {
         // Reset flags
-        if (Tries < 3) {
-            isLaunched = false;
-            isWon = false;
-            isDead = false;
+        isLaunched = false;
+        isWon = false;
+        isDead = false;
 
-            // Reset player position
-            playerCircle.setOrigin(new Point(100, 100));
+        // Reset player position
+        playerCircle.setOrigin(new Point(100, 100));
 
-            velocity = new Vector2(0, 0);
-            entityUtils.updatePlayerVelocity(velocity);
+        velocity = new Vector2(0, 0);
+        entityUtils.updatePlayerVelocity(velocity);
 
-            currentPower = 20.0;
-            angle = 45.0;
-        }
+        currentPower = 20.0;
+        angle = 45.0;
     }
 }

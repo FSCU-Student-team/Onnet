@@ -46,8 +46,10 @@ public class Level5Renderer implements GLEventListener, GameLoop {
     private boolean isDead = false;
 
     private Vector2 velocity = new Vector2(0, 0);
-    private double Tries ;
+    private double Tries;
     private double score = 0;
+
+    private long timeElapsed;
     private TextRenderer textRenderer;
 
     public Level5Renderer(InputManager inputManager) {
@@ -246,7 +248,7 @@ public class Level5Renderer implements GLEventListener, GameLoop {
         shapes.add(rightTopWall);
         shapes.add(RightMidCircle);
 
-
+        timeElapsed = System.currentTimeMillis();
     }
 
     @Override
@@ -302,21 +304,17 @@ public class Level5Renderer implements GLEventListener, GameLoop {
     }
 
     private void checkDie() {
-
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
             Tries++;
-            if (Tries < 3)
-                resetLevel();
-            else
-                System.out.println("Die");
+            resetLevel();
         }
     }
 
     private void checkWin() {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
-            score = (-Tries + 3) * 1000;
+            score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
         }
     }
 
@@ -360,15 +358,6 @@ public class Level5Renderer implements GLEventListener, GameLoop {
             textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f); // أخضر
             textRenderer.draw("YOU WIN!", 250, 300);
             textRenderer.draw("yourScore:" + (score), 150, 150);
-
-            textRenderer.endRendering();
-        }
-        if (!isWon && Tries >= 3) {
-            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
-            textRenderer.beginRendering(800, 600);
-
-            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
-            textRenderer.draw("YOU Lose!", 250, 300);
 
             textRenderer.endRendering();
         }
