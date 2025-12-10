@@ -1,3 +1,4 @@
+import Game.GlobalVariables;
 import Game.InputManager;
 import Pages.*;
 import Pages.ContentPanels.Level;
@@ -7,7 +8,6 @@ import Renderers.Levels.*;
 import Renderers.MenuBackground;
 import com.jogamp.opengl.awt.GLJPanel;
 
-import javax.swing.*;
 
 public class Main {
 
@@ -39,7 +39,10 @@ public class Main {
 
         // Panel actions
         mainMenuPanel.setPlayButtonAction(() -> openLevel(0));
-        mainMenuPanel.setLevelsButtonAction(() -> app.setContent(levelSelectPanel));
+        mainMenuPanel.setLevelsButtonAction(() -> {
+            app.setContent(levelSelectPanel);
+            GlobalVariables.playerName = app.askPlayerName();
+        });
 
         levelSelectPanel.setBackButtonAction(() -> app.setContent(mainMenuPanel));
         levelSelectPanel.setLevelAction(0, () -> openLevel(0));
@@ -96,4 +99,5 @@ public class Main {
         canvas.addMouseMotionListener(inputManager);
         return canvas;
     }
+
 }

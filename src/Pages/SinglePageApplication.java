@@ -161,4 +161,16 @@ public class SinglePageApplication implements Page {
         canvas.addGLEventListener(renderer);
     }
 
+    /**
+     * Prompt the player for their name. Defaults to "Player" if left empty.
+     */
+    public String askPlayerName() {
+        String name = JOptionPane.showInputDialog(frame, "Enter your name:", "Player Name",
+                JOptionPane.PLAIN_MESSAGE);
+        if (name == null || name.trim().isEmpty()) {
+            name = "Player";
+        }
+        return name;
+    }
+
 }
