@@ -47,6 +47,7 @@ public class Level12Renderer implements GLEventListener, GameLoop {
     private TextRenderer textRenderer;
     private double score;
     private long timeElapsed;
+    private double Tries;
 
     // Factory elements
     private Rectangle conveyorBelt1;
@@ -121,7 +122,7 @@ public class Level12Renderer implements GLEventListener, GameLoop {
 
         // Factory floor and walls
         Rectangle floor = new Rectangle.Builder()
-                .color(new Color(0.4f, 0.4f, 0.4f))
+                .color(Color.RED)
                 .rotation(0)
                 .fill(true)
                 .origin(new Point(0, 0))
@@ -131,7 +132,7 @@ public class Level12Renderer implements GLEventListener, GameLoop {
                 .build();
 
         Rectangle ceiling = new Rectangle.Builder()
-                .color(new Color(0.4f, 0.4f, 0.4f))
+                .color(Color.RED)
                 .rotation(0)
                 .fill(true)
                 .origin(new Point(0, 580))
@@ -141,7 +142,7 @@ public class Level12Renderer implements GLEventListener, GameLoop {
                 .build();
 
         Rectangle leftWall = new Rectangle.Builder()
-                .color(new Color(0.4f, 0.4f, 0.4f))
+                .color(Color.RED)
                 .rotation(0)
                 .fill(true)
                 .origin(new Point(0, 0))
@@ -151,7 +152,7 @@ public class Level12Renderer implements GLEventListener, GameLoop {
                 .build();
 
         Rectangle rightWall = new Rectangle.Builder()
-                .color(new Color(0.4f, 0.4f, 0.4f))
+                .color(Color.RED)
                 .rotation(0)
                 .fill(true)
                 .origin(new Point(780, 0))
@@ -366,9 +367,12 @@ public class Level12Renderer implements GLEventListener, GameLoop {
     }
 
     private void checkDie() {
-        if (playerCircle.getCenter().y() < -50) {
+        // placeholder: you can check overlap with red rectangles here and set isDead
+        if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
+            Tries += 1;
             resetLevel();
+
         }
     }
 
