@@ -1,9 +1,6 @@
 package Renderers.Levels;
 
-import Game.GameLoop;
-import Game.Input;
-import Game.InputManager;
-import Game.LoopState;
+import Game.*;
 import Physics.ActionManager;
 import Renderers.EntityUtils;
 import Shapes.*;
@@ -29,9 +26,9 @@ public class Level11Renderer implements GLEventListener, GameLoop {
     private Rectangle goalRectangle;
 
     // Tunables
-    private static final double MAX_POWER = 250.0;
-    private static final double POWER_INCREMENT = 1.0;
-    private static final double ANGLE_INCREMENT = 0.5;
+    private static final double MAX_POWER = 50.0;
+    private static final double POWER_INCREMENT = 0.6;
+    private static final double ANGLE_INCREMENT = 0.25;
     private static final double POWER_SCALE = 0.05;
 
     private double currentPower = 20.0;
@@ -63,7 +60,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
     private final double ORBIT_SPEED = 0.01; // Speed of rotation
     private final Point CENTER_POINT = new Point(430, 250); // Center of Black Hole
 
-    private final double BLACK_HOLE_GRAVITY_STRENGTH = 100.0;
+    private final double BLACK_HOLE_GRAVITY_STRENGTH = 200.0;
 
     public Level11Renderer(InputManager inputManager) {
         this.inputManager = inputManager;
@@ -265,6 +262,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
             score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
+            LeaderboardHandler.save(11, new LeaderboardEntry(GlobalVariables.playerName, score));
         }
     }
 
