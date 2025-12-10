@@ -27,11 +27,11 @@ public class LevelSelectPanel extends JPanel {
     private void addButtons() {
         // Level buttons
         Dimension btnSize = new Dimension(200, 120);
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 9; i++) {
             JButton btn = new JButton("Level " + (i + 1));
             int row = i % 3;
             int col = i / 3;
-            btn.setBounds(150 + col * 300, 100 + row * 150, btnSize.width, btnSize.height);
+            btn.setBounds(80 + col * 250, 100 + row * 150, btnSize.width, btnSize.height);
             levelBtns.add(btn);
             onLevel.add(null);
             add(btn);
@@ -60,7 +60,7 @@ public class LevelSelectPanel extends JPanel {
 
     // Action setters
     public void setBackButtonAction(Runnable r) { this.onBack = r; }
-    public void setLevelAction(int index, Runnable r) { if (index >= 0 && index < 6) onLevel.set(index, r); }
+    public void setLevelAction(int index, Runnable r) { if (index >= 0 && index < 9) onLevel.set(index, r); }
 
     public GLJPanel getCanvas() { return canvas; }
 }
