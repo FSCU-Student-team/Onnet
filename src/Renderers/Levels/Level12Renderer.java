@@ -380,7 +380,6 @@ public class Level12Renderer implements GLEventListener, GameLoop {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
             score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
-            LeaderboardHandler.save(6, new LeaderboardEntry(GlobalVariables.playerName, score));
         }
     }
 
