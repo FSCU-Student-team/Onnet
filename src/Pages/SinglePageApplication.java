@@ -1,5 +1,9 @@
 package Pages;
 
+import Game.InMenuPopup;
+import Pages.ContentPanels.MainMenuPanel;
+import Pages.ContentPanels.LevelSelectPanel;
+import Pages.ContentPanels.LeaderboardPanel;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.util.FPSAnimator;
@@ -17,6 +21,12 @@ public class SinglePageApplication implements Page {
     private final JPanel contentPanel;   // swap child pages here
     private final JPanel glassPane;      // overlay buttons
     private final JLayeredPane layeredPane;
+    // Reference to panels
+    private MainMenuPanel mainMenuPanel;
+    private LevelSelectPanel levelSelectPanel;
+    private LeaderboardPanel leaderboardPanel;
+    private InMenuPopup globalMenu;
+    private JButton globalMenuBtn;
 
     public SinglePageApplication(GLJPanel sharedCanvas, String title) {
         this.canvas = sharedCanvas;
@@ -50,6 +60,10 @@ public class SinglePageApplication implements Page {
         layeredPane.add(glassPane, Integer.valueOf(2));
 
         frame.setContentPane(layeredPane);
+
+        // global menu
+        addGlobalMenu();
+        makeMenuMouseOnly();
     }
 
     /**
@@ -174,4 +188,90 @@ public class SinglePageApplication implements Page {
         return name;
     }
 
+    private void addGlobalMenu() {
+        // Create global menu button
+        globalMenuBtn = new JButton("Menu");
+        globalMenuBtn.setBounds(694, 30, 100, 50);
+        glassPane.add(globalMenuBtn);
+
+        // Create global menu
+        globalMenu = new InMenuPopup();
+
+        // Set up menu actions
+        setupGlobalMenuActions();
+
+        globalMenuBtn.addActionListener(e -> globalMenu.toggleMenu(glassPane));
+
+        globalMenu.setGameCanvas(canvas); // Pass canvas reference
+    }
+
+    private void setupGlobalMenuActions() {
+        globalMenu.setOnMainMenu(() -> {
+            // Return to main menu
+            if (mainMenuPanel != null) {
+                setContent(mainMenuPanel);
+                globalMenu.hideMenu();
+            }
+        });
+
+        globalMenu.setOnLevels(() -> {
+            // Go to level selection
+            if (levelSelectPanel != null) {
+                setContent(levelSelectPanel);
+                globalMenu.hideMenu();
+            }
+        });
+
+        globalMenu.setOnLeaderboard(() -> {
+            // Go to leaderboard
+            if (leaderboardPanel != null) {
+                setContent(leaderboardPanel);
+                globalMenu.hideMenu();
+            }
+        });
+
+        globalMenu.setOnExit(() -> {
+            int choice = JOptionPane.showConfirmDialog(
+                    frame,
+                    "Exit to desktop?",
+                    "Exit Game",
+                    JOptionPane.YES_NO_OPTION
+            );
+            if (choice == JOptionPane.YES_OPTION) {
+                System.exit(0);
+            }
+        });
+
+        // Resume just hides menu
+        globalMenu.setOnResume(() -> globalMenu.hideMenu());
+    }
+
+    private void hideMenu() {
+        if (globalMenu != null && globalMenu.isMenuVisible()) {
+            globalMenu.hideMenu();
+        }
+    }
+
+    public void setPanels(MainMenuPanel mainMenu, LevelSelectPanel levelSelect, LeaderboardPanel leaderboard) {
+        this.mainMenuPanel = mainMenu;
+        this.levelSelectPanel = levelSelect;
+        this.leaderboardPanel = leaderboard;
+    }
+    private void makeMenuMouseOnly() {
+        // Disable focus for all menu-related components
+        if (globalMenuBtn != null) {
+            globalMenuBtn.setFocusable(false);
+            globalMenuBtn.setRequestFocusEnabled(false);
+        }
+
+        if (glassPane != null) {
+            glassPane.setFocusable(false);
+        }
+
+        // Ensure canvas stays focusable for game controls
+        if (canvas != null) {
+            canvas.setFocusable(true);
+            canvas.requestFocusInWindow();
+        }
+    }
 }
