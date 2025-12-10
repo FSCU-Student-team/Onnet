@@ -302,53 +302,14 @@ public class Level5Renderer implements GLEventListener, GameLoop {
     }
 
     private void checkDie() {
-        for (Shape shape : shapes) {
 
-            // 1. تجاهل اللاعب نفسه
-            if (shape == playerCircle) {
-                continue;
-            }
-
-            // 2. فحص الأجسام الحمراء فقط
-            if (shape.getColor().toString().equals(Color.RED.toString())) {
-
-                // --- بداية الكود الجديد ---
-
-                // إحداثيات ونصف قطر اللاعب
-                double pX = playerCircle.getCenter().x();
-                double pY = playerCircle.getCenter().y();
-                double pRadius = playerCircle.getWidth() / 2.0;
-
-                // إحداثيات وأبعاد الجسم الأحمر (الحائط/الأرضية)
-                double sX = shape.getCenter().x();
-                double sY = shape.getCenter().y();
-                double sHalfWidth = shape.getWidth() / 2.0;
-                double sHalfHeight = shape.getHeight() / 2.0;
-
-                // حساب حدود المستطيل
-                double left = sX - sHalfWidth;
-                double right = sX + sHalfWidth;
-                double bottom = sY - sHalfHeight;
-                double top = sY + sHalfHeight;
-
-                // أهم خطوة: إيجاد أقرب نقطة من المستطيل لمركز اللاعب (Clamping)
-                // هذه الدالة تجبر إحداثيات اللاعب أن تكون داخل حدود المستطيل
-                double closestX = Math.max(left, Math.min(pX, right));
-                double closestY = Math.max(bottom, Math.min(pY, top));
-
-                // حساب المسافة بين مركز اللاعب وهذه النقطة القريبة
-                double dx = pX - closestX;
-                double dy = pY - closestY;
-
-                // إذا كانت المسافة أقل من نصف قطر اللاعب، فهذا يعني تلامس حقيقي
-                if ((dx * dx + dy * dy) < (pRadius * pRadius)) {
-                    isDead = true;
-                    Tries += 1;
-                    if (Tries < 3)
-                        resetLevel();
-                    return;
-                }
-            }
+        if (entityUtils.checkPlayerDying(playerCircle)) {
+            isDead = true;
+            Tries += 1;
+            if (Tries < 3)
+                resetLevel();
+            else
+                System.out.println("Die");
         }
     }
 
