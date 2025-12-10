@@ -362,7 +362,7 @@ public class Level4Renderer implements GLEventListener, GameLoop {
         isWon = false;
         isDead = false;
 
-        playerCircle.setOrigin(new Point(100, 100));
+        playerCircle.setOrigin(new Point(320, 35));
         velocity = new Vector2(0, 0);
         entityUtils.updatePlayerVelocity(velocity);
 
