@@ -333,7 +333,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
         isLaunched = false;
         isWon = false;
         isDead = false;
-        playerCircle.setOrigin(new Point(80, 80));
+        playerCircle.setOrigin(new Point(100, 150));
         velocity = new Vector2(0, 0);
         entityUtils.updatePlayerVelocity(velocity);
         currentPower = 20.0;
