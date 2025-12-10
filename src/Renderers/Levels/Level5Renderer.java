@@ -343,8 +343,9 @@ public class Level5Renderer implements GLEventListener, GameLoop {
                 // إذا كانت المسافة أقل من نصف قطر اللاعب، فهذا يعني تلامس حقيقي
                 if ((dx * dx + dy * dy) < (pRadius * pRadius)) {
                     isDead = true;
-                    Tries -= 1;
-                    resetLevel();
+                    Tries += 1;
+                    if (Tries < 3)
+                        resetLevel();
                     return;
                 }
             }
@@ -352,13 +353,9 @@ public class Level5Renderer implements GLEventListener, GameLoop {
     }
 
     private void checkWin() {
-        double dx = playerCircle.getCenter().x() - goalRectangle.getCenter().x();
-        double dy = playerCircle.getCenter().y() - goalRectangle.getCenter().y();
-        double dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist <= Math.max(goalRectangle.getWidth()/2,goalRectangle.getHeight()/2)) {
+        if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
             score = Tries * 1000;
-            System.out.println(score);
         }
     }
 
@@ -401,11 +398,11 @@ public class Level5Renderer implements GLEventListener, GameLoop {
 
             textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f); // أخضر
             textRenderer.draw("YOU WIN!", 250, 300);
-            textRenderer.draw("yourScore:"+(score),150,150);
+            textRenderer.draw("yourScore:" + (score), 150, 150);
 
             textRenderer.endRendering();
         }
-        if (!isWon && Tries <= 0) {
+        if (!isWon && Tries >= 3) {
             textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
             textRenderer.beginRendering(800, 600);
 

@@ -46,8 +46,8 @@ public class Level2Renderer implements GLEventListener, GameLoop {
     private boolean isDead = false;
 
     private Vector2 velocity = new Vector2(0, 0);
-    private double Tries=3;
-    private double score=0;
+    private double Tries = 3;
+    private double score = 0;
     private TextRenderer textRenderer;
 
     public Level2Renderer(InputManager inputManager) {
@@ -247,156 +247,114 @@ public class Level2Renderer implements GLEventListener, GameLoop {
     }
 
     private void checkDie() {
-        for (Shape shape : shapes) {
-
-            // 1. تجاهل اللاعب نفسه
-            if (shape == playerCircle) {
-                continue;
-            }
-
-            // 2. فحص الأجسام الحمراء فقط
-            if (shape.getColor().toString().equals(Color.RED.toString())) {
-
-                // --- بداية الكود الجديد ---
-
-                // إحداثيات ونصف قطر اللاعب
-                double pX = playerCircle.getCenter().x();
-                double pY = playerCircle.getCenter().y();
-                double pRadius = playerCircle.getWidth() / 2.0;
-
-                // إحداثيات وأبعاد الجسم الأحمر (الحائط/الأرضية)
-                double sX = shape.getCenter().x();
-                double sY = shape.getCenter().y();
-                double sHalfWidth = shape.getWidth() / 2.0;
-                double sHalfHeight = shape.getHeight() / 2.0;
-
-                // حساب حدود المستطيل
-                double left = sX - sHalfWidth;
-                double right = sX + sHalfWidth;
-                double bottom = sY - sHalfHeight;
-                double top = sY + sHalfHeight;
-
-                // أهم خطوة: إيجاد أقرب نقطة من المستطيل لمركز اللاعب (Clamping)
-                // هذه الدالة تجبر إحداثيات اللاعب أن تكون داخل حدود المستطيل
-                double closestX = Math.max(left, Math.min(pX, right));
-                double closestY = Math.max(bottom, Math.min(pY, top));
-
-                // حساب المسافة بين مركز اللاعب وهذه النقطة القريبة
-                double dx = pX - closestX;
-                double dy = pY - closestY;
-
-                // إذا كانت المسافة أقل من نصف قطر اللاعب، فهذا يعني تلامس حقيقي
-                if ((dx * dx + dy * dy) < (pRadius * pRadius)) {
-                    isDead = true;
-                    Tries-=1;
-                    resetLevel();
-                    return;
-                }
-            }
+        if (entityUtils.checkPlayerDying(playerCircle)) {
+            isDead = true;
+            Tries += 1;
+            if (Tries < 3)
+                resetLevel();
+            else
+                System.out.println("Die");
         }
     }
 
-    private void checkWin() {
-        double dx = playerCircle.getCenter().x() - goalRectangle.getCenter().x();
-        double dy = playerCircle.getCenter().y() - goalRectangle.getCenter().y();
-        double dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist <= Math.max(goalRectangle.getWidth()/2,goalRectangle.getHeight()/2)) {
-            isWon = true;
-            score=Tries*1000;
-            System.out.println(score);
-        }
+
+private void checkWin() {
+    if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
+        isWon = true;
+        score = Tries * 1000;
+    }
+}
+
+@Override
+public void renderUpdate(GL2 gl) {
+    gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
+    gl.glPushMatrix();
+
+    // Draw all shapes
+    for (Shape shape : shapes) {
+        shape.draw(gl);
     }
 
-    @Override
-    public void renderUpdate(GL2 gl) {
-        gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
-        gl.glPushMatrix();
+    // Aim line (visible only before launch). Length scales with currentPower.
+    if (!isLaunched) {
+        gl.glBegin(GL2.GL_LINES);
+        // use white (or whatever color your shapes use)
+        if ((currentPower / MAX_POWER) * 100 <= 30)//green
+            gl.glColor3f(0f, 1f, 0f);
+        else if ((currentPower / MAX_POWER) * 100 <= 70)//Yellow
+            gl.glColor3f(1f, 1f, 0f);
+        else if ((currentPower / MAX_POWER) * 100 >= 70)//red
+            gl.glColor3f(1f, 0f, 0f);
 
-        // Draw all shapes
-        for (Shape shape : shapes) {
-            shape.draw(gl);
-        }
+        double len = Math.max(10, currentPower * 0.4); // visual length; tweak multiplier if desired
+        double radius = playerCircle.getWidth() / 2.0;
+        double rad = Math.toRadians(angle);
+        double x1 = playerCircle.getCenter().x() + radius * Math.cos(rad);
+        double y1 = playerCircle.getCenter().y() + radius * Math.sin(rad);
+        double x2 = x1 + len * Math.cos(rad);
+        double y2 = y1 + len * Math.sin(rad);
 
-        // Aim line (visible only before launch). Length scales with currentPower.
-        if (!isLaunched) {
-            gl.glBegin(GL2.GL_LINES);
-            // use white (or whatever color your shapes use)
-            if ((currentPower / MAX_POWER) * 100 <= 30)//green
-                gl.glColor3f(0f, 1f, 0f);
-            else if ((currentPower / MAX_POWER) * 100 <= 70)//Yellow
-                gl.glColor3f(1f, 1f, 0f);
-            else if ((currentPower / MAX_POWER) * 100 >= 70)//red
-                gl.glColor3f(1f, 0f, 0f);
+        gl.glVertex2d(x1, y1);
+        gl.glVertex2d(x2, y2);
+        gl.glEnd();
+    }
+    if (isWon) {
+        textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
+        textRenderer.beginRendering(800, 600);
 
-            double len = Math.max(10, currentPower * 0.4); // visual length; tweak multiplier if desired
-            double radius = playerCircle.getWidth() / 2.0;
-            double rad = Math.toRadians(angle);
-            double x1 = playerCircle.getCenter().x() + radius * Math.cos(rad);
-            double y1 = playerCircle.getCenter().y() + radius * Math.sin(rad);
-            double x2 = x1 + len * Math.cos(rad);
-            double y2 = y1 + len * Math.sin(rad);
+        textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f); // أخضر
+        textRenderer.draw("YOU WIN!", 250, 300);
+        textRenderer.draw("yourScore:" + (score), 150, 150);
 
-            gl.glVertex2d(x1, y1);
-            gl.glVertex2d(x2, y2);
-            gl.glEnd();
-        }
-        if (isWon){
-            textRenderer=new TextRenderer(new Font("Monospaced",Font.BOLD,60));
-            textRenderer.beginRendering(800,600);
+        textRenderer.endRendering();
+    }
+    if (!isWon && Tries >= 3) {
+        textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
+        textRenderer.beginRendering(800, 600);
 
-            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f); // أخضر
-            textRenderer.draw("YOU WIN!", 250, 300);
-            textRenderer.draw("yourScore:"+(score),150,150);
+        textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
+        textRenderer.draw("YOU Lose!", 250, 300);
 
-            textRenderer.endRendering();
-        }
-        if (!isWon&&Tries<=0){
-            textRenderer=new TextRenderer(new Font("Monospaced",Font.BOLD,60));
-            textRenderer.beginRendering(800,600);
-
-            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
-            textRenderer.draw("YOU Lose!", 250, 300);
-
-            textRenderer.endRendering();
-        }
-
-        gl.glPopMatrix();
-
-        // play any bounce sounds queued by entityUtils
-        entityUtils.allowBounceSounds();
+        textRenderer.endRendering();
     }
 
-    @Override
-    public void inputUpdate() {
-        actionManager.update();
-    }
+    gl.glPopMatrix();
 
-    public double getCurrentPower() {
-        return currentPower;
-    }
+    // play any bounce sounds queued by entityUtils
+    entityUtils.allowBounceSounds();
+}
 
-    public void setCurrentPower(double newPower) {
-        if (newPower > MAX_POWER) this.currentPower = MAX_POWER;
-        else this.currentPower = Math.max(newPower, 5);
-    }
+@Override
+public void inputUpdate() {
+    actionManager.update();
+}
 
-    public InputManager getInputManager() {
-        return inputManager;
-    }
+public double getCurrentPower() {
+    return currentPower;
+}
 
-    private void resetLevel() {
-        // Reset flags
-        isLaunched = false;
-        isWon = false;
-        isDead = false;
+public void setCurrentPower(double newPower) {
+    if (newPower > MAX_POWER) this.currentPower = MAX_POWER;
+    else this.currentPower = Math.max(newPower, 5);
+}
 
-        // Reset player position
-        playerCircle.setOrigin(new Point(100, 100));
+public InputManager getInputManager() {
+    return inputManager;
+}
 
-        velocity = new Vector2(0, 0);
-        entityUtils.updatePlayerVelocity(velocity);
+private void resetLevel() {
+    // Reset flags
+    isLaunched = false;
+    isWon = false;
+    isDead = false;
 
-        currentPower = 50.0;
-        angle = 45.0;
-    }
+    // Reset player position
+    playerCircle.setOrigin(new Point(100, 100));
+
+    velocity = new Vector2(0, 0);
+    entityUtils.updatePlayerVelocity(velocity);
+
+    currentPower = 50.0;
+    angle = 45.0;
+}
 }
