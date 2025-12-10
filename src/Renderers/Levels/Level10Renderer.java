@@ -17,14 +17,14 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Level1Renderer implements GLEventListener, GameLoop {
+public class Level10Renderer implements GLEventListener, GameLoop {
     private InputManager inputManager;
     private ActionManager actionManager;
     private LoopState loopState;
     private EntityUtils entityUtils = new EntityUtils();
     private Circle playerCircle;
     private Rectangle goalRectangle;
-
+    private Rectangle middleTopWall;
     // Tunables
     private static final double MAX_POWER = 200.0;      // max "power" the player can set
     private static final double POWER_INCREMENT = 0.6;  // amount W/S changes power
@@ -43,13 +43,14 @@ public class Level1Renderer implements GLEventListener, GameLoop {
     private boolean isDead = false;
 
     private Vector2 velocity = new Vector2(0, 0);
-    private double score;
     private double Tries;
+    private Rectangle MiddleTopWall2;
+    private double score = 0;
+
+    private long timeElapsed;
     private TextRenderer textRenderer;
 
-    long timeElapsed;
-
-    public Level1Renderer(InputManager inputManager) {
+    public Level10Renderer(InputManager inputManager) {
         this.inputManager = inputManager;
     }
 
@@ -69,19 +70,15 @@ public class Level1Renderer implements GLEventListener, GameLoop {
         // --- INPUT BINDINGS (small increments, only when not launched) ---
         actionManager.bind(Input.A, () -> {
             if (!isLaunched) angle = (angle + ANGLE_INCREMENT) % 360;
-            System.out.println(angle);
         });
         actionManager.bind(Input.D, () -> {
             if (!isLaunched) angle = (angle - ANGLE_INCREMENT + 360) % 360;
-            System.out.println(angle);
         });
         actionManager.bind(Input.W, () -> {
             if (!isLaunched) setCurrentPower(currentPower + POWER_INCREMENT);
-            System.out.println(currentPower);
         });
         actionManager.bind(Input.S, () -> {
             if (!isLaunched) setCurrentPower(currentPower - POWER_INCREMENT);
-            System.out.println(currentPower);
         });
 
         actionManager.bind(Input.R, this::resetLevel);
@@ -105,17 +102,35 @@ public class Level1Renderer implements GLEventListener, GameLoop {
                 .color(Color.WHITE)
                 .radius(15)
                 .angle(0)
-                .center(new Point(100, 100)) // start pos
+                .center(new Point(100, 340)) // start pos
                 .filled(true)
                 .build();
 
         // goal
         goalRectangle = new Rectangle.Builder()
                 .color(Color.YELLOW)
-                .width(30)
+                .width(120)
                 .height(30)
                 .fill(false)
-                .origin(new Point(700, 120))
+                .origin(new Point(550, 70))
+                .build();
+        middleTopWall = new Rectangle.Builder()
+                .color(Color.BLUE)
+                .rotation(0)
+                .fill(true)
+                .origin(new Point(505, 340))
+                .restitution(0)
+                .width(20)
+                .height(190)
+                .build();
+        MiddleTopWall2 = new Rectangle.Builder()
+                .color(Color.BLUE)
+                .rotation(0)
+                .fill(true)
+                .origin(new Point(365, 340))
+                .restitution(0)
+                .width(20)
+                .height(100)
                 .build();
 
         // static environment (platforms / walls)
@@ -125,7 +140,7 @@ public class Level1Renderer implements GLEventListener, GameLoop {
                 .fill(true)
                 .origin(new Point(0, 0))
                 .restitution(0.0)
-                .width(1000)
+                .width(500)
                 .height(10)
                 .build();
 
@@ -133,9 +148,9 @@ public class Level1Renderer implements GLEventListener, GameLoop {
                 .color(Color.RED)
                 .rotation(0)
                 .fill(true)
-                .origin(new Point(0, 600))
+                .origin(new Point(0, 590))
                 .restitution(0.0)
-                .width(1000)
+                .width(700)
                 .height(10)
                 .build();
 
@@ -149,37 +164,92 @@ public class Level1Renderer implements GLEventListener, GameLoop {
                 .height(1000)
                 .build();
 
-        Rectangle rightWall = new Rectangle.Builder()
-                .color(Color.RED)
-                .rotation(0)
-                .fill(true)
-                .origin(new Point(790, 0))
-                .restitution(0.0)
-                .width(10)
-                .height(1000)
-                .build();
 
-        Rectangle middleWall = new Rectangle.Builder()
+        Rectangle middleBottomWall = new Rectangle.Builder()
                 .color(Color.BLUE)
                 .rotation(0)
                 .fill(true)
-                .origin(new Point(390, 0))
+                .origin(new Point(490, 20))
                 .restitution(0.5)
                 .width(50)
-                .height(150)
+                .height(300)
                 .build();
+        Rectangle middleBottomWall2 = new Rectangle.Builder()
+                .color(Color.BLUE)
+                .rotation(0)
+                .fill(true)
+                .origin(new Point(350, 20))
+                .restitution(0.5)
+                .width(50)
+                .height(300)
+                .build();
+        Rectangle rightBottomWall = new Rectangle.Builder()
+                .color(Color.BLUE)
+                .rotation(0)
+                .fill(true)
+                .origin(new Point(700, 20))
+                .restitution(0.5)
+                .width(50)
+                .height(300)
+                .build();
+        Rectangle BottomWall = new Rectangle.Builder()
+                .color(Color.BLUE)
+                .rotation(0)
+                .fill(true)
+                .origin(new Point(490, 20))
+                .restitution(0.5)
+                .width(260)
+                .height(30)
+                .build();
+        Rectangle middleTopWall2 = new Rectangle.Builder()
+                .color(Color.RED)
+                .rotation(0)
+                .fill(true)
+                .origin(new Point(490, 550))
+                .restitution(0)
+                .width(50)
+                .height(50)
+                .build();
+        Rectangle rightTopWall = new Rectangle.Builder()
+                .color(Color.RED)
+                .rotation(0)
+                .fill(true)
+                .origin(new Point(700, 525))
+                .restitution(0)
+                .width(50)
+                .height(75)
+                .build();
+        Circle RightMidCircle = new Circle.Builder()
+                .color(Color.GREEN)
+                .filled(true)
+                .center(new Point(725, 425))
+                .restitution(1)
+                .radius(100)
+                .angle(0)
+                .build();
+
 
         // IMPORTANT: don't add playerCircle to entityUtils shapes list (avoid self-collision)
         entityUtils.addShape(goalRectangle);
         entityUtils.addShape(floor);
         entityUtils.addShape(ceiling);
         entityUtils.addShape(leftWall);
-        entityUtils.addShape(rightWall);
-        entityUtils.addShape(middleWall);
+
+        entityUtils.addShape(middleBottomWall);
+        entityUtils.addShape(middleTopWall);
+        entityUtils.addShape(rightBottomWall);
+        entityUtils.addShape(BottomWall);
+        entityUtils.addShape(middleTopWall2);
+        entityUtils.addShape(rightTopWall);
+        entityUtils.addShape(RightMidCircle);
+
 
         // set up entity utils with starting velocity and gravity
         entityUtils.updatePlayerVelocity(velocity);
         entityUtils.updateGravity(gravity);
+        entityUtils.addShape(middleBottomWall2);
+        entityUtils.addShape(MiddleTopWall2);
+
 
         shapes.clear();
         shapes.add(playerCircle);
@@ -187,8 +257,15 @@ public class Level1Renderer implements GLEventListener, GameLoop {
         shapes.add(floor);
         shapes.add(ceiling);
         shapes.add(leftWall);
-        shapes.add(rightWall);
-        shapes.add(middleWall);
+        shapes.add(middleBottomWall);
+        shapes.add(middleTopWall);
+        shapes.add(rightBottomWall);
+        shapes.add(BottomWall);
+        shapes.add(middleTopWall2);
+        shapes.add(rightTopWall);
+        shapes.add(RightMidCircle);
+        shapes.add(middleBottomWall2);
+        shapes.add(MiddleTopWall2);
 
         timeElapsed = System.currentTimeMillis();
     }
@@ -218,6 +295,9 @@ public class Level1Renderer implements GLEventListener, GameLoop {
     @Override
     public void physicsUpdate() {
         inputUpdate();
+        middleTopWall.rotate(30 / 360.0);
+        MiddleTopWall2.rotate(350 / 360.0);
+
 
         if (isLaunched && !isWon && !isDead) {
             // inform entity utils of the current velocity
@@ -235,8 +315,11 @@ public class Level1Renderer implements GLEventListener, GameLoop {
             // apply gravity for next frame
             velocity = velocity.add(gravity);
 
-            checkDie();
+
             checkWin();
+            checkDie();
+
+
         }
     }
 
@@ -252,15 +335,13 @@ public class Level1Renderer implements GLEventListener, GameLoop {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
             score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
-            LeaderboardHandler.save(1, new LeaderboardEntry(GlobalVariables.playerName, score));
+            LeaderboardHandler.save(10, new LeaderboardEntry(GlobalVariables.playerName, score));
         }
     }
 
     @Override
     public void renderUpdate(GL2 gl) {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
-        gl.glPushMatrix();
-
         // Draw all shapes
         for (Shape shape : shapes) {
             shape.draw(gl);
@@ -296,8 +377,8 @@ public class Level1Renderer implements GLEventListener, GameLoop {
             textRenderer.beginRendering(800, 600);
 
             textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f); // أخضر
-            textRenderer.draw("YOU WON!\n", 250, 300);
-            textRenderer.draw("yourScore: " + (score), 150, 150);
+            textRenderer.draw("YOU WIN!", 250, 300);
+            textRenderer.draw("yourScore:" + (score), 150, 150);
 
             textRenderer.endRendering();
         }
@@ -331,7 +412,7 @@ public class Level1Renderer implements GLEventListener, GameLoop {
         isDead = false;
 
         // Reset player position
-        playerCircle.setOrigin(new Point(100, 100));
+        playerCircle.setOrigin(new Point(100, 340));
 
         velocity = new Vector2(0, 0);
         entityUtils.updatePlayerVelocity(velocity);
@@ -339,5 +420,5 @@ public class Level1Renderer implements GLEventListener, GameLoop {
         currentPower = 20.0;
         angle = 45.0;
     }
-
 }
+

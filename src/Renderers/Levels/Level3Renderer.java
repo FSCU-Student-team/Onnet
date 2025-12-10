@@ -27,8 +27,8 @@ public class Level3Renderer implements GLEventListener, GameLoop {
 
     // Tunables
     private static final double MAX_POWER = 200.0;
-    private static final double POWER_INCREMENT = 1.0;
-    private static final double ANGLE_INCREMENT = 0.5;
+    private static final double POWER_INCREMENT = 0.6;
+    private static final double ANGLE_INCREMENT = 0.25;
     private static final double POWER_SCALE = 0.05;
 
     private double currentPower = 20.0;
@@ -87,9 +87,6 @@ public class Level3Renderer implements GLEventListener, GameLoop {
                 double speed = currentPower * POWER_SCALE;
                 velocity = new Vector2(speed * Math.cos(rad), speed * Math.sin(rad));
                 entityUtils.updatePlayerVelocity(velocity);
-
-                // start timer on launch
-                timeElapsed = System.currentTimeMillis();
             }
         });
 
@@ -206,7 +203,6 @@ public class Level3Renderer implements GLEventListener, GameLoop {
         shapes.add(ramp1);
         shapes.add(ramp2);
 
-        // NEW — timer start on level load
         timeElapsed = System.currentTimeMillis();
     }
 
