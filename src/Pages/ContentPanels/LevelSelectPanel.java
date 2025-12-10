@@ -1,5 +1,6 @@
 package Pages.ContentPanels;
 
+import Game.GreyOverlayPanel;
 import com.jogamp.opengl.awt.GLJPanel;
 
 import javax.swing.*;
@@ -11,10 +12,10 @@ import java.util.ArrayList;
 public class LevelSelectPanel extends JPanel {
 
     private final GLJPanel canvas;
-    private JButton backBtn;
     private final ArrayList<JButton> levelBtns = new ArrayList<>();
     private final ArrayList<Runnable> onLevel = new ArrayList<>();
     private Runnable onBack;
+    private GreyOverlayPanel overlayPanel;
 
     public LevelSelectPanel(GLJPanel sharedCanvas) {
         this.canvas = sharedCanvas;
@@ -23,6 +24,10 @@ public class LevelSelectPanel extends JPanel {
 
         addButtons();
         addListeners();
+
+        overlayPanel = GreyOverlayPanel.createMenuOverlay();
+        overlayPanel.setBounds(0, 0, 800, 600);
+        add(overlayPanel);
     }
 
     private void addButtons() {
@@ -89,22 +94,6 @@ public class LevelSelectPanel extends JPanel {
             onLevel.add(null);
             add(btn);
         }
-
-        // Back button
-        backBtn = new JButton("Back");
-        backBtn.setBounds(670, 10, 100, 50);
-        backBtn.setBackground(new Color(200, 50, 50));
-        backBtn.setForeground(Color.WHITE);
-        backBtn.setFont(new Font("Arial", Font.BOLD, 16));
-        backBtn.setFocusPainted(false);
-        backBtn.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
-        backBtn.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) { backBtn.setBackground(backBtn.getBackground().brighter()); }
-            @Override
-            public void mouseExited(MouseEvent e) { backBtn.setBackground(new Color(200, 50, 50)); }
-        });
-        add(backBtn);
     }
 
     private Color blendColors(Color c1, Color c2, float t) {
@@ -115,7 +104,6 @@ public class LevelSelectPanel extends JPanel {
     }
 
     private void addListeners() {
-        backBtn.addActionListener(e -> { if (onBack != null) onBack.run(); });
 
         for (int i = 0; i < levelBtns.size(); i++) {
             final int idx = i;
@@ -130,12 +118,17 @@ public class LevelSelectPanel extends JPanel {
         if (canvas != null) canvas.display();
     }
 
-    public void setBackButtonAction(Runnable r) { this.onBack = r; }
+    public void setBackButtonAction(Runnable r) {
+        this.onBack = r;
+    }
+
     public void setLevelAction(int index, Runnable r) {
         if (index >= 0 && index < levelBtns.size()) {
             onLevel.set(index, r);
         }
     }
 
-    public GLJPanel getCanvas() { return canvas; }
+    public GLJPanel getCanvas() {
+        return canvas;
+    }
 }
