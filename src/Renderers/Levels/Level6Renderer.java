@@ -315,10 +315,10 @@ public class Level6Renderer implements GLEventListener, GameLoop {
 
     private void checkDie() {
         // placeholder: you can check overlap with red rectangles here and set isDead
-        if (entityUtils.checkPlayerDying(playerCircle)){
-            isDead=true;
+        if (entityUtils.checkPlayerDying(playerCircle)) {
+            isDead = true;
             Tries++;
-            if (Tries<3)
+            if (Tries < 3)
                 resetLevel();
             else
                 System.out.println("Die");
@@ -326,11 +326,9 @@ public class Level6Renderer implements GLEventListener, GameLoop {
     }
 
     private void checkWin() {
-        double dx = playerCircle.getCenter().x() - goalRectangle.getCenter().x();
-        double dy = playerCircle.getCenter().y() - goalRectangle.getCenter().y();
-        double dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 30) {
+        if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
+            score = Tries * 1000;
         }
     }
 
@@ -411,7 +409,7 @@ public class Level6Renderer implements GLEventListener, GameLoop {
 
     private void resetLevel() {
         // Reset flags
-        if (Tries<3) {
+        if (Tries < 3) {
             isLaunched = false;
             isWon = false;
             isDead = false;
