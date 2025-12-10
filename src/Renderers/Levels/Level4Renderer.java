@@ -46,14 +46,14 @@ public class Level4Renderer implements GLEventListener, GameLoop {
     private boolean isDead = false;
 
     private Vector2 velocity = new Vector2(0, 0);
-    private double Tries ;
-    private double score = 0;
+    private double score;
     private TextRenderer textRenderer;
+
+    long timeElapsed;
 
     public Level4Renderer(InputManager inputManager) {
         this.inputManager = inputManager;
     }
-
 
     @Override
     public void init(GLAutoDrawable glAutoDrawable) {
@@ -96,7 +96,7 @@ public class Level4Renderer implements GLEventListener, GameLoop {
         });
 
         actionManager.bind(Input.Escape, this::togglePause);
-
+        timeElapsed = System.currentTimeMillis();
         // shapes
         // player: start near bottom-left
         playerCircle = new Circle.Builder()
@@ -278,18 +278,14 @@ public class Level4Renderer implements GLEventListener, GameLoop {
     private void checkDie() {
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
-            Tries += 1;
-            if (Tries<3)
-             resetLevel();
-            else
-                System.out.println("Die");
+            resetLevel();
         }
     }
 
     private void checkWin() {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
-            score = (-Tries + 3) * 1000;
+            score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
         }
     }
 
@@ -338,15 +334,6 @@ public class Level4Renderer implements GLEventListener, GameLoop {
 
             textRenderer.endRendering();
         }
-        if (!isWon && Tries >= 3) {
-            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
-            textRenderer.beginRendering(800, 600);
-
-            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
-            textRenderer.draw("YOU Lose!", 250, 300);
-
-            textRenderer.endRendering();
-        }
 
         // play any bounce sounds queued by entityUtils
         entityUtils.allowBounceSounds();
@@ -371,18 +358,16 @@ public class Level4Renderer implements GLEventListener, GameLoop {
     }
 
     private void resetLevel() {
-        // Reset flags
         isLaunched = false;
         isWon = false;
         isDead = false;
 
-        // Reset player position
-        playerCircle.setOrigin(new Point(320, 35));
-
+        playerCircle.setOrigin(new Point(100, 100));
         velocity = new Vector2(0, 0);
         entityUtils.updatePlayerVelocity(velocity);
 
         currentPower = 20.0;
         angle = 45.0;
+        // do NOT reset timeElapsed here
     }
 }

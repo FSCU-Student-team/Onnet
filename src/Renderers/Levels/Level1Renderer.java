@@ -50,6 +50,8 @@ public class Level1Renderer implements GLEventListener, GameLoop {
     private double Tries;
     private TextRenderer textRenderer;
 
+    long timeElapsed;
+
     public Level1Renderer(InputManager inputManager) {
         this.inputManager = inputManager;
     }
@@ -190,6 +192,8 @@ public class Level1Renderer implements GLEventListener, GameLoop {
         shapes.add(leftWall);
         shapes.add(rightWall);
         shapes.add(middleWall);
+
+        timeElapsed = System.currentTimeMillis();
     }
 
     @Override
@@ -243,18 +247,14 @@ public class Level1Renderer implements GLEventListener, GameLoop {
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
             Tries++;
-            if (Tries >= 3) {
-                System.out.println("Die");
-            } else {
-                resetLevel();
-            }
+            resetLevel();
         }
     }
 
     private void checkWin() {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
-            score = (-Tries + 3) * 1000;
+            score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
         }
     }
 
@@ -298,17 +298,8 @@ public class Level1Renderer implements GLEventListener, GameLoop {
             textRenderer.beginRendering(800, 600);
 
             textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f); // أخضر
-            textRenderer.draw("YOU WIN!\n", 250, 300);
-            textRenderer.draw("yourScore:" + (score), 150, 150);
-
-            textRenderer.endRendering();
-        }
-        if (!isWon && Tries >= 3) {
-            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
-            textRenderer.beginRendering(800, 600);
-
-            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
-            textRenderer.draw("YOU Lose!", 250, 300);
+            textRenderer.draw("YOU WON!\n", 250, 300);
+            textRenderer.draw("yourScore: " + (score), 150, 150);
 
             textRenderer.endRendering();
         }
@@ -337,20 +328,18 @@ public class Level1Renderer implements GLEventListener, GameLoop {
 
     private void resetLevel() {
         // Reset flags
-        if (Tries<3) {
-            isLaunched = false;
-            isWon = false;
-            isDead = false;
+        isLaunched = false;
+        isWon = false;
+        isDead = false;
 
-            // Reset player position
-            playerCircle.setOrigin(new Point(100, 100));
+        // Reset player position
+        playerCircle.setOrigin(new Point(100, 100));
 
-            velocity = new Vector2(0, 0);
-            entityUtils.updatePlayerVelocity(velocity);
+        velocity = new Vector2(0, 0);
+        entityUtils.updatePlayerVelocity(velocity);
 
-            currentPower = 20.0;
-            angle = 45.0;
-        }
+        currentPower = 20.0;
+        angle = 45.0;
     }
 
 }
