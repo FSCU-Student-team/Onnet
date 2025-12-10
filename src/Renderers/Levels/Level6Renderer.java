@@ -38,7 +38,7 @@ public class Level6Renderer implements GLEventListener, GameLoop {
     private double angle = 45.0;// degrees (0 -> right, 90 -> up)
     private double Tries;
     private double score;
- private Rectangle rotatingObstacle3;
+    private Rectangle rotatingObstacle3;
 
     private long timeElapsed;
 
@@ -173,17 +173,17 @@ public class Level6Renderer implements GLEventListener, GameLoop {
                 .height(20)
                 .build();
 
-     rotatingObstacle3  = new Rectangle.Builder()
-              .color(Color.GREEN)
-              .rotation(60)
-              .fill(true)
-              .origin(new Point(415, 400))
-              .restitution(0.7)
-              .width(20)
-              .height(120)
-              .build();
+        rotatingObstacle3  = new Rectangle.Builder()
+                .color(Color.GREEN)
+                .rotation(60)
+                .fill(true)
+                .origin(new Point(415, 400))
+                .restitution(0.7)
+                .width(20)
+                .height(120)
+                .build();
 
-        
+
         // bouncing obstacle circle
         bouncingCircle = new Circle.Builder()
                 .color(Color.MAGENTA)
@@ -251,6 +251,7 @@ public class Level6Renderer implements GLEventListener, GameLoop {
         shapes.add(rightWall);
         shapes.add(movingPlatform);
         shapes.add(bouncingCircle);
+        shapes.add(rotatingObstacle3);
         shapes.add(obstacle1);
         shapes.add(obstacle2);
         shapes.add(ramp);
@@ -283,7 +284,7 @@ public class Level6Renderer implements GLEventListener, GameLoop {
     @Override
     public void physicsUpdate() {
         inputUpdate();
-         rotatingObstacle3.rotate(60 / 360.0);
+        rotatingObstacle3.rotate(60 / 360.0);
         // platform moves left/right
         movingPlatform.move(new Vector2((platformMovingRight ? platformSpeed : -platformSpeed) * GameLoop.PHYSICS_STEP, 0));
         if (movingPlatform.getCenter().x() > 715) platformMovingRight = false;
@@ -412,17 +413,17 @@ public class Level6Renderer implements GLEventListener, GameLoop {
 
     private void resetLevel() {
         // Reset flags
-            isLaunched = false;
-            isWon = false;
-            isDead = false;
+        isLaunched = false;
+        isWon = false;
+        isDead = false;
 
-            // Reset player position
-            playerCircle.setOrigin(new Point(100, 100));
+        // Reset player position
+        playerCircle.setOrigin(new Point(100, 100));
 
-            velocity = new Vector2(0, 0);
-            entityUtils.updatePlayerVelocity(velocity);
+        velocity = new Vector2(0, 0);
+        entityUtils.updatePlayerVelocity(velocity);
 
-            currentPower = 20.0;
-            angle = 45.0;
+        currentPower = 20.0;
+        angle = 45.0;
     }
 }
