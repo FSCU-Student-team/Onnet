@@ -275,6 +275,7 @@ public class Level9Renderer implements GLEventListener, GameLoop {
             isWon = true;
             score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
             LeaderboardHandler.save(9, new LeaderboardEntry(GlobalVariables.playerName, score));
+            timeElapsed = System.currentTimeMillis();
         }
     }
 
