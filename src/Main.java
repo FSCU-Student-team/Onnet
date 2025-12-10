@@ -1,6 +1,7 @@
 import Game.GlobalVariables;
 import Game.InputManager;
 import Pages.*;
+import Pages.ContentPanels.LeaderboardPanel;
 import Pages.ContentPanels.Level;
 import Pages.ContentPanels.LevelSelectPanel;
 import Pages.ContentPanels.MainMenuPanel;
@@ -20,6 +21,7 @@ public class Main {
     // Panels
     private static MainMenuPanel mainMenuPanel;
     private static LevelSelectPanel levelSelectPanel;
+    private static LeaderboardPanel leaderboardPanel;
     private static Level levelPanel; // single level panel
     private static InputManager inputManager;
 
@@ -36,9 +38,10 @@ public class Main {
         mainMenuPanel = new MainMenuPanel(sharedCanvas);
         levelSelectPanel = new LevelSelectPanel(sharedCanvas);
         levelPanel = new Level(sharedCanvas);
+        leaderboardPanel = new LeaderboardPanel(sharedCanvas);
 
         // Panel actions
-        mainMenuPanel.setPlayButtonAction(() -> openLevel(0));
+        mainMenuPanel.setPlayButtonAction(() -> app.setContent(leaderboardPanel));
         mainMenuPanel.setLevelsButtonAction(() -> {
             app.setContent(levelSelectPanel);
             GlobalVariables.playerName = app.askPlayerName();
@@ -60,6 +63,7 @@ public class Main {
             openLevel(-1);
             app.setContent(levelSelectPanel);
         });
+        leaderboardPanel.setBackAction(() -> app.setContent(mainMenuPanel));
 
 
         // Show initial panel
