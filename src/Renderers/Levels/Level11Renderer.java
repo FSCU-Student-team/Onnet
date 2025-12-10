@@ -126,7 +126,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
 
         // The Black Hole (Gravity Well)
         blackHole = new Circle.Builder()
-                .color(new Color(0.4f, 0.0f, 0.6f)) // Dark Purple
+                .color(Color.RED)
                 .filled(true)
                 .center(CENTER_POINT)
                 .restitution(0.0)
@@ -135,10 +135,10 @@ public class Level11Renderer implements GLEventListener, GameLoop {
                 .build();
 
         // Boundaries
-        Rectangle floor = new Rectangle.Builder().color(Color.RED).fill(true).origin(new Point(0, 0)).width(800).height(10).build();
-        Rectangle ceiling = new Rectangle.Builder().color(Color.RED).fill(true).origin(new Point(0, 590)).width(800).height(10).build();
-        Rectangle leftWall = new Rectangle.Builder().color(Color.RED).fill(true).origin(new Point(0, 0)).width(10).height(600).build();
-        Rectangle rightWall = new Rectangle.Builder().color(Color.RED).fill(true).origin(new Point(790, 0)).width(10).height(600).build();
+        Rectangle floor = new Rectangle.Builder().color(Color.DARK_GRAY).fill(true).origin(new Point(0, 0)).width(800).height(10).build();
+        Rectangle ceiling = new Rectangle.Builder().color(Color.DARK_GRAY).fill(true).origin(new Point(0, 590)).width(800).height(10).build();
+        Rectangle leftWall = new Rectangle.Builder().color(Color.DARK_GRAY).fill(true).origin(new Point(0, 0)).width(10).height(600).build();
+        Rectangle rightWall = new Rectangle.Builder().color(Color.DARK_GRAY).fill(true).origin(new Point(790, 0)).width(10).height(600).build();
 
         // Asteroids (Obstacles) - Initial positions will be updated in physics loop
         asteroid1 = new Circle.Builder().color(Color.DARK_GRAY).filled(true).center(new Point(250, 400)).radius(25).build();
