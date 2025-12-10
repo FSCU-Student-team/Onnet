@@ -1,10 +1,12 @@
 package Pages.ContentPanels;
 
 import Game.SoundHandler;
-import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.awt.GLJPanel;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class MainMenuPanel extends JPanel {
 
@@ -15,17 +17,17 @@ public class MainMenuPanel extends JPanel {
 
     public MainMenuPanel(GLJPanel sharedCanvas) {
         this.canvas = sharedCanvas;
-        setLayout(null);  // manual positioning like before
-        setOpaque(false); // let canvas show through
+        setLayout(null);  // manual positioning
+        setOpaque(false); // canvas shows through
 
         addButtons();
         addListeners();
     }
 
     private void addButtons() {
-        playBtn = new JButton("Play");
-        levelsBtn = new JButton("Levels");
-        muteBtn = new JButton("Mute");
+        playBtn = createButton("Leaderboard", new Color(20, 165, 224));
+        levelsBtn = createButton("Levels", new Color(40, 173, 17));
+        muteBtn = createButton("Mute", new Color(236, 179, 13));
 
         playBtn.setBounds(150, 200, 200, 120);
         levelsBtn.setBounds(450, 200, 200, 120);
@@ -34,6 +36,29 @@ public class MainMenuPanel extends JPanel {
         add(playBtn);
         add(levelsBtn);
         add(muteBtn);
+    }
+
+    private JButton createButton(String text, Color baseColor) {
+        JButton btn = new JButton(text);
+        btn.setFocusPainted(false);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Arial", Font.BOLD, 20));
+        btn.setBackground(baseColor);
+        btn.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+
+        // Hover effect
+        btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(baseColor.brighter());
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(baseColor);
+            }
+        });
+
+        return btn;
     }
 
     private void addListeners() {
