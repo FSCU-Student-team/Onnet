@@ -10,6 +10,8 @@ import Renderers.MenuBackground;
 import com.jogamp.opengl.awt.GLJPanel;
 import Pages.ContentPanels.LoadingPanel;
 
+import java.lang.reflect.Field;
+
 
 public class Main {
 
@@ -28,6 +30,10 @@ public class Main {
     private static InputManager inputManager;
 
     public static void main(String[] args) {
+
+        //exporting steps, please ignore
+
+        exportOS();
 
         inputManager = new InputManager();
         // Create shared GLJPanel
@@ -78,6 +84,8 @@ public class Main {
         app.init();
     }
 
+
+
     /**
      * Open level with loading screen
      */
@@ -125,5 +133,29 @@ public class Main {
         canvas.addMouseListener(inputManager);
         canvas.addMouseMotionListener(inputManager);
         return canvas;
+    }
+
+    private static void exportOS() {
+
+        String os = System.getProperty("os.name").toLowerCase();
+
+        if (os.contains("win")) {
+            System.setProperty("java.library.path", "Libs/Natives/Windows");
+        } else if (os.contains("linux")){
+            System.setProperty("java.library.path", "Libs/Natives/Linux");
+        } else{
+            System.setProperty("java.library.path", "Libs/Natives/Mac");
+        }
+
+        // force JVM to reload the library path
+        try {
+            Field fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
+            fieldSysPath.setAccessible(true);
+            fieldSysPath.set(null, null);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+
     }
 }
