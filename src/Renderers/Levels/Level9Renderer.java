@@ -196,7 +196,6 @@ public class Level9Renderer implements GLEventListener, GameLoop {
                 .build();
 
         // Add to entity utils
-        entityUtils.addShape(playerCircle);
         entityUtils.addShape(goalRectangle);
         entityUtils.addShape(floor);
         entityUtils.addShape(ceiling);
@@ -210,16 +209,9 @@ public class Level9Renderer implements GLEventListener, GameLoop {
         entityUtils.updatePlayerVelocity(velocity);
         entityUtils.updateGravity(gravity);
 
+        shapes.clear();
         shapes.add(playerCircle);
-        shapes.add(goalRectangle);
-        shapes.add(floor);
-        shapes.add(ceiling);
-        shapes.add(leftWall);
-        shapes.add(rightWall);
-        shapes.add(windZoneLeft);
-        shapes.add(windZoneRight);
-        shapes.add(obstacle1);
-        shapes.add(obstacle2);
+        shapes.addAll(entityUtils.getShapes());
     }
 
     @Override

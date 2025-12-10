@@ -227,7 +227,6 @@ public class Level7Renderer implements GLEventListener, GameLoop {
                 .build();
 
         // Add to entity utils
-        entityUtils.clearShapes(); // Good practice to clear first
         entityUtils.addShape(goalRectangle);
         entityUtils.addShape(floor);
         entityUtils.addShape(ceiling);
