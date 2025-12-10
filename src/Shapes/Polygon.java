@@ -26,6 +26,10 @@ public class Polygon implements Shape {
         this.origin = b.origin != null ? b.origin : calculateCenter();
     }
 
+    public Color getColor() {
+        return color;
+    }
+
     private Point calculateCenter() {
         double sumX = 0, sumY = 0;
         for (Point p : points) {

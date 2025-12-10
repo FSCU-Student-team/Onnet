@@ -2,8 +2,7 @@ package Renderers;
 
 import Game.SoundHandler;
 import Physics.Collision.Collider;
-import Shapes.Shape;
-import Shapes.Vector2;
+import Shapes.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,47 +16,47 @@ public class EntityUtils {
 
     private boolean allowSounds;
 
-    public void addShape(Shape shape){
+    public void addShape(Shape shape) {
         shapes.add(shape);
     }
 
-    public void removeShape(Shape shape){
+    public void removeShape(Shape shape) {
         shapes.remove(shape);
     }
 
-    public void clearShapes(){
+    public void clearShapes() {
         shapes.clear();
     }
 
-    public Vector2 getGravity(){
+    public Vector2 getGravity() {
         return gravity;
     }
 
-    public Vector2 getPlayerVelocity(){
+    public Vector2 getPlayerVelocity() {
         return playerVelocity;
     }
 
-    public List<Shape> getShapes(){
+    public List<Shape> getShapes() {
         return shapes;
     }
 
-    public void allowBounceSounds(){
+    public void allowBounceSounds() {
         allowSounds = true;
     }
 
-    public void updateGravity(Vector2 gravity){
+    public void updateGravity(Vector2 gravity) {
         this.gravity = gravity;
     }
 
-    public void updatePlayerVelocity(Vector2 velocity){
+    public void updatePlayerVelocity(Vector2 velocity) {
         playerVelocity = velocity;
     }
 
     //checks collisions between the player and all shapes, returns boolean for whether bounced or not
-    public void checkCollisions(Shape player){
+    public void checkCollisions(Shape player) {
         boolean bounced = false;
-        for (Shape shape : shapes){
-            if (player.getCollider().intersects(shape.getCollider())){
+        for (Shape shape : shapes) {
+            if (player.getCollider().intersects(shape.getCollider())) {
                 collide(player, shape.getCollider(), shape.getRestitution());
                 bounced = true;
             }
@@ -65,11 +64,11 @@ public class EntityUtils {
     }
 
     //collision and bounce algorithm
-    private void collide(Shape player, Collider other, double restitution){
+    private void collide(Shape player, Collider other, double restitution) {
         Collider collider = player.getCollider();
         Vector2 mtv = collider.getMTV(other);
         if (!mtv.isZero()) {
-            if (allowSounds && !playerVelocity.isZero()){
+            if (allowSounds && !playerVelocity.isZero()) {
                 playBounceSound(restitution);
             }
             player.move(mtv);
@@ -82,5 +81,68 @@ public class EntityUtils {
         if (restitution >= 0) {
             SoundHandler.play(bounceSounds[0], 0.7);
         } //TODO: ADD DIFFERENT SOUNDS DEPENDING ON RESTITUTION VALUE
+    }
+
+    public boolean checkPlayerDying(Circle playerCircle) {
+        for (Shape shape : shapes) {
+
+            if (shape == playerCircle) {
+                continue;
+            }
+
+            if (shape.getColor().toString().equals(Color.RED.toString())) {
+
+
+                double pX = playerCircle.getCenter().x();
+                double pY = playerCircle.getCenter().y();
+                double pRadius = playerCircle.getWidth() / 2.0;
+
+                double sX = shape.getCenter().x();
+                double sY = shape.getCenter().y();
+                double sHalfWidth = shape.getWidth() / 2.0;
+                double sHalfHeight = shape.getHeight() / 2.0;
+
+                double left = sX - sHalfWidth;
+                double right = sX + sHalfWidth;
+                double bottom = sY - sHalfHeight;
+                double top = sY + sHalfHeight;
+
+
+                double closestX = Math.max(left, Math.min(pX, right));
+                double closestY = Math.max(bottom, Math.min(pY, top));
+
+                double dx = pX - closestX;
+                double dy = pY - closestY;
+
+                if ((Math.sqrt(dx * dx + dy * dy)) < (pRadius)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean checkPlayerWinning(Circle playerCircle, Rectangle goalRectangle) {
+        double goalX = goalRectangle.getCenter().x();
+        double goalY = goalRectangle.getCenter().y();
+        double goalHalfWidth = goalRectangle.getWidth() / 2.0;
+        double goalHalfHeight = goalRectangle.getHeight() / 2.0;
+
+        double left = goalX - goalHalfWidth;
+        double right = goalX + goalHalfWidth;
+        double bottom = goalY - goalHalfHeight;
+        double top = goalY + goalHalfHeight;
+
+        double pX = playerCircle.getCenter().x();
+        double pY = playerCircle.getCenter().y();
+        double pRadius = playerCircle.getWidth() / 2.0;
+
+        double closestX = Math.max(left, Math.min(pX, right));
+        double closestY = Math.max(bottom, Math.min(pY, top));
+
+        double dx = pX - closestX;
+        double dy = pY - closestY;
+
+        return (dx * dx + dy * dy) < (pRadius * pRadius);
     }
 }

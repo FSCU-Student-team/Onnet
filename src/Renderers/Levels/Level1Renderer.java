@@ -7,11 +7,16 @@ import Game.LoopState;
 import Physics.ActionManager;
 import Renderers.EntityUtils;
 import Shapes.*;
+import Shapes.Color;
+import Shapes.Point;
+import Shapes.Rectangle;
+import Shapes.Shape;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
-import com.jogamp.opengl.util.FPSAnimator;
+import com.jogamp.opengl.util.awt.TextRenderer;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +46,9 @@ public class Level1Renderer implements GLEventListener, GameLoop {
     private boolean isDead = false;
 
     private Vector2 velocity = new Vector2(0, 0);
+    private double score;
+    private double Tries;
+    private TextRenderer textRenderer;
 
     public Level1Renderer(InputManager inputManager) {
         this.inputManager = inputManager;
@@ -226,21 +234,27 @@ public class Level1Renderer implements GLEventListener, GameLoop {
             // apply gravity for next frame
             velocity = velocity.add(gravity);
 
-            checkWin();
             checkDie();
+            checkWin();
         }
     }
 
     private void checkDie() {
-        // placeholder: you can check overlap with red rectangles here and set isDead
+        if (entityUtils.checkPlayerDying(playerCircle)) {
+            isDead = true;
+            Tries++;
+            if (Tries >= 3) {
+                System.out.println("Die");
+            } else {
+                resetLevel();
+            }
+        }
     }
 
     private void checkWin() {
-        double dx = playerCircle.getCenter().x() - goalRectangle.getCenter().x();
-        double dy = playerCircle.getCenter().y() - goalRectangle.getCenter().y();
-        double dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 30) {
+        if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
+            score = (-Tries + 3) * 1000;
         }
     }
 
@@ -279,6 +293,25 @@ public class Level1Renderer implements GLEventListener, GameLoop {
         }
 
         gl.glPopMatrix();
+        if (isWon) {
+            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
+            textRenderer.beginRendering(800, 600);
+
+            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f); // أخضر
+            textRenderer.draw("YOU WIN!\n", 250, 300);
+            textRenderer.draw("yourScore:" + (score), 150, 150);
+
+            textRenderer.endRendering();
+        }
+        if (!isWon && Tries >= 3) {
+            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
+            textRenderer.beginRendering(800, 600);
+
+            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
+            textRenderer.draw("YOU Lose!", 250, 300);
+
+            textRenderer.endRendering();
+        }
 
         // play any bounce sounds queued by entityUtils
         entityUtils.allowBounceSounds();
@@ -304,18 +337,20 @@ public class Level1Renderer implements GLEventListener, GameLoop {
 
     private void resetLevel() {
         // Reset flags
-        isLaunched = false;
-        isWon = false;
-        isDead = false;
+        if (Tries<3) {
+            isLaunched = false;
+            isWon = false;
+            isDead = false;
 
-        // Reset player position
-        playerCircle.setOrigin(new Point(100, 100));
+            // Reset player position
+            playerCircle.setOrigin(new Point(100, 100));
 
-        velocity = new Vector2(0, 0);
-        entityUtils.updatePlayerVelocity(velocity);
+            velocity = new Vector2(0, 0);
+            entityUtils.updatePlayerVelocity(velocity);
 
-        currentPower = 50.0;
-        angle = 45.0;
+            currentPower = 20.0;
+            angle = 45.0;
+        }
     }
 
 }

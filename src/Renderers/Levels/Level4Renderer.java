@@ -7,10 +7,16 @@ import Game.LoopState;
 import Physics.ActionManager;
 import Renderers.EntityUtils;
 import Shapes.*;
+import Shapes.Color;
+import Shapes.Point;
+import Shapes.Rectangle;
+import Shapes.Shape;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.util.awt.TextRenderer;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +35,7 @@ public class Level4Renderer implements GLEventListener, GameLoop {
     private static final double POWER_SCALE = 0.05;     // converts "power" -> velocity (pixels per physics step)
     // lower = slower launch, raise to speed up
 
-    private double currentPower = 50.0;   // sensible default
+    private double currentPower = 20.0;   // sensible default
     private Vector2 gravity = new Vector2(0, -0.05); // tuned for visible arc (you can lower magnitude if too fast)
     private double angle = 135.0;          // degrees (0 -> right, 90 -> up)
 
@@ -40,6 +46,9 @@ public class Level4Renderer implements GLEventListener, GameLoop {
     private boolean isDead = false;
 
     private Vector2 velocity = new Vector2(0, 0);
+    private double Tries ;
+    private double score = 0;
+    private TextRenderer textRenderer;
 
     public Level4Renderer(InputManager inputManager) {
         this.inputManager = inputManager;
@@ -149,10 +158,6 @@ public class Level4Renderer implements GLEventListener, GameLoop {
                 .build();
 
 
-
-
-
-
         Rectangle ramp1 = new Rectangle.Builder()
                 .color(Color.RED)
                 .rotation(0)
@@ -202,8 +207,6 @@ public class Level4Renderer implements GLEventListener, GameLoop {
         entityUtils.addShape(ramp2);
         entityUtils.addShape(ramp3);
         entityUtils.addShape(ramp4);
-
-
 
 
         // set up entity utils with starting velocity and gravity
@@ -273,15 +276,20 @@ public class Level4Renderer implements GLEventListener, GameLoop {
     }
 
     private void checkDie() {
-
+        if (entityUtils.checkPlayerDying(playerCircle)) {
+            isDead = true;
+            Tries += 1;
+            if (Tries<3)
+             resetLevel();
+            else
+                System.out.println("Die");
+        }
     }
 
     private void checkWin() {
-        double dx = playerCircle.getCenter().x() - goalRectangle.getCenter().x();
-        double dy = playerCircle.getCenter().y() - goalRectangle.getCenter().y();
-        double dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 30) {
+        if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
+            score = (-Tries + 3) * 1000;
         }
     }
 
@@ -299,12 +307,18 @@ public class Level4Renderer implements GLEventListener, GameLoop {
         if (!isLaunched) {
             gl.glBegin(GL2.GL_LINES);
             // use white (or whatever color your shapes use)
-            gl.glColor3f(1f, 1f, 1f);
+            if ((currentPower / MAX_POWER) * 100 <= 30)//green
+                gl.glColor3f(0f, 1f, 0f);
+            else if ((currentPower / MAX_POWER) * 100 <= 70)//Yellow
+                gl.glColor3f(1f, 1f, 0f);
+            else if ((currentPower / MAX_POWER) * 100 >= 70)//red
+                gl.glColor3f(1f, 0f, 0f);
 
-            double len = Math.max(30, currentPower * 0.4); // visual length; tweak multiplier if desired
+            double len = Math.max(10, currentPower * 0.4); // visual length; tweak multiplier if desired
+            double radius = playerCircle.getWidth() / 2.0;
             double rad = Math.toRadians(angle);
-            double x1 = playerCircle.getCenter().x();
-            double y1 = playerCircle.getCenter().y();
+            double x1 = playerCircle.getCenter().x() + radius * Math.cos(rad);
+            double y1 = playerCircle.getCenter().y() + radius * Math.sin(rad);
             double x2 = x1 + len * Math.cos(rad);
             double y2 = y1 + len * Math.sin(rad);
 
@@ -314,6 +328,25 @@ public class Level4Renderer implements GLEventListener, GameLoop {
         }
 
         gl.glPopMatrix();
+        if (isWon) {
+            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
+            textRenderer.beginRendering(800, 600);
+
+            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f); // أخضر
+            textRenderer.draw("YOU WIN!", 250, 300);
+            textRenderer.draw("yourScore:" + (score), 150, 150);
+
+            textRenderer.endRendering();
+        }
+        if (!isWon && Tries >= 3) {
+            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
+            textRenderer.beginRendering(800, 600);
+
+            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
+            textRenderer.draw("YOU Lose!", 250, 300);
+
+            textRenderer.endRendering();
+        }
 
         // play any bounce sounds queued by entityUtils
         entityUtils.allowBounceSounds();
@@ -349,7 +382,7 @@ public class Level4Renderer implements GLEventListener, GameLoop {
         velocity = new Vector2(0, 0);
         entityUtils.updatePlayerVelocity(velocity);
 
-        currentPower = 50.0;
+        currentPower = 20.0;
         angle = 45.0;
     }
 }

@@ -15,6 +15,10 @@ public class Circle implements Shape {
     CircleCollider collider;
 
 
+    public Color getColor() {
+        return color;
+    }
+
     public Circle(Builder builder) {
         radius = builder.radius;
         center = builder.center;

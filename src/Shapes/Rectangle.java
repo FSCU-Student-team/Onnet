@@ -28,6 +28,10 @@ public class Rectangle implements Shape {
         collider = new RectangleCollider(origin, width, height, angle);
     }
 
+    public Color getColor() {
+        return color;
+    }
+
     @Override
     public void setOrigin(Point origin) {
         this.origin = origin;
