@@ -68,10 +68,18 @@ public class Level3Renderer implements GLEventListener, GameLoop {
         gl.glOrtho(0, 800, 0, 600, -1, 1);
 
         // INPUT
-        actionManager.bind(Input.A, () -> { if (!isLaunched) angle = (angle + ANGLE_INCREMENT) % 360; });
-        actionManager.bind(Input.D, () -> { if (!isLaunched) angle = (angle - ANGLE_INCREMENT + 360) % 360; });
-        actionManager.bind(Input.W, () -> { if (!isLaunched) setCurrentPower(currentPower + POWER_INCREMENT); });
-        actionManager.bind(Input.S, () -> { if (!isLaunched) setCurrentPower(currentPower - POWER_INCREMENT); });
+        actionManager.bind(Input.A, () -> {
+            if (!isLaunched) angle = (angle + ANGLE_INCREMENT) % 360;
+        });
+        actionManager.bind(Input.D, () -> {
+            if (!isLaunched) angle = (angle - ANGLE_INCREMENT + 360) % 360;
+        });
+        actionManager.bind(Input.W, () -> {
+            if (!isLaunched) setCurrentPower(currentPower + POWER_INCREMENT);
+        });
+        actionManager.bind(Input.S, () -> {
+            if (!isLaunched) setCurrentPower(currentPower - POWER_INCREMENT);
+        });
 
         actionManager.bind(Input.R, this::resetLevel);
 
@@ -206,7 +214,8 @@ public class Level3Renderer implements GLEventListener, GameLoop {
     }
 
     @Override
-    public void dispose(GLAutoDrawable glAutoDrawable) {}
+    public void dispose(GLAutoDrawable glAutoDrawable) {
+    }
 
     @Override
     public void display(GLAutoDrawable glAutoDrawable) {
