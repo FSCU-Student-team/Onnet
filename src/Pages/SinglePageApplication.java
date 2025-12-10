@@ -27,6 +27,7 @@ public class SinglePageApplication implements Page {
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
 
+
         // Content panel
         contentPanel = new JPanel();
         contentPanel.setOpaque(false);
