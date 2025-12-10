@@ -1,6 +1,7 @@
 import Game.GlobalVariables;
 import Game.InputManager;
 import Pages.*;
+import Pages.ContentPanels.LeaderboardPanel;
 import Pages.ContentPanels.Level;
 import Pages.ContentPanels.LevelSelectPanel;
 import Pages.ContentPanels.MainMenuPanel;
@@ -20,6 +21,7 @@ public class Main {
     // Panels
     private static MainMenuPanel mainMenuPanel;
     private static LevelSelectPanel levelSelectPanel;
+    private static LeaderboardPanel leaderboardPanel;
     private static Level levelPanel; // single level panel
     private static InputManager inputManager;
 
@@ -36,9 +38,10 @@ public class Main {
         mainMenuPanel = new MainMenuPanel(sharedCanvas);
         levelSelectPanel = new LevelSelectPanel(sharedCanvas);
         levelPanel = new Level(sharedCanvas);
+        leaderboardPanel = new LeaderboardPanel(sharedCanvas);
 
         // Panel actions
-        mainMenuPanel.setPlayButtonAction(() -> openLevel(0));
+        mainMenuPanel.setPlayButtonAction(() -> app.setContent(leaderboardPanel));
         mainMenuPanel.setLevelsButtonAction(() -> {
             app.setContent(levelSelectPanel);
             GlobalVariables.playerName = app.askPlayerName();
@@ -54,12 +57,15 @@ public class Main {
         levelSelectPanel.setLevelAction(6, () -> openLevel(6));
         levelSelectPanel.setLevelAction(7, () -> openLevel(7));
         levelSelectPanel.setLevelAction(8, () -> openLevel(8));
-        levelSelectPanel.setLevelAction(10,() -> openLevel(10));
+        levelSelectPanel.setLevelAction(9, () -> openLevel(9));
+        levelSelectPanel.setLevelAction(10, () -> openLevel(10));
+        levelSelectPanel.setLevelAction(11, () -> openLevel(11));
 
         levelPanel.setBackButtonAction(() -> {
             openLevel(-1);
             app.setContent(levelSelectPanel);
         });
+        leaderboardPanel.setBackAction(() -> app.setContent(mainMenuPanel));
 
 
         // Show initial panel
@@ -84,7 +90,9 @@ public class Main {
             case 6 -> app.setLevelRenderer(new Level7Renderer(inputManager));
             case 7 -> app.setLevelRenderer(new Level8Renderer(inputManager));
             case 8 -> app.setLevelRenderer(new Level9Renderer(inputManager));
-            case 10 -> app.setLevelRenderer((new Level11Renderer(inputManager)));
+            case 9 -> app.setLevelRenderer(new Level10Renderer(inputManager));
+            case 10 -> app.setLevelRenderer(new Level11Renderer(inputManager));
+            case 11 -> app.setLevelRenderer(new Level12Renderer(inputManager));
             default -> throw new IllegalArgumentException("No renderer for level " + i);
         }
 

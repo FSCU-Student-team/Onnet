@@ -4,6 +4,8 @@ import com.jogamp.opengl.awt.GLJPanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 public class LevelSelectPanel extends JPanel {
@@ -25,7 +27,7 @@ public class LevelSelectPanel extends JPanel {
 
     private void addButtons() {
 
-        int panelWidth = 800;   // adjust if your window differs
+        int panelWidth = 800;
         int btnWidth = 200;
         int btnHeight = 60;
         int gapBetweenColumns = 80;
@@ -36,26 +38,80 @@ public class LevelSelectPanel extends JPanel {
         int startY = 50;
         int verticalSpacing = 80;
 
+        // Colors gradient: green → yellow → orange → red
+        Color startColor = new Color(50, 200, 50);   // green
+        Color mid1Color = new Color(250, 250, 50);   // yellow
+        Color mid2Color = new Color(250, 150, 50);   // orange
+        Color endColor = new Color(250, 50, 50);     // red
+
         for (int i = 0; i < 12; i++) {
             JButton btn = new JButton("Level " + (i + 1));
-
             int row = i % 6;
             int col = i / 6;
-
             int x = (col == 0 ? col1X : col2X);
             int y = startY + row * verticalSpacing;
-
             btn.setBounds(x, y, btnWidth, btnHeight);
+
+            // Determine gradient color for difficulty
+            float t = i / 11f; // 0 → 1
+            Color levelColor;
+            if (t <= 0.33f) { // green → yellow
+                float subT = t / 0.33f;
+                levelColor = blendColors(startColor, mid1Color, subT);
+            } else if (t <= 0.66f) { // yellow → orange
+                float subT = (t - 0.33f) / 0.33f;
+                levelColor = blendColors(mid1Color, mid2Color, subT);
+            } else { // orange → red
+                float subT = (t - 0.66f) / 0.34f;
+                levelColor = blendColors(mid2Color, endColor, subT);
+            }
+
+            btn.setBackground(levelColor);
+            btn.setForeground(Color.WHITE);
+            btn.setFont(new Font("Arial", Font.BOLD, 18));
+            btn.setFocusPainted(false);
+            btn.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+
+            // Hover effect: brighten
+            btn.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    btn.setBackground(levelColor.brighter());
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    btn.setBackground(levelColor);
+                }
+            });
 
             levelBtns.add(btn);
             onLevel.add(null);
             add(btn);
         }
 
-        // back button
+        // Back button
         backBtn = new JButton("Back");
         backBtn.setBounds(670, 10, 100, 50);
+        backBtn.setBackground(new Color(200, 50, 50));
+        backBtn.setForeground(Color.WHITE);
+        backBtn.setFont(new Font("Arial", Font.BOLD, 16));
+        backBtn.setFocusPainted(false);
+        backBtn.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+        backBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) { backBtn.setBackground(backBtn.getBackground().brighter()); }
+            @Override
+            public void mouseExited(MouseEvent e) { backBtn.setBackground(new Color(200, 50, 50)); }
+        });
         add(backBtn);
+    }
+
+    private Color blendColors(Color c1, Color c2, float t) {
+        int r = (int) (c1.getRed() + t * (c2.getRed() - c1.getRed()));
+        int g = (int) (c1.getGreen() + t * (c2.getGreen() - c1.getGreen()));
+        int b = (int) (c1.getBlue() + t * (c2.getBlue() - c1.getBlue()));
+        return new Color(r, g, b);
     }
 
     private void addListeners() {
