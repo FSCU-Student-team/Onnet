@@ -317,7 +317,7 @@ public class Level6Renderer implements GLEventListener, GameLoop {
         // placeholder: you can check overlap with red rectangles here and set isDead
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
-            Tries++;
+            Tries+=1;
             if (Tries < 3)
                 resetLevel();
             else
