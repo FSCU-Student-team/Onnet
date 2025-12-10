@@ -79,7 +79,7 @@ public class Main {
             case 1 -> app.setLevelRenderer(new Level2Renderer(inputManager));
             case 2 -> app.setLevelRenderer(new Level3Renderer(inputManager));
             case 3 -> app.setLevelRenderer(new Level4Renderer(inputManager));
-            case 4 -> app.setLevelRenderer(new Level10Renderer(inputManager));
+            case 4 -> app.setLevelRenderer(new Level5Renderer(inputManager));
             case 5 -> app.setLevelRenderer(new Level6Renderer(inputManager));
             case 6 -> app.setLevelRenderer(new Level7Renderer(inputManager));
             case 7 -> app.setLevelRenderer(new Level8Renderer(inputManager));
