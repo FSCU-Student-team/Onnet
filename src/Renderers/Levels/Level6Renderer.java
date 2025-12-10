@@ -1,9 +1,6 @@
 package Renderers.Levels;
 
-import Game.GameLoop;
-import Game.Input;
-import Game.InputManager;
-import Game.LoopState;
+import Game.*;
 import Physics.ActionManager;
 import Renderers.EntityUtils;
 import Shapes.*;
@@ -41,7 +38,9 @@ public class Level6Renderer implements GLEventListener, GameLoop {
     private double angle = 45.0;// degrees (0 -> right, 90 -> up)
     private double Tries;
     private double score;
-    private Rectangle rotatingObstacle3;
+ private Rectangle rotatingObstacle3;
+
+    private long timeElapsed;
 
     private List<Shape> shapes = new ArrayList<>();
 
@@ -174,16 +173,17 @@ public class Level6Renderer implements GLEventListener, GameLoop {
                 .height(20)
                 .build();
 
-      rotatingObstacle3  = new Rectangle.Builder()
+     rotatingObstacle3  = new Rectangle.Builder()
               .color(Color.GREEN)
-              .rotation(30)
+              .rotation(60)
               .fill(true)
-              .origin(new Point(380, 400))
+              .origin(new Point(415, 400))
               .restitution(0.7)
               .width(20)
               .height(120)
               .build();
 
+        
         // bouncing obstacle circle
         bouncingCircle = new Circle.Builder()
                 .color(Color.MAGENTA)
@@ -214,8 +214,6 @@ public class Level6Renderer implements GLEventListener, GameLoop {
                 .width(50)
                 .height(150)
                 .build();
-
-
 
         Triangle ramp = new Triangle.Builder()
                 .color(Color.ORANGE)
@@ -255,9 +253,9 @@ public class Level6Renderer implements GLEventListener, GameLoop {
         shapes.add(bouncingCircle);
         shapes.add(obstacle1);
         shapes.add(obstacle2);
-        shapes.add(rotatingObstacle3);
         shapes.add(ramp);
 
+        timeElapsed = System.currentTimeMillis();
     }
 
     @Override
@@ -285,7 +283,7 @@ public class Level6Renderer implements GLEventListener, GameLoop {
     @Override
     public void physicsUpdate() {
         inputUpdate();
-        rotatingObstacle3.rotate(45 / 360.0);
+         rotatingObstacle3.rotate(60 / 360.0);
         // platform moves left/right
         movingPlatform.move(new Vector2((platformMovingRight ? platformSpeed : -platformSpeed) * GameLoop.PHYSICS_STEP, 0));
         if (movingPlatform.getCenter().x() > 715) platformMovingRight = false;
@@ -332,18 +330,17 @@ public class Level6Renderer implements GLEventListener, GameLoop {
         // placeholder: you can check overlap with red rectangles here and set isDead
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
-            Tries+=1;
-            if (Tries < 3)
-                resetLevel();
-            else
-                System.out.println("Die");
+            Tries += 1;
+            resetLevel();
+
         }
     }
 
     private void checkWin() {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
-            score = (-Tries + 3) * 1000;
+            score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
+            LeaderboardHandler.save(6, new LeaderboardEntry(GlobalVariables.playerName, score));
         }
     }
 
@@ -388,15 +385,6 @@ public class Level6Renderer implements GLEventListener, GameLoop {
 
             textRenderer.endRendering();
         }
-        if (!isWon && Tries >= 3) {
-            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
-            textRenderer.beginRendering(800, 600);
-
-            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
-            textRenderer.draw("YOU Lose!", 250, 300);
-
-            textRenderer.endRendering();
-        }
 
         gl.glPopMatrix();
 
@@ -424,7 +412,6 @@ public class Level6Renderer implements GLEventListener, GameLoop {
 
     private void resetLevel() {
         // Reset flags
-        if (Tries < 3) {
             isLaunched = false;
             isWon = false;
             isDead = false;
@@ -437,6 +424,5 @@ public class Level6Renderer implements GLEventListener, GameLoop {
 
             currentPower = 20.0;
             angle = 45.0;
-        }
     }
 }
