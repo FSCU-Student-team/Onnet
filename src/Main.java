@@ -1,14 +1,10 @@
 import Game.GlobalVariables;
 import Game.InputManager;
 import Pages.*;
-import Pages.ContentPanels.LeaderboardPanel;
-import Pages.ContentPanels.Level;
-import Pages.ContentPanels.LevelSelectPanel;
-import Pages.ContentPanels.MainMenuPanel;
+import Pages.ContentPanels.*;
 import Renderers.Levels.*;
 import Renderers.MenuBackground;
 import com.jogamp.opengl.awt.GLJPanel;
-import Pages.ContentPanels.LoadingPanel;
 
 import java.lang.reflect.Field;
 
@@ -28,6 +24,8 @@ public class Main {
     private static Level levelPanel; // single level panel
     private static LoadingPanel loadingPanel;
     private static InputManager inputManager;
+    private static InstructionsPanel instructionsPanel;
+    private static CreditsPanel creditsPanel;
 
     public static void main(String[] args) {
 
@@ -48,29 +46,28 @@ public class Main {
         levelPanel = new Level(sharedCanvas);
         leaderboardPanel = new LeaderboardPanel(sharedCanvas);
         loadingPanel = new LoadingPanel(sharedCanvas);
+        instructionsPanel = new InstructionsPanel(sharedCanvas);
+        creditsPanel = new CreditsPanel(sharedCanvas);
+
+        instructionsPanel.setBackAction(() -> app.setContent(mainMenuPanel));
+        creditsPanel.setBackAction(() -> app.setContent(mainMenuPanel));
 
         // Panel actions (with loading)
-        mainMenuPanel.setPlayButtonAction(() -> openLevelWithLoading(0));
         mainMenuPanel.setLevelsButtonAction(() -> app.setContent(levelSelectPanel));
         mainMenuPanel.setPlayButtonAction(() -> app.setContent(leaderboardPanel));
+        mainMenuPanel.setInstructionsButtonAction(() -> app.setContent(instructionsPanel));
+        mainMenuPanel.setCreditsButtonAction(() -> app.setContent(creditsPanel));
         mainMenuPanel.setLevelsButtonAction(() -> {
             app.setContent(levelSelectPanel);
             GlobalVariables.playerName = app.askPlayerName();
         });
 
         levelSelectPanel.setBackButtonAction(() -> app.setContent(mainMenuPanel));
-        levelSelectPanel.setLevelAction(0, () -> openLevelWithLoading(0));
-        levelSelectPanel.setLevelAction(1, () -> openLevelWithLoading(1));
-        levelSelectPanel.setLevelAction(2, () -> openLevelWithLoading(2));
-        levelSelectPanel.setLevelAction(3, () -> openLevelWithLoading(3));
-        levelSelectPanel.setLevelAction(4, () -> openLevelWithLoading(4));
-        levelSelectPanel.setLevelAction(5, () -> openLevelWithLoading(5));
-        levelSelectPanel.setLevelAction(6, () -> openLevelWithLoading(6));
-        levelSelectPanel.setLevelAction(7, () -> openLevelWithLoading(7));
-        levelSelectPanel.setLevelAction(8, () -> openLevelWithLoading(8));
-        levelSelectPanel.setLevelAction(9, () -> openLevelWithLoading(9));
-        levelSelectPanel.setLevelAction(10, () -> openLevelWithLoading(10));
-        levelSelectPanel.setLevelAction(11, () -> openLevelWithLoading(11));
+        for (int i = 0; i < 12; i++) {
+            int idx = i;
+            levelSelectPanel.setLevelAction(i, () -> openLevelWithLoading(idx));
+
+        }
 
         levelPanel.setBackButtonAction(() -> {
             openLevel(-1);
@@ -83,8 +80,6 @@ public class Main {
         // Start SPA
         app.init();
     }
-
-
 
     /**
      * Open level with loading screen
