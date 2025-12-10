@@ -125,7 +125,7 @@ public class Level7Renderer implements GLEventListener, GameLoop {
                 .build();
 
         Rectangle ceiling = new Rectangle.Builder()
-                .color(Color.RED)
+                .color(Color.BLUE)
                 .rotation(0)
                 .fill(true)
                 .origin(new Point(0, 590))
@@ -135,7 +135,7 @@ public class Level7Renderer implements GLEventListener, GameLoop {
                 .build();
 
         Rectangle leftWall = new Rectangle.Builder()
-                .color(Color.RED)
+                .color(Color.BLUE)
                 .rotation(0)
                 .fill(true)
                 .origin(new Point(0, 0))
