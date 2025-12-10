@@ -381,6 +381,7 @@ public class Level12Renderer implements GLEventListener, GameLoop {
             isWon = true;
             score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
             LeaderboardHandler.save(12, new LeaderboardEntry(GlobalVariables.playerName, score));
+            timeElapsed = System.currentTimeMillis();
         }
     }
 

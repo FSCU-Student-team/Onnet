@@ -259,6 +259,7 @@ public class Level2Renderer implements GLEventListener, GameLoop {
             isWon = true;
             score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
             LeaderboardHandler.save(2, new LeaderboardEntry(GlobalVariables.playerName, score));
+            timeElapsed = System.currentTimeMillis();
         }
     }
 

@@ -260,6 +260,7 @@ public class Level3Renderer implements GLEventListener, GameLoop {
             long time = System.currentTimeMillis() - timeElapsed;
             score = Math.max(100000 - time, 0);
             LeaderboardHandler.save(3, new LeaderboardEntry(GlobalVariables.playerName, score));
+            timeElapsed = System.currentTimeMillis();
         }
     }
 
