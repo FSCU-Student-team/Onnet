@@ -35,7 +35,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
     private static final double POWER_SCALE = 0.05;
 
     private double currentPower = 20.0;
-    private Vector2 gravity = new Vector2(-0.05, -0.08); // Zero gravity in space
+    private Vector2 gravity = new Vector2(-0.0, -0.0); // Zero gravity in space
     private double angle = 45.0;
     private double score;
 
@@ -61,7 +61,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
     private double orbitAngle2 = 2.0; // Start at different angle
     private double orbitAngle3 = 4.0; // Start at different angle
     private final double ORBIT_SPEED = 0.01; // Speed of rotation
-    private final Point CENTER_POINT = new Point(380, 250); // Center of Black Hole
+    private final Point CENTER_POINT = new Point(430, 250); // Center of Black Hole
 
     private final double BLACK_HOLE_GRAVITY_STRENGTH = 100.0;
 
@@ -111,7 +111,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
                 .color(Color.WHITE)
                 .radius(15)
                 .angle(0)
-                .center(new Point(80, 80))
+                .center(new Point(100, 150))
                 .filled(true)
                 .build();
 
@@ -129,16 +129,16 @@ public class Level11Renderer implements GLEventListener, GameLoop {
                 .color(new Color(0.4f, 0.0f, 0.6f)) // Dark Purple
                 .filled(true)
                 .center(CENTER_POINT)
-                .restitution(0.0) // No bounce, it absorbs
+                .restitution(0.0)
                 .radius(40)
                 .angle(0)
                 .build();
 
         // Boundaries
-        Rectangle floor = new Rectangle.Builder().color(Color.GRAY).fill(true).origin(new Point(0, 0)).width(800).height(10).build();
-        Rectangle ceiling = new Rectangle.Builder().color(Color.GRAY).fill(true).origin(new Point(0, 590)).width(800).height(10).build();
-        Rectangle leftWall = new Rectangle.Builder().color(Color.GRAY).fill(true).origin(new Point(0, 0)).width(10).height(600).build();
-        Rectangle rightWall = new Rectangle.Builder().color(Color.GRAY).fill(true).origin(new Point(790, 0)).width(10).height(600).build();
+        Rectangle floor = new Rectangle.Builder().color(Color.RED).fill(true).origin(new Point(0, 0)).width(800).height(10).build();
+        Rectangle ceiling = new Rectangle.Builder().color(Color.RED).fill(true).origin(new Point(0, 590)).width(800).height(10).build();
+        Rectangle leftWall = new Rectangle.Builder().color(Color.RED).fill(true).origin(new Point(0, 0)).width(10).height(600).build();
+        Rectangle rightWall = new Rectangle.Builder().color(Color.RED).fill(true).origin(new Point(790, 0)).width(10).height(600).build();
 
         // Asteroids (Obstacles) - Initial positions will be updated in physics loop
         asteroid1 = new Circle.Builder().color(Color.DARK_GRAY).filled(true).center(new Point(250, 400)).radius(25).build();
@@ -193,7 +193,6 @@ public class Level11Renderer implements GLEventListener, GameLoop {
     public void physicsUpdate() {
         inputUpdate();
 
-        // --- ORBIT LOGIC (Always running) ---
         // Update angles
         orbitAngle1 += ORBIT_SPEED;
         orbitAngle2 += ORBIT_SPEED * 0.8; // Different speed
@@ -205,8 +204,6 @@ public class Level11Renderer implements GLEventListener, GameLoop {
         double r3 = 90;
 
         // Calculate new positions
-        // x = center_x + radius * cos(angle)
-        // y = center_y + radius * sin(angle)
         asteroid1.setOrigin(new Point(
                 CENTER_POINT.x() + r1 * Math.cos(orbitAngle1),
                 CENTER_POINT.y() + r1 * Math.sin(orbitAngle1)
@@ -223,7 +220,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
         ));
         if (isLaunched && !isWon && !isDead) {
 
-            // --- Custom Gravity Logic (Black Hole Pull) ---
+            // Custom Gravity Logic (Black Hole Pull
             Point pPos = playerCircle.getCenter();
             Point holePos = blackHole.getCenter();
 
@@ -250,7 +247,6 @@ public class Level11Renderer implements GLEventListener, GameLoop {
             entityUtils.checkCollisions(playerCircle);
             velocity = entityUtils.getPlayerVelocity();
             playerCircle.move(velocity);
-            velocity = velocity.add(gravity);
 
             checkWin();
             checkDie();
