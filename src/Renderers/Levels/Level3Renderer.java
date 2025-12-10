@@ -87,9 +87,6 @@ public class Level3Renderer implements GLEventListener, GameLoop {
                 double speed = currentPower * POWER_SCALE;
                 velocity = new Vector2(speed * Math.cos(rad), speed * Math.sin(rad));
                 entityUtils.updatePlayerVelocity(velocity);
-
-                // start timer on launch
-                timeElapsed = System.currentTimeMillis();
             }
         });
 
@@ -206,7 +203,6 @@ public class Level3Renderer implements GLEventListener, GameLoop {
         shapes.add(ramp1);
         shapes.add(ramp2);
 
-        // NEW — timer start on level load
         timeElapsed = System.currentTimeMillis();
     }
 
