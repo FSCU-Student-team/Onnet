@@ -1,9 +1,6 @@
 package Renderers.Levels;
 
-import Game.GameLoop;
-import Game.Input;
-import Game.InputManager;
-import Game.LoopState;
+import Game.*;
 import Physics.ActionManager;
 import Renderers.EntityUtils;
 import Shapes.*;
@@ -29,8 +26,8 @@ public class Level8Renderer implements GLEventListener, GameLoop {
     private Rectangle goalRectangle;
     // Tunables
     private static final double MAX_POWER = 200.0;
-    private static final double POWER_INCREMENT = 0.5;
-    private static final double ANGLE_INCREMENT = 0.2;
+    private static final double POWER_INCREMENT = 1.0;
+    private static final double ANGLE_INCREMENT = 0.5;
     private static final double POWER_SCALE = 0.05;
 
     private double currentPower = 50.0;
@@ -38,6 +35,8 @@ public class Level8Renderer implements GLEventListener, GameLoop {
     private double angle = 45.0;
     private double Tries;
     private double score;
+
+    private long timeElapsed;
 
     private List<Shape> shapes = new ArrayList<>();
 
@@ -244,6 +243,8 @@ public class Level8Renderer implements GLEventListener, GameLoop {
         shapes.clear();
         shapes.add(playerCircle);
         shapes.addAll(entityUtils.getShapes());
+
+        timeElapsed = System.currentTimeMillis();
     }
 
     @Override
@@ -273,7 +274,7 @@ public class Level8Renderer implements GLEventListener, GameLoop {
 
         // Rotating obstacles
         rotatingObstacle1.rotate(40 / 360.0);
-        rotatingObstacle2.rotate(-20 / 360.0);
+        rotatingObstacle2.rotate(-30 / 360.0);
 
         // Moving target
         if (targetMovingUp) {
@@ -301,26 +302,15 @@ public class Level8Renderer implements GLEventListener, GameLoop {
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
             Tries++;
-            if (Tries < 3)
-                resetLevel();
-            else
-                System.out.println("Die");
+            resetLevel();
         }
     }
-
-//    private void checkWin() {
-//        double dx = playerCircle.getCenter().x() - goalRectangle.getCenter().x();
-//        double dy = playerCircle.getCenter().y() - goalRectangle.getCenter().y();
-//        double dist = Math.sqrt(dx * dx + dy * dy);
-//        if (dist < 30) {
-//            isWon = true;
-//        }
-//    }
 
     private void checkWin() {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
-            score = (-Tries + 3) * 1000;
+            score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
+            LeaderboardHandler.save(8, new LeaderboardEntry(GlobalVariables.playerName, score));
         }
     }
 
@@ -363,15 +353,6 @@ public class Level8Renderer implements GLEventListener, GameLoop {
 
             textRenderer.endRendering();
         }
-        if (!isWon && Tries >= 3) {
-            textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
-            textRenderer.beginRendering(800, 600);
-
-            textRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
-            textRenderer.draw("YOU Lose!", 250, 300);
-
-            textRenderer.endRendering();
-        }
 
         gl.glPopMatrix();
         entityUtils.allowBounceSounds();
@@ -397,19 +378,16 @@ public class Level8Renderer implements GLEventListener, GameLoop {
 
     private void resetLevel() {
         // Reset flags
-        if (Tries < 3) {
-            isLaunched = false;
-            isWon = false;
-            isDead = false;
+        isLaunched = false;
+        isWon = false;
+        isDead = false;
 
-            // Reset player position
-            playerCircle.setOrigin(new Point(100, 100));
+        // Reset player position
+        playerCircle.setOrigin(new Point(100, 100));
 
-            velocity = new Vector2(0, 0);
-            entityUtils.updatePlayerVelocity(velocity);
+        velocity = new Vector2(0, 0);
+        entityUtils.updatePlayerVelocity(velocity);
 
-            currentPower = 20.0;
-            angle = 45.0;
-        }
+        currentPower = 20.0;
     }
 }
