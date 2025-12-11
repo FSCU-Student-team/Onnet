@@ -35,6 +35,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
     private Vector2 gravity = new Vector2(-0.0, -0.0); // Zero gravity in space
     private double angle = 45.0;
     private double score;
+    private double Tries;
 
     private long timeElapsed;
     private TextRenderer textRenderer;
@@ -74,24 +75,31 @@ public class Level11Renderer implements GLEventListener, GameLoop {
         GL2 gl = glAutoDrawable.getGL().getGL2();
         gl.glClearColor(0.05f, 0.0f, 0.1f, 1); // Deep Space Dark Blue
 
+        // change these values to match that size.
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
         gl.glOrtho(0, 800, 0, 600, -1, 1);
 
-        // --- Inputs ---
+        // --- INPUT BINDINGS (small increments, only when not launched) ---
         actionManager.bind(Input.A, () -> {
             if (!isLaunched) angle = (angle + ANGLE_INCREMENT) % 360;
+
         });
         actionManager.bind(Input.D, () -> {
             if (!isLaunched) angle = (angle - ANGLE_INCREMENT + 360) % 360;
+
         });
         actionManager.bind(Input.W, () -> {
             if (!isLaunched) setCurrentPower(currentPower + POWER_INCREMENT);
+
         });
         actionManager.bind(Input.S, () -> {
             if (!isLaunched) setCurrentPower(currentPower - POWER_INCREMENT);
+
         });
+
         actionManager.bind(Input.R, this::resetLevel);
+
         actionManager.bind(Input.Space, () -> {
             if (!isLaunched) {
                 isLaunched = true;
@@ -101,7 +109,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
                 entityUtils.updatePlayerVelocity(velocity);
             }
         });
-        actionManager.bind(Input.Escape, this::togglePause);
+
 
         // Player
         playerCircle = new Circle.Builder()
@@ -251,9 +259,9 @@ public class Level11Renderer implements GLEventListener, GameLoop {
     }
 
     private void checkDie() {
-        // If player hits the black hole or other hazards
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
+            Tries++;
             resetLevel();
         }
     }
@@ -262,7 +270,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
             score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
-            LeaderboardHandler.save(11, new LeaderboardEntry(GlobalVariables.playerName, score));
+            LeaderboardHandler.save(1, new LeaderboardEntry(GlobalVariables.playerName, score));
             timeElapsed = System.currentTimeMillis();
         }
     }
@@ -333,7 +341,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
         isLaunched = false;
         isWon = false;
         isDead = false;
-        playerCircle.setOrigin(new Point(80, 80));
+        playerCircle.setOrigin(new Point(100, 150));
         velocity = new Vector2(0, 0);
         entityUtils.updatePlayerVelocity(velocity);
         currentPower = 20.0;

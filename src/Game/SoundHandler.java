@@ -104,7 +104,7 @@ public class SoundHandler {
      */
     public static void play(String sound, double volume) {
         long now = System.currentTimeMillis();
-        if (now - lastPlay < 200) return; // 200 ms cooldown
+        if (now - lastPlay < 100) return; // 100 ms cooldown
         lastPlay = now;
 
         if (mute) return;
@@ -118,7 +118,7 @@ public class SoundHandler {
 
             AudioInputStream in = AudioSystem.getAudioInputStream(file);
             Clip clip = AudioSystem.getClip();
-            clip.open(in);
+            clip.open(in);if(sound.equals("Sounds/memphis-trap-wav-349366.wav")) { clip.loop(Clip.LOOP_CONTINUOUSLY);}
 
             final TrackedClip tc = new TrackedClip(clip);
 

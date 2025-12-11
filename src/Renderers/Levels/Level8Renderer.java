@@ -26,7 +26,7 @@ public class Level8Renderer implements GLEventListener, GameLoop {
     private Rectangle goalRectangle;
     // Tunables
     private static final double MAX_POWER = 200.0;
-    private static final double POWER_INCREMENT = 0.6;
+    private static final double POWER_INCREMENT = 0.4;  // amount W/S changes power
     private static final double ANGLE_INCREMENT = 0.25;
     private static final double POWER_SCALE = 0.05;
 
@@ -65,23 +65,31 @@ public class Level8Renderer implements GLEventListener, GameLoop {
         GL2 gl = glAutoDrawable.getGL().getGL2();
         gl.glClearColor(0.2f, 0.0f, 0.3f, 1); // Purple background
 
+        // change these values to match that size.
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
         gl.glOrtho(0, 800, 0, 600, -1, 1);
 
+        // --- INPUT BINDINGS (small increments, only when not launched) ---
         actionManager.bind(Input.A, () -> {
             if (!isLaunched) angle = (angle + ANGLE_INCREMENT) % 360;
+
         });
         actionManager.bind(Input.D, () -> {
             if (!isLaunched) angle = (angle - ANGLE_INCREMENT + 360) % 360;
+
         });
         actionManager.bind(Input.W, () -> {
             if (!isLaunched) setCurrentPower(currentPower + POWER_INCREMENT);
+
         });
         actionManager.bind(Input.S, () -> {
             if (!isLaunched) setCurrentPower(currentPower - POWER_INCREMENT);
+
         });
+
         actionManager.bind(Input.R, this::resetLevel);
+
         actionManager.bind(Input.Space, () -> {
             if (!isLaunched) {
                 isLaunched = true;
@@ -91,7 +99,7 @@ public class Level8Renderer implements GLEventListener, GameLoop {
                 entityUtils.updatePlayerVelocity(velocity);
             }
         });
-        actionManager.bind(Input.Escape, this::togglePause);
+
 
         // Player
         playerCircle = new Circle.Builder()
@@ -153,11 +161,11 @@ public class Level8Renderer implements GLEventListener, GameLoop {
                 .build();
 
         // Rotating obstacles
-        rotatingObstacle1 = new Rectangle.Builder()
+             rotatingObstacle1 = new Rectangle.Builder()
                 .color(Color.CYAN)
                 .rotation(0)
                 .fill(true)
-                .origin(new Point(300, 200))
+                .origin(new Point(250, 200))
                 .restitution(0.7)
                 .width(80)
                 .height(20)
@@ -177,7 +185,7 @@ public class Level8Renderer implements GLEventListener, GameLoop {
         movingTarget = new Circle.Builder()
                 .color(Color.GREEN)
                 .filled(true)
-                .center(new Point(600, 300))
+                .center(new Point(300, 300))
                 .restitution(1.0)
                 .radius(25)
                 .angle(0)
@@ -218,9 +226,9 @@ public class Level8Renderer implements GLEventListener, GameLoop {
                 .color(Color.ORANGE)
                 .fill(true)
                 .restitution(0.3)
-                .addPoint(new Point(650, 100))
-                .addPoint(new Point(700, 100))
-                .addPoint(new Point(675, 200))
+                .addPoint(new Point(400, 600))
+                .addPoint(new Point(350, 600))
+                .addPoint(new Point(375, 500))
                 .build();
 
         // Add to entity utils

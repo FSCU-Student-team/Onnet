@@ -27,7 +27,7 @@ public class Level3Renderer implements GLEventListener, GameLoop {
 
     // Tunables
     private static final double MAX_POWER = 200.0;
-    private static final double POWER_INCREMENT = 0.6;
+    private static final double POWER_INCREMENT = 0.4;  // amount W/S changes power
     private static final double ANGLE_INCREMENT = 0.25;
     private static final double POWER_SCALE = 0.05;
 
@@ -43,6 +43,7 @@ public class Level3Renderer implements GLEventListener, GameLoop {
 
     private Vector2 velocity = new Vector2(0, 0);
     private double score = 0;
+    private double Tries;
 
     private long timeElapsed;  // NEW — timer for scoring
 
@@ -60,22 +61,27 @@ public class Level3Renderer implements GLEventListener, GameLoop {
         GL2 gl = glAutoDrawable.getGL().getGL2();
         gl.glClearColor(0, 0, 0, 1);
 
+        // change these values to match that size.
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
         gl.glOrtho(0, 800, 0, 600, -1, 1);
 
-        // INPUT
+        // --- INPUT BINDINGS (small increments, only when not launched) ---
         actionManager.bind(Input.A, () -> {
             if (!isLaunched) angle = (angle + ANGLE_INCREMENT) % 360;
+
         });
         actionManager.bind(Input.D, () -> {
             if (!isLaunched) angle = (angle - ANGLE_INCREMENT + 360) % 360;
+
         });
         actionManager.bind(Input.W, () -> {
             if (!isLaunched) setCurrentPower(currentPower + POWER_INCREMENT);
+
         });
         actionManager.bind(Input.S, () -> {
             if (!isLaunched) setCurrentPower(currentPower - POWER_INCREMENT);
+
         });
 
         actionManager.bind(Input.R, this::resetLevel);
@@ -90,7 +96,7 @@ public class Level3Renderer implements GLEventListener, GameLoop {
             }
         });
 
-        actionManager.bind(Input.Escape, this::togglePause);
+
 
         // SHAPES
         playerCircle = new Circle.Builder()
@@ -250,15 +256,15 @@ public class Level3Renderer implements GLEventListener, GameLoop {
     private void checkDie() {
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
-            resetLevel(); // immediate reset, no tries, no losing
+            Tries++;
+            resetLevel();
         }
     }
 
     private void checkWin() {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
-            long time = System.currentTimeMillis() - timeElapsed;
-            score = Math.max(100000 - time, 0);
+            score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
             LeaderboardHandler.save(3, new LeaderboardEntry(GlobalVariables.playerName, score));
             timeElapsed = System.currentTimeMillis();
         }

@@ -27,14 +27,13 @@ public class Level7Renderer implements GLEventListener, GameLoop {
     private Rectangle goalRectangle;
     // Tunables
     private static final double MAX_POWER = 200.0;
-    private static final double POWER_INCREMENT = 0.6;
+    private static final double POWER_INCREMENT = 0.4;  // amount W/S changes power
     private static final double ANGLE_INCREMENT = 0.25;
     private static final double POWER_SCALE = 0.05;
 
     private double currentPower = 20.0;
     private Vector2 gravity = new Vector2(0, -0.03); // Reduced gravity for water
     private double angle = 45.0;
-    private double Tries;
     private double score;
 
     private List<Shape> shapes = new ArrayList<>();
@@ -66,23 +65,31 @@ public class Level7Renderer implements GLEventListener, GameLoop {
         GL2 gl = glAutoDrawable.getGL().getGL2();
         gl.glClearColor(0.1f, 0.3f, 0.6f, 1); // Ocean blue
 
+        // change these values to match that size.
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
         gl.glOrtho(0, 800, 0, 600, -1, 1);
 
+        // --- INPUT BINDINGS (small increments, only when not launched) ---
         actionManager.bind(Input.A, () -> {
             if (!isLaunched) angle = (angle + ANGLE_INCREMENT) % 360;
+
         });
         actionManager.bind(Input.D, () -> {
             if (!isLaunched) angle = (angle - ANGLE_INCREMENT + 360) % 360;
+
         });
         actionManager.bind(Input.W, () -> {
             if (!isLaunched) setCurrentPower(currentPower + POWER_INCREMENT);
+
         });
         actionManager.bind(Input.S, () -> {
             if (!isLaunched) setCurrentPower(currentPower - POWER_INCREMENT);
+
         });
+
         actionManager.bind(Input.R, this::resetLevel);
+
         actionManager.bind(Input.Space, () -> {
             if (!isLaunched) {
                 isLaunched = true;
@@ -92,11 +99,11 @@ public class Level7Renderer implements GLEventListener, GameLoop {
                 entityUtils.updatePlayerVelocity(velocity);
             }
         });
-        actionManager.bind(Input.Escape, this::togglePause);
+
 
         // Player
         playerCircle = new Circle.Builder()
-                .color(new Color(1f, 0.8f, 0.2f)) // Yellow/orange
+                .color(Color.WHITE) // Yellow/orange
                 .radius(15)
                 .angle(0)
                 .center(new Point(100, 100))
@@ -114,7 +121,7 @@ public class Level7Renderer implements GLEventListener, GameLoop {
 
         // Boundaries
         Rectangle floor = new Rectangle.Builder()
-                .color(new Color(0.4f, 0.2f, 0.0f)) // Brown sand
+                .color(Color.RED) // Brown sand
                 .rotation(0)
                 .fill(true)
                 .origin(new Point(0, 0))
@@ -124,7 +131,7 @@ public class Level7Renderer implements GLEventListener, GameLoop {
                 .build();
 
         Rectangle ceiling = new Rectangle.Builder()
-                .color(Color.BLUE)
+                .color(Color.RED)
                 .rotation(0)
                 .fill(true)
                 .origin(new Point(0, 590))
@@ -134,7 +141,7 @@ public class Level7Renderer implements GLEventListener, GameLoop {
                 .build();
 
         Rectangle leftWall = new Rectangle.Builder()
-                .color(Color.BLUE)
+                .color(Color.RED)
                 .rotation(0)
                 .fill(true)
                 .origin(new Point(0, 0))
@@ -144,7 +151,7 @@ public class Level7Renderer implements GLEventListener, GameLoop {
                 .build();
 
         Rectangle rightWall = new Rectangle.Builder()
-                .color(Color.BLUE)
+                .color(Color.RED)
                 .rotation(0)
                 .fill(true)
                 .origin(new Point(790, 0))
@@ -299,7 +306,6 @@ public class Level7Renderer implements GLEventListener, GameLoop {
     private void checkDie() {
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
-            Tries++;
             resetLevel();
         }
     }

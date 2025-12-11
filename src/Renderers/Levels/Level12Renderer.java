@@ -29,7 +29,7 @@ public class Level12Renderer implements GLEventListener, GameLoop {
     private Rectangle goalRectangle;
     // Tunables
     private static final double MAX_POWER = 200.0;
-    private static final double POWER_INCREMENT = 0.6;
+    private static final double POWER_INCREMENT = 0.4;  // amount W/S changes power
     private static final double ANGLE_INCREMENT = 0.25;
     private static final double POWER_SCALE = 0.05;
 
@@ -74,23 +74,31 @@ public class Level12Renderer implements GLEventListener, GameLoop {
         GL2 gl = glAutoDrawable.getGL().getGL2();
         gl.glClearColor(0.3f, 0.3f, 0.3f, 1); // Factory gray
 
+        // change these values to match that size.
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
         gl.glOrtho(0, 800, 0, 600, -1, 1);
 
+        // --- INPUT BINDINGS (small increments, only when not launched) ---
         actionManager.bind(Input.A, () -> {
             if (!isLaunched) angle = (angle + ANGLE_INCREMENT) % 360;
+
         });
         actionManager.bind(Input.D, () -> {
             if (!isLaunched) angle = (angle - ANGLE_INCREMENT + 360) % 360;
+
         });
         actionManager.bind(Input.W, () -> {
             if (!isLaunched) setCurrentPower(currentPower + POWER_INCREMENT);
+
         });
         actionManager.bind(Input.S, () -> {
             if (!isLaunched) setCurrentPower(currentPower - POWER_INCREMENT);
+
         });
+
         actionManager.bind(Input.R, this::resetLevel);
+
         actionManager.bind(Input.Space, () -> {
             if (!isLaunched) {
                 isLaunched = true;
@@ -100,7 +108,7 @@ public class Level12Renderer implements GLEventListener, GameLoop {
                 entityUtils.updatePlayerVelocity(velocity);
             }
         });
-        actionManager.bind(Input.Escape, this::togglePause);
+
 
         // Player (metal ball)
         playerCircle = new Circle.Builder()

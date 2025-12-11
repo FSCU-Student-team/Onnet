@@ -13,8 +13,9 @@ Members of the team:-
 
 
 How to use this project:
+- Please check that you have JDK 16 or newer (we have in our project Records & Enums that don't supported till JDK 15)
 - clone the library into the default idea folders you have, not any nested folders inside of it, so relative paths work as expected
-- go to run, press run configurations,and set VM options to the command you will find in Main class, that's crucial for the project to work, qnd set Main as main file
+- go to run, press run configurations, and set VM options to the command you will find in Main class, that's crucial for the project to work, and set Main as main file
 
  
 Components of this project explained:

@@ -40,18 +40,30 @@ public record Color(double r, double g, double b, double a) {
     }
 
     public Color(String hex) {
+        // Validate and parse in a helper method
+        this(parseAndValidateHex(hex));
+    }
+
+    // Private static helper method
+    private static double[] parseAndValidateHex(String hex) {
+        // Validate
         if (!hex.matches("^#[A-Fa-f0-9]{6}([A-Fa-f0-9]{2})?$")) {
             throw new IllegalArgumentException("Invalid hex color: " + hex);
         }
 
-        this(
-                parseHex(hex, 0),
-                parseHex(hex, 2),
-                parseHex(hex, 4),
-                hex.length() == 9 ? parseHex(hex, 6) : 1.0
-        );
+        // Parse
+        double r = parseHex(hex, 0);
+        double g = parseHex(hex, 2);
+        double b = parseHex(hex, 4);
+        double a = hex.length() == 9 ? parseHex(hex, 6) : 1.0;
+
+        return new double[]{r, g, b, a};
     }
 
+    // Private constructor for the array
+    private Color(double[] rgba) {
+        this(rgba[0], rgba[1], rgba[2], rgba[3]);
+    }
     //helper method, takes a hex string and returns a double between 0 and 1
     private static double parseHex(String hex, int start) {
         return Integer.parseInt(hex.substring(1 + start, 3 + start), 16) / 255.0;
