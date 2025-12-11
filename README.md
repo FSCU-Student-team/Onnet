@@ -111,11 +111,17 @@ you will find a few options
 - Exit
 - Levels
 - Leaderboard
+
 all are self explanatory
+
 Continue leaves the popup menu and continues whatever is going on
+
 Return to main menu returns to main menu
+
 Exit exits the program (not before jumpscaring you with another popup to make sure that you are sure)
+
 Leaderboard shows the leaderboard
+
 Levels shows all levels
 
 in the end, we've all learned a lot from this project as a whole, and if you reach the end of this readme file totally not skimming through the whole file, It was of great fun to work on this project, I always prefer projects than quizzes.
