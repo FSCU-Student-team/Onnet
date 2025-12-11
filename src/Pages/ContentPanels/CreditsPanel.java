@@ -53,8 +53,8 @@ public class CreditsPanel extends JPanel {
                         "Handled sound system and multiple high-quality levels. Responsible for most of the sound effects."},
                 {"Abdelrahman Osama (2327133)", "Roles: Developer - Level designer",
                         "Implemented gravity, launch and aiming physics. Created multiple high-quality levels."},
-                {"Ahmed Reda (2327492)", "Roles: Developer - Level designer",
-                        "Responsible for loading page quality, multiple high-quality levels. Contributed to project routing."},
+                {"Ahmed Reda (2327492)", "Roles: Developer - Levels designer & Logic Contributor",
+                        "Responsible for loading page quality & pause menu, Created multiple high-quality levels. Contributed to project routing."},
                 {"Yousef Atef (2327471)", "Roles: Developer - Level designer",
                         "Contributed to GUI foundations and produced several levels."}
         };
