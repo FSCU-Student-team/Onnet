@@ -24,6 +24,10 @@ public class Level extends JPanel {
     private void addMenuButton() {
         menuBtn = new MenuButton(this);
         menuBtn.setBounds(694, 30, 100, 50);
+        menuBtn.setBackground(new Color(200, 50, 50));
+        menuBtn.setForeground(Color.WHITE);
+        menuBtn.setFocusPainted(false);
+        menuBtn.setFont(new Font("Arial", Font.BOLD, 16));
         add(menuBtn);
 
         // Add listener for the menu button itself
