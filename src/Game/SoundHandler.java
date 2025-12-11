@@ -118,7 +118,7 @@ public class SoundHandler {
 
             AudioInputStream in = AudioSystem.getAudioInputStream(file);
             Clip clip = AudioSystem.getClip();
-            clip.open(in);
+            clip.open(in);if(sound.equals("Sounds/memphis-trap-wav-349366.wav")) { clip.loop(Clip.LOOP_CONTINUOUSLY);}
 
             final TrackedClip tc = new TrackedClip(clip);
 

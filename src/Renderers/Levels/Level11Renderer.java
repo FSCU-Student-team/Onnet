@@ -61,7 +61,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
     private final double ORBIT_SPEED = 0.01; // Speed of rotation
     private final Point CENTER_POINT = new Point(430, 250); // Center of Black Hole
 
-    private final double BLACK_HOLE_GRAVITY_STRENGTH = 800.0;
+    private final double BLACK_HOLE_GRAVITY_STRENGTH = 900.0;
 
     public Level11Renderer(InputManager inputManager) {
         this.inputManager = inputManager;
@@ -83,19 +83,19 @@ public class Level11Renderer implements GLEventListener, GameLoop {
         // --- INPUT BINDINGS (small increments, only when not launched) ---
         actionManager.bind(Input.A, () -> {
             if (!isLaunched) angle = (angle + ANGLE_INCREMENT) % 360;
-            System.out.println(angle);
+
         });
         actionManager.bind(Input.D, () -> {
             if (!isLaunched) angle = (angle - ANGLE_INCREMENT + 360) % 360;
-            System.out.println(angle);
+
         });
         actionManager.bind(Input.W, () -> {
             if (!isLaunched) setCurrentPower(currentPower + POWER_INCREMENT);
-            System.out.println(currentPower);
+
         });
         actionManager.bind(Input.S, () -> {
             if (!isLaunched) setCurrentPower(currentPower - POWER_INCREMENT);
-            System.out.println(currentPower);
+
         });
 
         actionManager.bind(Input.R, this::resetLevel);

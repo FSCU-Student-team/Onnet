@@ -1,7 +1,6 @@
 package Pages;
 
-import Game.InMenuPopup;
-import Game.SoundHandler;
+import Pages.ContentPanels.InMenuPopup;
 import Pages.ContentPanels.MainMenuPanel;
 import Pages.ContentPanels.LevelSelectPanel;
 import Pages.ContentPanels.LeaderboardPanel;
