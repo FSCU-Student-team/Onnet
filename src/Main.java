@@ -102,7 +102,7 @@ public class Main {
 
         // Start SPA
         app.init();
-        // to make error messages appeared as red & JOGL shutdown messages as white
+        // to make pre-error messages appeared as red, post-error messages & JOGL shutdown messages as white
         System.setErr(filteredErr);
     }
 
