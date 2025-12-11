@@ -29,7 +29,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
     private static final double MAX_POWER = 100.0;
     private static final double POWER_INCREMENT = 0.6;
     private static final double ANGLE_INCREMENT = 0.25;
-    private static final double POWER_SCALE = 0.09;
+    private static final double POWER_SCALE = 0.03;
 
     private double currentPower = 20.0;
     private Vector2 gravity = new Vector2(-0.0, -0.0); // Zero gravity in space
