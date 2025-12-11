@@ -97,7 +97,7 @@ public class Level4Renderer implements GLEventListener, GameLoop {
             }
         });
 
-        actionManager.bind(Input.Escape, this::togglePause);
+
         timeElapsed = System.currentTimeMillis();
         // shapes
         // player: start near bottom-left
