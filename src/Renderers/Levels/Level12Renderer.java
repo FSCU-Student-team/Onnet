@@ -417,13 +417,14 @@ public class Level12Renderer implements GLEventListener, GameLoop {
             else
                 gl.glColor3f(1f, 0f, 0f);
 
-            double len = Math.max(30, currentPower * 0.4);
+            double len = Math.max(10, currentPower * 0.4); // visual length; tweak multiplier if desired
+            double radius = playerCircle.getWidth() / 2.0;
             double rad = Math.toRadians(angle);
-            double x1 = playerCircle.getCenter().x();
-            double y1 = playerCircle.getCenter().y();
+            double x1 = playerCircle.getCenter().x() + radius * Math.cos(rad);
+            double y1 = playerCircle.getCenter().y() + radius * Math.sin(rad);
             double x2 = x1 + len * Math.cos(rad);
             double y2 = y1 + len * Math.sin(rad);
-
+            
             gl.glVertex2d(x1, y1);
             gl.glVertex2d(x2, y2);
             gl.glEnd();
