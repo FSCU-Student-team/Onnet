@@ -26,8 +26,8 @@ public class Level11Renderer implements GLEventListener, GameLoop {
     private Rectangle goalRectangle;
 
     // Tunables
-    private static final double MAX_POWER = 50.0;
-    private static final double POWER_INCREMENT = 0.6;
+    private static final double MAX_POWER = 200.0;
+    private static final double POWER_INCREMENT = 0.4;  // amount W/S changes power
     private static final double ANGLE_INCREMENT = 0.25;
     private static final double POWER_SCALE = 0.05;
 
@@ -35,6 +35,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
     private Vector2 gravity = new Vector2(-0.0, -0.0); // Zero gravity in space
     private double angle = 45.0;
     private double score;
+    private double Tries;
 
     private long timeElapsed;
     private TextRenderer textRenderer;
@@ -258,9 +259,9 @@ public class Level11Renderer implements GLEventListener, GameLoop {
     }
 
     private void checkDie() {
-        // If player hits the black hole or other hazards
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
+            Tries++;
             resetLevel();
         }
     }
@@ -269,7 +270,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
             score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
-            LeaderboardHandler.save(11, new LeaderboardEntry(GlobalVariables.playerName, score));
+            LeaderboardHandler.save(1, new LeaderboardEntry(GlobalVariables.playerName, score));
             timeElapsed = System.currentTimeMillis();
         }
     }
