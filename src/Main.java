@@ -2,10 +2,16 @@ import Game.GlobalVariables;
 import Game.InputManager;
 import Pages.*;
 import Pages.ContentPanels.*;
+import Pages.ContentPanels.LeaderboardPanel;
+import Pages.ContentPanels.Level;
+import Pages.ContentPanels.LevelSelectPanel;
+import Pages.ContentPanels.MainMenuPanel;
 import Renderers.Levels.*;
 import Renderers.MenuBackground;
 import com.jogamp.opengl.awt.GLJPanel;
+import Pages.ContentPanels.LoadingPanel;
 
+import javax.swing.*;
 import java.lang.reflect.Field;
 
 
@@ -69,13 +75,20 @@ public class Main {
 
         }
 
-        levelPanel.setBackButtonAction(() -> {
+        levelPanel.setMenuButtonAction(() -> {
             openLevel(-1);
             app.setContent(levelSelectPanel);
         });
         leaderboardPanel.setBackAction(() -> app.setContent(mainMenuPanel));
+
+        // Create level panel
+        levelPanel = new Level(sharedCanvas);
+
         // Show initial panel
         app.setContent(mainMenuPanel);
+
+        // Pass panel references to SPA
+        app.setPanels(mainMenuPanel, levelSelectPanel, leaderboardPanel);
 
         // Start SPA
         app.init();
@@ -100,6 +113,18 @@ public class Main {
      * Open a level by swapping the renderer
      */
     private static void openLevel(int i) {
+
+        // Show the single shared level panel
+        app.setContent(levelPanel);
+
+        // Set up navigation actions
+        setupNavigation();
+
+        // CRITICAL: Give focus back to canvas
+        SwingUtilities.invokeLater(() -> {
+            levelPanel.getCanvas().requestFocusInWindow();
+        });
+
         switch (i) {
             case -1 -> app.setLevelRenderer(new MenuBackground(inputManager));
             case 0 -> app.setLevelRenderer(new Level1Renderer(inputManager));
@@ -116,8 +141,6 @@ public class Main {
             case 11 -> app.setLevelRenderer(new Level12Renderer(inputManager));
             default -> throw new IllegalArgumentException("No renderer for level " + i);
         }
-        // Show the single shared level panel
-        app.setContent(levelPanel);
     }
 
     private static GLJPanel createSharedCanvas() {
@@ -152,5 +175,28 @@ public class Main {
         }
 
 
+    }
+
+    private static void setupNavigation() {
+        // Main Menu actions
+        mainMenuPanel.setLevelsButtonAction(() -> app.setContent(levelSelectPanel));
+
+        // Level Select actions
+        levelSelectPanel.setBackButtonAction(() -> app.setContent(mainMenuPanel));
+
+        // Level panel actions
+        levelPanel.setMenuButtonAction(() -> {
+            openLevel(-1); // Go back to menu background
+            app.setContent(levelSelectPanel);
+        });
+
+
+        // Set menu actions for the level panel
+        levelPanel.setMenuActions(
+                () -> app.setContent(mainMenuPanel),      // Main Menu
+                () -> app.setContent(levelSelectPanel),   // Levels
+                () -> app.setContent(leaderboardPanel),   // Leaderboard
+                () -> System.exit(0)                      // Exit
+        );
     }
 }
