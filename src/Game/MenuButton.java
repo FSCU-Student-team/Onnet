@@ -14,7 +14,9 @@ public class MenuButton extends JButton {
 
         setFont(new Font("Arial", Font.BOLD, 14));
         setBounds(694, 30, 100, 50); // Standard position
-
+        setBackground(new Color(200, 50, 50));
+        setForeground(Color.WHITE);
+        setFocusPainted(false);
         setFocusable(false); // Don't steal focus
 
         // Store focus before opening menu
