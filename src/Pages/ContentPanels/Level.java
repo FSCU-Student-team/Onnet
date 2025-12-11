@@ -1,6 +1,5 @@
 package Pages.ContentPanels;
 
-import Game.MenuButton;
 import com.jogamp.opengl.awt.GLJPanel;
 
 import javax.swing.*;

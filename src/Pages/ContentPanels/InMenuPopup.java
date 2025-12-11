@@ -1,8 +1,9 @@
-package Game;
+package Pages.ContentPanels;
+
+import Game.SoundHandler;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
 public class InMenuPopup extends JPanel {
     private JButton leaderboardBtn;
