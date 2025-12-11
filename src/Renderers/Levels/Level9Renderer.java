@@ -76,19 +76,19 @@ public class Level9Renderer implements GLEventListener, GameLoop {
         // --- INPUT BINDINGS (small increments, only when not launched) ---
         actionManager.bind(Input.A, () -> {
             if (!isLaunched) angle = (angle + ANGLE_INCREMENT) % 360;
-            System.out.println(angle);
+
         });
         actionManager.bind(Input.D, () -> {
             if (!isLaunched) angle = (angle - ANGLE_INCREMENT + 360) % 360;
-            System.out.println(angle);
+
         });
         actionManager.bind(Input.W, () -> {
             if (!isLaunched) setCurrentPower(currentPower + POWER_INCREMENT);
-            System.out.println(currentPower);
+
         });
         actionManager.bind(Input.S, () -> {
             if (!isLaunched) setCurrentPower(currentPower - POWER_INCREMENT);
-            System.out.println(currentPower);
+
         });
 
         actionManager.bind(Input.R, this::resetLevel);
@@ -109,13 +109,13 @@ public class Level9Renderer implements GLEventListener, GameLoop {
                 .color(Color.WHITE)
                 .radius(15)
                 .angle(0)
-                .center(new Point(100, 100))
+                .center(new Point(100, 100)) // start pos
                 .filled(true)
                 .build();
 
         // Goal
         goalRectangle = new Rectangle.Builder()
-                .color(Color.BLUE)
+                .color(Color.YELLOW)
                 .width(40)
                 .height(40)
                 .fill(false)
@@ -291,23 +291,27 @@ public class Level9Renderer implements GLEventListener, GameLoop {
     @Override
     public void renderUpdate(GL2 gl) {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
+        // Draw all shapes
         for (Shape shape : shapes) {
             shape.draw(gl);
         }
 
+        // Aim line (visible only before launch). Length scales with currentPower.
         if (!isLaunched) {
             gl.glBegin(GL2.GL_LINES);
-            if ((currentPower / MAX_POWER) * 100 <= 30)
+            // use white (or whatever color your shapes use)
+            if ((currentPower / MAX_POWER) * 100 <= 30)//green
                 gl.glColor3f(0f, 1f, 0f);
-            else if ((currentPower / MAX_POWER) * 100 <= 70)
+            else if ((currentPower / MAX_POWER) * 100 <= 70)//Yellow
                 gl.glColor3f(1f, 1f, 0f);
-            else
+            else if ((currentPower / MAX_POWER) * 100 >= 70)//red
                 gl.glColor3f(1f, 0f, 0f);
 
-            double len = Math.max(30, currentPower * 0.4);
+            double len = Math.max(10, currentPower * 0.4); // visual length; tweak multiplier if desired
+            double radius = playerCircle.getWidth() / 2.0;
             double rad = Math.toRadians(angle);
-            double x1 = playerCircle.getCenter().x();
-            double y1 = playerCircle.getCenter().y();
+            double x1 = playerCircle.getCenter().x() + radius * Math.cos(rad);
+            double y1 = playerCircle.getCenter().y() + radius * Math.sin(rad);
             double x2 = x1 + len * Math.cos(rad);
             double y2 = y1 + len * Math.sin(rad);
 
@@ -317,8 +321,6 @@ public class Level9Renderer implements GLEventListener, GameLoop {
         }
 
         gl.glPopMatrix();
-        entityUtils.allowBounceSounds();
-
         if (isWon) {
             textRenderer = new TextRenderer(new Font("Monospaced", Font.BOLD, 60));
             textRenderer.beginRendering(800, 600);
@@ -329,6 +331,9 @@ public class Level9Renderer implements GLEventListener, GameLoop {
 
             textRenderer.endRendering();
         }
+
+        // play any bounce sounds queued by entityUtils
+        entityUtils.allowBounceSounds();
     }
 
     @Override
