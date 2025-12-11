@@ -27,6 +27,7 @@ public class SinglePageApplication implements Page {
     private LeaderboardPanel leaderboardPanel;
     private InMenuPopup globalMenu;
     private JButton globalMenuBtn;
+    private Runnable onExitLevel; // Callback to reset renderer when leaving a level
 
     public SinglePageApplication(GLJPanel sharedCanvas, String title) {
         this.canvas = sharedCanvas;
@@ -213,6 +214,7 @@ public class SinglePageApplication implements Page {
         globalMenu.setOnMainMenu(() -> {
             // Return to main menu
             if (mainMenuPanel != null) {
+                if (onExitLevel != null) onExitLevel.run(); // Reset renderer
                 setContent(mainMenuPanel);
                 globalMenu.hideMenu();
             }
@@ -221,6 +223,7 @@ public class SinglePageApplication implements Page {
         globalMenu.setOnLevels(() -> {
             // Go to level selection
             if (levelSelectPanel != null) {
+                if (onExitLevel != null) onExitLevel.run(); // Reset renderer
                 setContent(levelSelectPanel);
                 globalMenu.hideMenu();
             }
@@ -229,6 +232,7 @@ public class SinglePageApplication implements Page {
         globalMenu.setOnLeaderboard(() -> {
             // Go to leaderboard
             if (leaderboardPanel != null) {
+                if (onExitLevel != null) onExitLevel.run(); // Reset renderer
                 setContent(leaderboardPanel);
                 globalMenu.hideMenu();
             }
@@ -261,6 +265,11 @@ public class SinglePageApplication implements Page {
         this.levelSelectPanel = levelSelect;
         this.leaderboardPanel = leaderboard;
     }
+
+    public void setOnExitLevel(Runnable callback) {
+        this.onExitLevel = callback;
+    }
+
     private void makeMenuMouseOnly() {
         // Disable focus for all menu-related components
         if (globalMenuBtn != null) {

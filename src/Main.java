@@ -100,6 +100,9 @@ public class Main {
         // Pass panel references to SPA
         app.setPanels(mainMenuPanel, levelSelectPanel, leaderboardPanel);
 
+        // Set callback to reset renderer when exiting a level
+        app.setOnExitLevel(() -> app.setLevelRenderer(new MenuBackground(inputManager)));
+
         // Start SPA
         app.init();
         // to make pre-error messages appeared as red, post-error messages & JOGL shutdown messages as white
@@ -205,7 +208,7 @@ public class Main {
 
         // Set menu actions for the level panel
         levelPanel.setMenuActions(
-                () -> app.setContent(mainMenuPanel),      // Main Menu
+                () -> {app.setContent(mainMenuPanel);},      // Main Menu
                 () -> app.setContent(levelSelectPanel),   // Levels
                 () -> app.setContent(leaderboardPanel),   // Leaderboard
                 () -> System.exit(0)                      // Exit
