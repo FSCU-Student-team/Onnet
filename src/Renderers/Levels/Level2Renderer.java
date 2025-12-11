@@ -28,7 +28,7 @@ public class Level2Renderer implements GLEventListener, GameLoop {
 
     // Tunables
     private static final double MAX_POWER = 200.0;      // max "power" the player can set
-    private static final double POWER_INCREMENT = 0.6;  // amount W/S changes power
+    private static final double POWER_INCREMENT = 0.4;  // amount W/S changes power
     private static final double ANGLE_INCREMENT = 0.25;  // degrees per A/D press
     private static final double POWER_SCALE = 0.05;     // converts "power" -> velocity (pixels per physics step)
     // lower = slower launch, raise to speed up
