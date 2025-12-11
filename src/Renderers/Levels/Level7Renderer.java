@@ -103,7 +103,7 @@ public class Level7Renderer implements GLEventListener, GameLoop {
 
         // Player
         playerCircle = new Circle.Builder()
-                .color(new Color(1f, 0.8f, 0.2f)) // Yellow/orange
+                .color(Color.WHITE) // Yellow/orange
                 .radius(15)
                 .angle(0)
                 .center(new Point(100, 100))
@@ -121,7 +121,7 @@ public class Level7Renderer implements GLEventListener, GameLoop {
 
         // Boundaries
         Rectangle floor = new Rectangle.Builder()
-                .color(new Color(0.4f, 0.2f, 0.0f)) // Brown sand
+                .color(Color.RED) // Brown sand
                 .rotation(0)
                 .fill(true)
                 .origin(new Point(0, 0))
@@ -131,7 +131,7 @@ public class Level7Renderer implements GLEventListener, GameLoop {
                 .build();
 
         Rectangle ceiling = new Rectangle.Builder()
-                .color(Color.BLUE)
+                .color(Color.RED)
                 .rotation(0)
                 .fill(true)
                 .origin(new Point(0, 590))
@@ -141,7 +141,7 @@ public class Level7Renderer implements GLEventListener, GameLoop {
                 .build();
 
         Rectangle leftWall = new Rectangle.Builder()
-                .color(Color.BLUE)
+                .color(Color.RED)
                 .rotation(0)
                 .fill(true)
                 .origin(new Point(0, 0))
@@ -151,7 +151,7 @@ public class Level7Renderer implements GLEventListener, GameLoop {
                 .build();
 
         Rectangle rightWall = new Rectangle.Builder()
-                .color(Color.BLUE)
+                .color(Color.RED)
                 .rotation(0)
                 .fill(true)
                 .origin(new Point(790, 0))

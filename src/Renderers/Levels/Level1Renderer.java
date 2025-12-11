@@ -111,8 +111,8 @@ public class Level1Renderer implements GLEventListener, GameLoop {
         // goal
         goalRectangle = new Rectangle.Builder()
                 .color(Color.YELLOW)
-                .width(30)
-                .height(30)
+                .width(45)
+                .height(45)
                 .fill(false)
                 .origin(new Point(700, 120))
                 .build();
@@ -132,7 +132,7 @@ public class Level1Renderer implements GLEventListener, GameLoop {
                 .color(Color.RED)
                 .rotation(0)
                 .fill(true)
-                .origin(new Point(0, 600))
+                .origin(new Point(0, 590))
                 .restitution(0.0)
                 .width(1000)
                 .height(10)

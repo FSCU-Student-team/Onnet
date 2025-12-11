@@ -1,6 +1,5 @@
 package Pages.ContentPanels;
 
-import Game.GreyOverlayPanel;
 import com.jogamp.opengl.awt.GLJPanel;
 
 import javax.swing.*;
