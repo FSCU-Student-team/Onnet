@@ -191,6 +191,10 @@ public class SinglePageApplication implements Page {
     private void addGlobalMenu() {
         // Create global menu button
         globalMenuBtn = new JButton("Menu");
+        globalMenuBtn.setBackground(new Color(200, 50, 50));
+        globalMenuBtn.setForeground(Color.WHITE);
+        globalMenuBtn.setFocusPainted(false);
+        globalMenuBtn.setFont(new Font("Arial", Font.BOLD, 16));
         globalMenuBtn.setBounds(694, 30, 100, 50);
         glassPane.add(globalMenuBtn);
 
