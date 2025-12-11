@@ -58,7 +58,7 @@ public class InstructionsPanel extends JPanel {
                 "W/S to adjust the launching force",
                 "Spacebar to launch",
                 "R to reset the level",
-                "Escape to pause",
+                "Click (Menu) Button to show pause menu",
                 "Avoid hitting red objects",
                 "Win by reaching the Yellow target (hollow rectangle shaped)",
                 "Some objects bounce",
