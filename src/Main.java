@@ -12,6 +12,7 @@ import com.jogamp.opengl.awt.GLJPanel;
 import Pages.ContentPanels.LoadingPanel;
 
 import javax.swing.*;
+import java.io.PrintStream;
 import java.lang.reflect.Field;
 
 
@@ -34,6 +35,18 @@ public class Main {
     private static CreditsPanel creditsPanel;
 
     public static void main(String[] args) {
+        // Make error messages appear as normal white output
+        PrintStream filteredErr = new PrintStream(System.out) {
+            @Override
+            public void println(String x) {
+                // Remove "ERROR" label from JOGL messages
+                if (x != null && (x.contains("X11Util") || x.contains("Shutdown"))) {
+                    x = "[System] " + x;
+                }
+                super.println(x);
+            }
+        };
+        System.setErr(filteredErr);
 
         //exporting steps, please ignore
 
