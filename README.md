@@ -16,6 +16,7 @@ How to use this project:
 - Please check that you have JDK 23 or newer (we have in our project Records & Enums that don't supported till JDK 15)
 - clone the library into the default idea folders you have, not any nested folders inside of it, so relative paths work as expected, or else you will receive path not found exceptions
 - basically do not nest this project inside of another project
+- if you are using linux, please use an english keyboard or else inputs won't work
 
  
 Components of this project explained:
@@ -29,11 +30,11 @@ Components of this project explained:
 - `LoopState`: contains information about current frame time and last frame time to calculate deltaTime, used in `GameLoop`
 
 ## Physics
-- `RandomUtils`: contains utilities for randomization od doubles, vectors, points and so on
+- `RandomUtils`: contains utilities for randomization of doubles, vectors, points and so on
 - `ActionHandler`: uses Hashmap to bind the  `Input`enum to the `Action` interface, checking for inputs pressed every second and executing the Action's `execute` method mapped inside the Hashmap
 ### Physics/Collisions
 - `Collider`: uses a pattern I think called neighbor pattern to support intersecting methods for all shapes for all children (It's a permutation of possibilities), also supports the get MTV function, MTV standing for. `Minimum transition Vector`, what is does is incase of physics failing and penetration happening between two objects, the hitter object is moved by an MTV amount ensuring it doesn't penetrate the other object
-- `CircleCollider`: a child class if fhe Collider interface, the circle in this class is the hitter, the collide method checks for types, if circle then do collision circle to circle and calculate MTV, if rectangle do the rectangle intersection algorithm and so on, there are classes like this too for multiple different shapes... neighbor pattern
+- `CircleCollider`: a child class if fhe Collider interface, the circle in this class is the hitter, the collide method checks for types, if circle then do collision circle to circle and calculate MTV, if rectangle do the rectangle intersection algorithm and so on, there are classes like this too for multiple different shapes... NEIGHBOR PATTERN!!!!
 - `AABB`: stands for Axis-Aligned boundary box, which as the names implies represents the boundaries of any shape used for collision alforithms
 - `MTVResult`: a helper record (Immutable class) that is used in particular to support MTV finding algorithms
 - There exists other colliders but they are designed to be collided with not to collide (as the only controllable object in this game is the player's circle)
@@ -89,14 +90,18 @@ tells you the controls, your target, what should you avoid touching or else you 
 Credits every developer that worked on the project, and shows their roles
 
 ### Levels
-opens a panel filled with levels, notice that for in all cases no matter where you will go the Menu button will keep ominously staying on the top right
+opens a panel filled with levels, notice that for in all cases no matter where you will go the Menu button will keep ominously staying on the top right, also notice that every time you enter the levels panel it will jumpscare you with a popup asking for your name, if you provide nothing, it will default to 'Player'
+
 upon entering a level, the level loads, there are three possibilities
 - you get stuck
 - you win
-- you die
+- you literally die (ingame)
+
 if you get stuck, that's intended behavior because some maps are designed to have traps, if you find yourself in one, just press R, it doesn't reset your timer and your score keeps going down, so don't worry, you are actively losing score
-if you die, you reset, same as above the score doesn't reset
-if you win, you get a winning screen, a few people clapping for you, and your score viewed (whether that's a good or bad thing), you can still press R to restart if you get a shameful score, but don't worry this shameful score is stored in the leaderboard forever (unless you modify the txt files which is cheating by the way)
+
+if you die (ingame), you reset, same as above the score doesn't reset
+
+if you win, you get a winning screen, a few people clapping for you, and your score viewed (whether that's a good or bad thing), you can still press R to restart if you get a shameful score, the score will reset back to full, but don't worry this shameful score is stored in the leaderboard forever (unless you modify the txt files which is cheating by the way)
 
 ### Menu
 for the elephant in the room, the menu button, when you win a level, your only way to return and pick another level is to head for the menu and go to levels
@@ -106,6 +111,17 @@ you will find a few options
 - Exit
 - Levels
 - Leaderboard
+
 all are self explanatory
+
+Continue leaves the popup menu and continues whatever is going on
+
+Return to main menu returns to main menu
+
+Exit exits the program (not before jumpscaring you with another popup to make sure that you are sure)
+
+Leaderboard shows the leaderboard
+
+Levels shows all levels
 
 in the end, we've all learned a lot from this project as a whole, and if you reach the end of this readme file totally not skimming through the whole file, It was of great fun to work on this project, I always prefer projects than quizzes.
