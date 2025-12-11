@@ -1,6 +1,6 @@
 # Onnet
 
-A game built on an Java OpenGL based game engine
+A student project game built on an Java OpenGL based game engine
 
 For subject Computer graphics (CS304)
 
