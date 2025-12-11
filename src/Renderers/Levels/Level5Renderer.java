@@ -43,7 +43,6 @@ public class Level5Renderer implements GLEventListener, GameLoop {
     private boolean isDead = false;
 
     private Vector2 velocity = new Vector2(0, 0);
-    private double Tries;
     private double score = 0;
 
     private long timeElapsed;
@@ -307,7 +306,7 @@ public class Level5Renderer implements GLEventListener, GameLoop {
     private void checkDie() {
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
-            Tries++;
+
             resetLevel();
         }
     }

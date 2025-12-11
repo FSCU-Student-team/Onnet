@@ -37,7 +37,6 @@ public class Level6Renderer implements GLEventListener, GameLoop {
     private double currentPower = 50.0;   // sensible default
     private Vector2 gravity = new Vector2(0, -0.05); // tuned for visible arc (you can lower magnitude if too fast)
     private double angle = 45.0;// degrees (0 -> right, 90 -> up)
-    private double Tries;
     private double score;
 
     private long timeElapsed;
@@ -336,7 +335,6 @@ public class Level6Renderer implements GLEventListener, GameLoop {
         // placeholder: you can check overlap with red rectangles here and set isDead
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
-            Tries += 1;
             resetLevel();
 
         }
