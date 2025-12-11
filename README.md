@@ -94,6 +94,7 @@ upon entering a level, the level loads, there are three possibilities
 - you get stuck
 - you win
 - you die
+
 if you get stuck, that's intended behavior because some maps are designed to have traps, if you find yourself in one, just press R, it doesn't reset your timer and your score keeps going down, so don't worry, you are actively losing score
 
 if you die, you reset, same as above the score doesn't reset
