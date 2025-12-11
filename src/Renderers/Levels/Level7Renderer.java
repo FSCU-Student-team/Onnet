@@ -100,7 +100,7 @@ public class Level7Renderer implements GLEventListener, GameLoop {
                 entityUtils.updatePlayerVelocity(velocity);
             }
         });
-        actionManager.bind(Input.Escape, this::togglePause);
+
 
         // Player
         playerCircle = new Circle.Builder()

@@ -97,7 +97,7 @@ public class Level5Renderer implements GLEventListener, GameLoop {
             }
         });
 
-        actionManager.bind(Input.Escape, this::togglePause);
+
 
         // shapes
         // player: start near bottom-left

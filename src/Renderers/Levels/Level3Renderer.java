@@ -96,7 +96,7 @@ public class Level3Renderer implements GLEventListener, GameLoop {
             }
         });
 
-        actionManager.bind(Input.Escape, this::togglePause);
+
 
         // SHAPES
         playerCircle = new Circle.Builder()
