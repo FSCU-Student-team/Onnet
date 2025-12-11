@@ -26,7 +26,7 @@ public class Level8Renderer implements GLEventListener, GameLoop {
     private Rectangle goalRectangle;
     // Tunables
     private static final double MAX_POWER = 200.0;
-    private static final double POWER_INCREMENT = 0.6;
+    private static final double POWER_INCREMENT = 0.4;  // amount W/S changes power
     private static final double ANGLE_INCREMENT = 0.25;
     private static final double POWER_SCALE = 0.05;
 
