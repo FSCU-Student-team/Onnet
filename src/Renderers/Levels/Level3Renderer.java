@@ -122,7 +122,7 @@ public class Level3Renderer implements GLEventListener, GameLoop {
 
         Rectangle ceiling = new Rectangle.Builder()
                 .color(Color.RED).fill(true)
-                .origin(new Point(0, 600))
+                .origin(new Point(0, 590))
                 .width(1000).height(10)
                 .build();
 
