@@ -151,14 +151,14 @@ public class Main {
             case 0 -> app.setLevelRenderer(new Level1Renderer(inputManager));
             case 1 -> app.setLevelRenderer(new Level2Renderer(inputManager));
             case 2 -> app.setLevelRenderer(new Level3Renderer(inputManager));
-            case 3 -> app.setLevelRenderer(new Level4Renderer(inputManager));
+            case 3 -> app.setLevelRenderer(new Level9Renderer(inputManager));
             case 4 -> app.setLevelRenderer(new Level5Renderer(inputManager));
-            case 5 -> app.setLevelRenderer(new Level6Renderer(inputManager));
-            case 6 -> app.setLevelRenderer(new Level7Renderer(inputManager));
-            case 7 -> app.setLevelRenderer(new Level8Renderer(inputManager));
-            case 8 -> app.setLevelRenderer(new Level9Renderer(inputManager));
+            case 5 -> app.setLevelRenderer(new Level4Renderer(inputManager));
+            case 6 -> app.setLevelRenderer(new Level6Renderer(inputManager));
+            case 7 -> app.setLevelRenderer(new Level7Renderer(inputManager));
+            case 8 -> app.setLevelRenderer(new Level11Renderer(inputManager));
             case 9 -> app.setLevelRenderer(new Level10Renderer(inputManager));
-            case 10 -> app.setLevelRenderer(new Level11Renderer(inputManager));
+            case 10 -> app.setLevelRenderer(new Level8Renderer(inputManager));
             case 11 -> app.setLevelRenderer(new Level12Renderer(inputManager));
             default -> throw new IllegalArgumentException("No renderer for level " + i);
         }
