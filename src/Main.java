@@ -1,5 +1,6 @@
 import Game.GlobalVariables;
 import Game.InputManager;
+import Game.SoundHandler;
 import Pages.*;
 import Pages.ContentPanels.*;
 import Pages.ContentPanels.LeaderboardPanel;
@@ -101,12 +102,17 @@ public class Main {
         app.setPanels(mainMenuPanel, levelSelectPanel, leaderboardPanel);
 
         // Set callback to reset renderer when exiting a level
-        app.setOnExitLevel(() -> app.setLevelRenderer(new MenuBackground(inputManager)));
+        app.setOnExitLevel(() -> {
+            SoundHandler.stopAll();
+            SoundHandler.play("Sounds/memphis-trap-wav-349366.wav", 0.8);
+            app.setLevelRenderer(new MenuBackground(inputManager));
+        });
 
         // Start SPA
         app.init();
         // to make pre-error messages appeared as red, post-error messages & JOGL shutdown messages as white
         System.setErr(filteredErr);
+        SoundHandler.play("Sounds/memphis-trap-wav-349366.wav", 0.8);
     }
 
     /**
@@ -208,9 +214,18 @@ public class Main {
 
         // Set menu actions for the level panel
         levelPanel.setMenuActions(
-                () -> {app.setContent(mainMenuPanel);},      // Main Menu
-                () -> app.setContent(levelSelectPanel),   // Levels
-                () -> app.setContent(leaderboardPanel),   // Leaderboard
+                () -> {
+                    SoundHandler.stopAll();
+                    app.setContent(mainMenuPanel);
+                },      // Main Menu
+                () -> {
+                    SoundHandler.stopAll();
+                    app.setContent(levelSelectPanel);
+                    },   // Levels
+                () -> {
+                    SoundHandler.stopAll();
+                    app.setContent(leaderboardPanel);
+                },   // Leaderboard
                 () -> System.exit(0)                      // Exit
         );
     }
