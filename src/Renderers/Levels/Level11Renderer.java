@@ -27,7 +27,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
 
     // Tunables
     private static final double MAX_POWER = 100.0;
-    private static final double POWER_INCREMENT = 0.6;
+    private static final double POWER_INCREMENT = 0.4;
     private static final double ANGLE_INCREMENT = 0.25;
     private static final double POWER_SCALE = 0.03;
 
