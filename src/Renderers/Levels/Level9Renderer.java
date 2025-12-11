@@ -29,8 +29,8 @@ public class Level9Renderer implements GLEventListener, GameLoop {
     private boolean platformMovingRight = true;
     // Tunables
     private static final double MAX_POWER = 200.0;
-    private static final double POWER_INCREMENT = .5;
-    private static final double ANGLE_INCREMENT = 0.1;
+    private static final double POWER_INCREMENT = .6;
+    private static final double ANGLE_INCREMENT = 0.25;
     private static final double POWER_SCALE = 0.05;
 
 
@@ -272,6 +272,7 @@ public class Level9Renderer implements GLEventListener, GameLoop {
             isWon = true;
             score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
             LeaderboardHandler.save(9, new LeaderboardEntry(GlobalVariables.playerName, score));
+            System.currentTimeMillis();
         }
     }
 
