@@ -35,15 +35,24 @@ public class Main {
     private static CreditsPanel creditsPanel;
 
     public static void main(String[] args) {
+        // Make JOGL Shutdown messages appear as normal white output
+        PrintStream filteredErr = new PrintStream(System.out) {
+            @Override
+            public void println(String x) {
+                // Remove "ERROR" label from JOGL messages
+                if (x != null && (x.contains("X11Util") || x.contains("Shutdown"))) {
+                    x = "[System] " + x;
+                }
+                super.println(x);
+            }
+        };
 
         //exporting steps, please ignore
-
         exportOS();
 
         inputManager = new InputManager();
         // Create shared GLJPanel
         sharedCanvas = createSharedCanvas();
-
         // Single frame SPA
         app = new SinglePageApplication(sharedCanvas, "Onnet");
 
@@ -93,6 +102,8 @@ public class Main {
 
         // Start SPA
         app.init();
+        // to make error messages appeared as red & JOGL shutdown messages as white
+        System.setErr(filteredErr);
     }
 
     /**
