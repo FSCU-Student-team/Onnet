@@ -22,6 +22,7 @@ public class Level6Renderer implements GLEventListener, GameLoop {
     private ActionManager actionManager;
     private LoopState loopState;
     private EntityUtils entityUtils = new EntityUtils();
+     private Rectangle rotatingObstacle3;
     private Circle playerCircle;
     private Rectangle goalRectangle;
     private Rectangle movingPlatform;
@@ -166,7 +167,7 @@ public class Level6Renderer implements GLEventListener, GameLoop {
                 .build();
 
         // moving platform
-        movingPlatform = new Rectangle.Builder()
+            movingPlatform = new Rectangle.Builder()
                 .color(Color.CYAN)
                 .rotation(0)
                 .fill(true)
@@ -175,6 +176,17 @@ public class Level6Renderer implements GLEventListener, GameLoop {
                 .width(150)
                 .height(20)
                 .build();
+
+        rotatingObstacle3  = new Rectangle.Builder()
+                .color(Color.GREEN)
+                .rotation(60)
+                .fill(true)
+                .origin(new Point(415, 400))
+                .restitution(0.7)
+                .width(20)
+                .height(120)
+                .build();
+
 
         // bouncing obstacle circle
         bouncingCircle = new Circle.Builder()
@@ -216,6 +228,7 @@ public class Level6Renderer implements GLEventListener, GameLoop {
                 .addPoint(new Point(600, 250))
                 .build();
 
+
         // IMPORTANT: don't add playerCircle to entityUtils shapes list (avoid self-collision)
         entityUtils.addShape(goalRectangle);
         entityUtils.addShape(floor);
@@ -226,6 +239,7 @@ public class Level6Renderer implements GLEventListener, GameLoop {
         entityUtils.addShape(bouncingCircle);
         entityUtils.addShape(obstacle1);
         entityUtils.addShape(obstacle2);
+        entityUtils.addShape(rotatingObstacle3);
         entityUtils.addShape(ramp);
 
         // set up entity utils with starting velocity and gravity
@@ -244,6 +258,7 @@ public class Level6Renderer implements GLEventListener, GameLoop {
         shapes.add(bouncingCircle);
         shapes.add(obstacle1);
         shapes.add(obstacle2);
+        shapes.add(rotatingObstacle3);
         shapes.add(ramp);
 
         timeElapsed = System.currentTimeMillis();
@@ -274,7 +289,7 @@ public class Level6Renderer implements GLEventListener, GameLoop {
     @Override
     public void physicsUpdate() {
         inputUpdate();
-
+        rotatingObstacle3.rotate(60 / 360.0);
         // platform moves left/right
         movingPlatform.move(new Vector2((platformMovingRight ? platformSpeed : -platformSpeed) * GameLoop.PHYSICS_STEP, 0));
         if (movingPlatform.getCenter().x() > 715) platformMovingRight = false;
