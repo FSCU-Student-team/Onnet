@@ -12,7 +12,8 @@ public class EntityUtils {
     private Vector2 playerVelocity = new Vector2(0, 0);
     private List<Shape> shapes = new ArrayList<>();
 
-    private static final String[] bounceSounds = {"Sounds/bounce.wav"};
+    private static final String[] bounceSounds = {"Sounds/mixkit-light-impact-on-the-ground-2070.wav",
+    "Sounds/bounce.wav"};
 
     private boolean allowSounds;
 
@@ -78,9 +79,11 @@ public class EntityUtils {
     }
 
     private void playBounceSound(double restitution) {
-        if (restitution >= 0) {
-            SoundHandler.play(bounceSounds[0], 0.7);
-        } //TODO: ADD DIFFERENT SOUNDS DEPENDING ON RESTITUTION VALUE
+        if (restitution >= 0 && restitution < 0.6) {
+            SoundHandler.play(bounceSounds[0], 1.2);
+        } else if (restitution >= 0.6){
+            SoundHandler.play(bounceSounds[1], 0.8);
+        }
     }
 
     public boolean checkPlayerDying(Circle playerCircle) {
@@ -115,6 +118,7 @@ public class EntityUtils {
                 double dy = pY - closestY;
 
                 if ((Math.sqrt(dx * dx + dy * dy)) < (pRadius)) {
+                    SoundHandler.play("Sounds/Voicy_Geometry Dash Death Sound.wav");
                     return true;
                 }
             }
@@ -143,6 +147,10 @@ public class EntityUtils {
         double dx = pX - closestX;
         double dy = pY - closestY;
 
-        return (dx * dx + dy * dy) < (pRadius * pRadius);
+        if ((dx * dx + dy * dy) < (pRadius * pRadius)) {
+            SoundHandler.play("Sounds/mixkit-conference-audience-clapping-strongly-476.wav");
+            return true;
+        }
+        return false;
     }
 }
