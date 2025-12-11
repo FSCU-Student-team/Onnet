@@ -12,7 +12,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
-public class SinglePageApplication implements Page {
+public class SinglePageApplication{
 
     private final JFrame frame;
     private final GLJPanel canvas;
@@ -87,7 +87,6 @@ public class SinglePageApplication implements Page {
         glassPane.repaint();
     }
 
-    @Override
     public void init() {
         setupFrame();
         addComponents();
@@ -95,7 +94,6 @@ public class SinglePageApplication implements Page {
         setupAnimator();
     }
 
-    @Override
     public void setupFrame() {
         // Show frame and buttons first
         frame.setVisible(true);
@@ -109,7 +107,6 @@ public class SinglePageApplication implements Page {
         });
     }
 
-    @Override
     public void setupAnimator() {
         if (canvas != null && (animator == null || !animator.isStarted())) {
             animator = new FPSAnimator(canvas, 60);
@@ -118,53 +115,25 @@ public class SinglePageApplication implements Page {
         }
     }
 
-    @Override
     public void addComponents() {
         // content and overlay already added in constructor
     }
 
-    @Override
     public void addListeners() {
         // override in child pages or add listeners to components
     }
 
-    @Override
     public void handleEvents(ActionEvent e) {
         // override in child pages
     }
 
-    @Override
     public void dispose() {
         if (animator != null && animator.isStarted()) animator.stop();
         frame.dispose();
     }
 
-    @Override
-    public boolean isVisible() {
-        return frame.isVisible();
-    }
-
-    @Override
-    public void setVisible(boolean b) {
-        frame.setVisible(b);
-    }
-
-    @Override
-    public void redraw() {
-        if (canvas != null) canvas.display();
-    }
-
-    @Override
     public JFrame getFrame() {
         return frame;
-    }
-
-    public JPanel getContentPanel() {
-        return contentPanel;
-    }
-
-    public JPanel getGlassPanePanel() {
-        return glassPane;
     }
 
     //sets new level renderer
