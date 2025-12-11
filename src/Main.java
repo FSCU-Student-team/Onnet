@@ -178,7 +178,6 @@ public class Main {
 
         private static void setupNavigation() {
         // Main Menu actions
-        mainMenuPanel.setPlayButtonAction(() -> openLevel(0));
         mainMenuPanel.setLevelsButtonAction(() -> app.setContent(levelSelectPanel));
 
         // Level Select actions
