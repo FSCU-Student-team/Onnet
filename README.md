@@ -72,3 +72,40 @@ includes the txt files used for saving, each level with its own file thus its ow
 Note: we could've used JSON, but that would require an external library named GSON and without Maven or Gradle it will be hard to do that, and making our own JSON reader/writer is way beyond the scope of the projecy
 
 
+
+# The journey
+this is the first project our university requested for us, and it was the first chance we were to work as a team, I am proud of the product we came out with, but there is one thing I haven't explained, how to use the app
+
+## How to use the app
+Upon starting the app, you will notice 6 things, a ball that bounces in the background, a menu button on the top right, credits, instructions, levels and leaderboard on the middle
+
+### Leaderboard
+inside you will notice a lot of things, a button for each level, a back button, and an ominous menu button still lingering on the top right, each level has its own leaderboard as described, when there are no scores, it shows that there are no leaderboard entries for the level with a gray-ish screen, that's intended behavior
+
+### Instructions
+tells you the controls, your target, what should you avoid touching or else you will die (ingame) and how score is calculated
+
+### Credits
+Credits every developer that worked on the project, and shows their roles
+
+### Levels
+opens a panel filled with levels, notice that for in all cases no matter where you will go the Menu button will keep ominously staying on the top right
+upon entering a level, the level loads, there are three possibilities
+- you get stuck
+- you win
+- you die
+if you get stuck, that's intended behavior because some maps are designed to have traps, if you find yourself in one, just press R, it doesn't reset your timer and your score keeps going down, so don't worry, you are actively losing score
+if you die, you reset, same as above the score doesn't reset
+if you win, you get a winning screen, a few people clapping for you, and your score viewed (whether that's a good or bad thing), you can still press R to restart if you get a shameful score, but don't worry this shameful score is stored in the leaderboard forever (unless you modify the txt files which is cheating by the way)
+
+### Menu
+for the elephant in the room, the menu button, when you win a level, your only way to return and pick another level is to head for the menu and go to levels
+you will find a few options
+- Continue
+- Return to main menu
+- Exit
+- Levels
+- Leaderboard
+all are self explanatory
+
+in the end, we've all learned a lot from this project as a whole, and if you reach the end of this readme file totally not skimming through the whole file, It was of great fun to work on this project, I always prefer projects than quizzes.
