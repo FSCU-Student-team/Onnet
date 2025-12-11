@@ -27,7 +27,7 @@ public class Level3Renderer implements GLEventListener, GameLoop {
 
     // Tunables
     private static final double MAX_POWER = 200.0;
-    private static final double POWER_INCREMENT = 0.6;
+    private static final double POWER_INCREMENT = 0.4;  // amount W/S changes power
     private static final double ANGLE_INCREMENT = 0.25;
     private static final double POWER_SCALE = 0.05;
 
@@ -43,6 +43,7 @@ public class Level3Renderer implements GLEventListener, GameLoop {
 
     private Vector2 velocity = new Vector2(0, 0);
     private double score = 0;
+    private double Tries;
 
     private long timeElapsed;  // NEW — timer for scoring
 
@@ -255,15 +256,15 @@ public class Level3Renderer implements GLEventListener, GameLoop {
     private void checkDie() {
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
-            resetLevel(); // immediate reset, no tries, no losing
+            Tries++;
+            resetLevel();
         }
     }
 
     private void checkWin() {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
-            long time = System.currentTimeMillis() - timeElapsed;
-            score = Math.max(100000 - time, 0);
+            score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
             LeaderboardHandler.save(3, new LeaderboardEntry(GlobalVariables.playerName, score));
             timeElapsed = System.currentTimeMillis();
         }
