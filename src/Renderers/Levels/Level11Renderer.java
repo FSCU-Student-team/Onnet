@@ -60,7 +60,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
     private final double ORBIT_SPEED = 0.01; // Speed of rotation
     private final Point CENTER_POINT = new Point(430, 250); // Center of Black Hole
 
-    private final double BLACK_HOLE_GRAVITY_STRENGTH = 200.0;
+    private final double BLACK_HOLE_GRAVITY_STRENGTH = 400.0;
 
     public Level11Renderer(InputManager inputManager) {
         this.inputManager = inputManager;
@@ -288,8 +288,8 @@ public class Level11Renderer implements GLEventListener, GameLoop {
             double radius = playerCircle.getWidth() / 2.0;
             double x1 = playerCircle.getCenter().x() + radius * Math.cos(rad);
             double y1 = playerCircle.getCenter().y() + radius * Math.sin(rad);
-            double x2 = x1 + 15 + len * Math.cos(rad);
-            double y2 = y1 + 15 + len * Math.sin(rad);
+            double x2 = x1 + 10 + len * Math.cos(rad);
+            double y2 = y1 + 10 + len * Math.sin(rad);
 
             gl.glVertex2d(x1, y1);
             gl.glVertex2d(x2, y2);
