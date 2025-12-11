@@ -50,7 +50,6 @@ public class Level9Renderer implements GLEventListener, GameLoop {
     private TextRenderer textRenderer;
     private double score;
     private long timeElapsed;
-    private double Tries;
 
     // Level 9 specific: Ice platforms (low friction)
     private Rectangle icePlatform1;
@@ -274,7 +273,6 @@ public class Level9Renderer implements GLEventListener, GameLoop {
         // placeholder: you can check overlap with red rectangles here and set isDead
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
-            Tries += 1;
             resetLevel();
         }
     }

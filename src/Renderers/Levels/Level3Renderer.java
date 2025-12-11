@@ -43,7 +43,6 @@ public class Level3Renderer implements GLEventListener, GameLoop {
 
     private Vector2 velocity = new Vector2(0, 0);
     private double score = 0;
-    private double Tries;
 
     private long timeElapsed;  // NEW — timer for scoring
 
@@ -256,7 +255,6 @@ public class Level3Renderer implements GLEventListener, GameLoop {
     private void checkDie() {
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
-            Tries++;
             resetLevel();
         }
     }

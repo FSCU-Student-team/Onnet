@@ -34,7 +34,6 @@ public class Level7Renderer implements GLEventListener, GameLoop {
     private double currentPower = 20.0;
     private Vector2 gravity = new Vector2(0, -0.03); // Reduced gravity for water
     private double angle = 45.0;
-    private double Tries;
     private double score;
 
     private List<Shape> shapes = new ArrayList<>();
@@ -307,7 +306,6 @@ public class Level7Renderer implements GLEventListener, GameLoop {
     private void checkDie() {
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
-            Tries++;
             resetLevel();
         }
     }

@@ -33,7 +33,6 @@ public class Level8Renderer implements GLEventListener, GameLoop {
     private double currentPower = 50.0;
     private Vector2 gravity = new Vector2(0, -0.05);
     private double angle = 45.0;
-    private double Tries;
     private double score;
 
     private long timeElapsed;
@@ -309,7 +308,6 @@ public class Level8Renderer implements GLEventListener, GameLoop {
         // placeholder: you can check overlap with red rectangles here and set isDead
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
-            Tries++;
             resetLevel();
         }
     }
