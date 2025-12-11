@@ -1,7 +1,5 @@
 package Game;
 
-import Pages.Page;
-
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 

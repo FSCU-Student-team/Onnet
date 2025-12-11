@@ -1,1 +1,1 @@
-Player:97543,teracura:95562,tera:88056,Player:87927,Player:85669,tera:85188,Player:83589,Player:82019,tera:81346,tera:72735,tera:56382
+Player:97609,Player:97543,Player:97239,Player:97160,Player:96742,Player:95726,teracura:95562,Player:95038,Player:94007,Player:92963,Player:92062,Player:91438,Player:90664,tera:88056,Player:87927,Player:85906,Player:85669,tera:85188,Player:84872,Player:83589,Player:82019,tera:81346,tera:72735,tera:56382
