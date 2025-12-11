@@ -35,7 +35,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
     private Vector2 gravity = new Vector2(-0.0, -0.0); // Zero gravity in space
     private double angle = 45.0;
     private double score;
-    private double Tries;
+
 
     private long timeElapsed;
     private TextRenderer textRenderer;
@@ -261,7 +261,6 @@ public class Level11Renderer implements GLEventListener, GameLoop {
     private void checkDie() {
         if (entityUtils.checkPlayerDying(playerCircle)) {
             isDead = true;
-            Tries++;
             resetLevel();
         }
     }
