@@ -28,7 +28,7 @@ public class Level1Renderer implements GLEventListener, GameLoop {
     // Tunables
     private static final double MAX_POWER = 200.0;      // max "power" the player can set
     private static final double POWER_INCREMENT = 0.4;  // amount W/S changes power
-    private static final double ANGLE_INCREMENT = 0.25;  // degrees per A/D press
+    private static final double ANGLE_INCREMENT = 0.2;  // degrees per A/D press
     private static final double POWER_SCALE = 0.05;     // converts "power" -> velocity (pixels per physics step)
     // lower = slower launch, raise to speed up
 
@@ -69,19 +69,19 @@ public class Level1Renderer implements GLEventListener, GameLoop {
         // --- INPUT BINDINGS (small increments, only when not launched) ---
         actionManager.bind(Input.A, () -> {
             if (!isLaunched) angle = (angle + ANGLE_INCREMENT) % 360;
-            System.out.println(angle);
+
         });
         actionManager.bind(Input.D, () -> {
             if (!isLaunched) angle = (angle - ANGLE_INCREMENT + 360) % 360;
-            System.out.println(angle);
+
         });
         actionManager.bind(Input.W, () -> {
             if (!isLaunched) setCurrentPower(currentPower + POWER_INCREMENT);
-            System.out.println(currentPower);
+
         });
         actionManager.bind(Input.S, () -> {
             if (!isLaunched) setCurrentPower(currentPower - POWER_INCREMENT);
-            System.out.println(currentPower);
+
         });
 
         actionManager.bind(Input.R, this::resetLevel);
