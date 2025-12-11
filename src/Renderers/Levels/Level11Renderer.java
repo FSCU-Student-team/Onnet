@@ -60,7 +60,7 @@ public class Level11Renderer implements GLEventListener, GameLoop {
     private final double ORBIT_SPEED = 0.01; // Speed of rotation
     private final Point CENTER_POINT = new Point(430, 250); // Center of Black Hole
 
-    private final double BLACK_HOLE_GRAVITY_STRENGTH = 900.0;
+    private final double BLACK_HOLE_GRAVITY_STRENGTH = 400.0;
 
     public Level11Renderer(InputManager inputManager) {
         this.inputManager = inputManager;
