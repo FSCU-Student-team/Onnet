@@ -70,19 +70,19 @@ public class Level10Renderer implements GLEventListener, GameLoop {
         // --- INPUT BINDINGS (small increments, only when not launched) ---
         actionManager.bind(Input.A, () -> {
             if (!isLaunched) angle = (angle + ANGLE_INCREMENT) % 360;
-            System.out.println(angle);
+
         });
         actionManager.bind(Input.D, () -> {
             if (!isLaunched) angle = (angle - ANGLE_INCREMENT + 360) % 360;
-            System.out.println(angle);
+
         });
         actionManager.bind(Input.W, () -> {
             if (!isLaunched) setCurrentPower(currentPower + POWER_INCREMENT);
-            System.out.println(currentPower);
+
         });
         actionManager.bind(Input.S, () -> {
             if (!isLaunched) setCurrentPower(currentPower - POWER_INCREMENT);
-            System.out.println(currentPower);
+
         });
 
         actionManager.bind(Input.R, this::resetLevel);
