@@ -93,13 +93,13 @@ opens a panel filled with levels, notice that for in all cases no matter where y
 upon entering a level, the level loads, there are three possibilities
 - you get stuck
 - you win
-- you die
+- you literally die (ingame)
 
 if you get stuck, that's intended behavior because some maps are designed to have traps, if you find yourself in one, just press R, it doesn't reset your timer and your score keeps going down, so don't worry, you are actively losing score
 
 if you die, you reset, same as above the score doesn't reset
 
-if you win, you get a winning screen, a few people clapping for you, and your score viewed (whether that's a good or bad thing), you can still press R to restart if you get a shameful score, but don't worry this shameful score is stored in the leaderboard forever (unless you modify the txt files which is cheating by the way)
+if you win, you get a winning screen, a few people clapping for you, and your score viewed (whether that's a good or bad thing), you can still press R to restart if you get a shameful score, the score will reset back to full, but don't worry this shameful score is stored in the leaderboard forever (unless you modify the txt files which is cheating by the way)
 
 ### Menu
 for the elephant in the room, the menu button, when you win a level, your only way to return and pick another level is to head for the menu and go to levels
