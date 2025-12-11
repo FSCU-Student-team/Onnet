@@ -125,3 +125,5 @@ Leaderboard shows the leaderboard
 Levels shows all levels
 
 in the end, we've all learned a lot from this project as a whole, and if you reach the end of this readme file totally not skimming through the whole file, It was of great fun to work on this project, I always prefer projects than quizzes.
+
+video: https://youtu.be/-J24kzDO9qU
