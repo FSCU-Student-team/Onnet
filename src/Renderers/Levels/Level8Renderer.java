@@ -316,7 +316,7 @@ public class Level8Renderer implements GLEventListener, GameLoop {
         if (entityUtils.checkPlayerWinning(playerCircle, goalRectangle)) {
             isWon = true;
             score = Math.max(100000 - (System.currentTimeMillis() - timeElapsed), 0);
-            LeaderboardHandler.save(8, new LeaderboardEntry(GlobalVariables.playerName, score));
+            LeaderboardHandler.save(11, new LeaderboardEntry(GlobalVariables.playerName, score));
             timeElapsed = System.currentTimeMillis();
         }
     }
