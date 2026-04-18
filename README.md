@@ -6,7 +6,7 @@ For subject Computer graphics (CS304)
 
 Members of the team:-
 - Teracura (عبدالله عاطف عبدالله) - code: 2327220
-- wizard1625 (عبدالرحمن اسامة) - code: 2327133
+- AbdelrahmanOsama243 (عبدالرحمن اسامة) - code: 2327133
 - helmy9999 (محمد حلمى) - code: 2328158
 - yousefAtef00 (يوسف عاطف) - code: 2327471
 - areda04 (احمد رضا احمد) - code: 2327492
